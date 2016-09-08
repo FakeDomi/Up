@@ -10,7 +10,6 @@ namespace domi1819.Crypto
         private const int RsaPrivateParamCount = 8;
         private const int RsaPublicParamCount = 2;
         private const int RsaParamLengthSize = 4;
-        private const string RsaHeader = "RSAKEY4-";
 
         public static void GenerateKeyPair(string privateKeyFile, string publicKeyFile, int keySize)
         {
@@ -19,44 +18,83 @@ namespace domi1819.Crypto
                 RSAParameters rsaParams = rsaCryptoProvider.ExportParameters(true);
                 byte[][] keyParams = { rsaParams.Modulus, rsaParams.Exponent, rsaParams.P, rsaParams.Q, rsaParams.DP, rsaParams.DQ, rsaParams.InverseQ, rsaParams.D };
                 byte[] sizes = new byte[RsaParamLengthSize];
-                byte[] header = Encoding.UTF8.GetBytes(RsaHeader);
 
                 using (FileStream privateKeyWriter = new FileStream(privateKeyFile, FileMode.Create, FileAccess.Write))
                 {
-                    privateKeyWriter.Write(header, 0, header.Length);
-                    privateKeyWriter.WriteByte(10);
+                    int index = 0;
+                    
                     Split(keySize, sizes);
-                    privateKeyWriter.Write(sizes, 0, sizes.Length);
-                    privateKeyWriter.WriteByte(0x01);
 
+                    WriteFormatted(0x01, ref index, privateKeyWriter);
+                    WriteFormatted(sizes, ref index, privateKeyWriter);
+                    
                     foreach (byte[] param in keyParams)
                     {
                         Split(param.Length, sizes);
-                        privateKeyWriter.Write(sizes, 0, sizes.Length);
-                        privateKeyWriter.Write(param, 0, param.Length);
+
+                        WriteFormatted(sizes, ref index, privateKeyWriter);
+                        WriteFormatted(param, ref index, privateKeyWriter);
                     }
                 }
 
                 using (FileStream publicKeyWriter = new FileStream(publicKeyFile, FileMode.Create, FileAccess.Write))
                 {
-                    publicKeyWriter.Write(header, 0, header.Length);
+                    int index = 0;
+                    
                     Split(keySize, sizes);
-                    publicKeyWriter.Write(sizes, 0, sizes.Length);
-                    publicKeyWriter.WriteByte(0x00);
+                    
+                    WriteFormatted(0x00, ref index, publicKeyWriter);
+                    WriteFormatted(sizes, ref index, publicKeyWriter);
 
                     for (int i = 0; i < RsaPublicParamCount; i++)
                     {
                         Split(keyParams[i].Length, sizes);
-                        publicKeyWriter.Write(sizes, 0, sizes.Length);
-                        publicKeyWriter.Write(keyParams[i], 0, keyParams[i].Length);
+
+                        WriteFormatted(sizes, ref index, publicKeyWriter);
+                        WriteFormatted(keyParams[i], ref index, publicKeyWriter);
                     }
                 }
             }
         }
 
-        private void WriteFormatted(byte[] data, ref int index)
+        private static void WriteFormatted(byte[] data, ref int index, Stream stream)
         {
-            
+            foreach (byte b in data)
+            {
+                if (index == 16)
+                {
+                    stream.WriteByte(10);
+                    index = 0;
+                }
+
+                stream.WriteByte(GetHexChar(b >> 4));
+                stream.WriteByte(GetHexChar(b));
+                stream.WriteByte(32);
+
+                index++;
+            }
+        }
+
+        private static void WriteFormatted(byte data, ref int index, FileStream stream)
+        {
+            if (index == 16)
+            {
+                stream.WriteByte(10);
+                index = 0;
+            }
+
+            stream.WriteByte(GetHexChar(data >> 4));
+            stream.WriteByte(GetHexChar(data));
+            stream.WriteByte(32);
+
+            index++;
+        }
+
+        private static byte GetHexChar(int value)
+        {
+            int loNibble = value & 0x0F;
+
+            return (byte)(loNibble + (loNibble < 10 ? 48 : 65 - 10));
         }
 
         public static RSACryptoServiceProvider GetProvider(string keyFilePath)
@@ -68,7 +106,7 @@ namespace domi1819.Crypto
             using (FileStream stream = new FileStream(keyFilePath, FileMode.Open, FileAccess.Read))
             {
                 byte[] size = new byte[RsaParamLengthSize];
-                byte[] header = new byte[RsaHeader.Length];
+                byte[] header = new byte[8];
 
                 stream.Read(header, 0, header.Length);
                 stream.Read(size, 0, size.Length);

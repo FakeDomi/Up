@@ -37,15 +37,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="StorageExplorer\DoubleBufferedDataGridView.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="StorageExplorer\FileIconCache.cs" />
     <Compile Include="Forms\AccountDetailsForm.cs">
       <SubType>Form</SubType>

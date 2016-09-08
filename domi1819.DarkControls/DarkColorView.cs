@@ -12,7 +12,6 @@ namespace domi1819.DarkControls
         private string text;
 
         private readonly ColorDialog colorDialog = new ColorDialog();
-
         private readonly Rectangle colorRectangle = new Rectangle(4, 4, 15, 15);
 
         public Color Color
@@ -39,6 +38,14 @@ namespace domi1819.DarkControls
                 this.RefreshLabelText();
             }
         }
+        public int GlowX => this.Location.X + this.DisplayRectangle.X;
+
+        public int GlowY => this.Location.Y + this.DisplayRectangle.Y;
+
+        public int GlowW => this.DisplayRectangle.Width;
+
+        public int GlowH => this.DisplayRectangle.Height;
+
 
         public event EventHandler ColorSelected;
 
@@ -61,26 +68,6 @@ namespace domi1819.DarkControls
             this.Color = DarkColors.StrongColor;
 
             this.colorDialog.CustomColors[1] = 0x1818C0;
-        }
-
-        public int GlowX
-        {
-            get { return this.Location.X + this.DisplayRectangle.X; }
-        }
-
-        public int GlowY
-        {
-            get { return this.Location.Y + this.DisplayRectangle.Y; }
-        }
-
-        public int GlowW
-        {
-            get { return this.DisplayRectangle.Width; }
-        }
-
-        public int GlowH
-        {
-            get { return this.DisplayRectangle.Height; }
         }
 
         protected override void OnPaint(PaintEventArgs e)

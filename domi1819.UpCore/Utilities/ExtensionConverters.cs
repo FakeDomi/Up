@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 
 namespace domi1819.UpCore.Utilities
 {
@@ -17,6 +18,11 @@ namespace domi1819.UpCore.Utilities
         public static string ToHex(this Color color)
         {
             return $"#{(color.A == 255 ? "" : color.A.ToHex())}{color.R.ToHex()}{color.G.ToHex()}{color.B.ToHex()}";
+        }
+
+        public static string FormatString(this DateTime dateTime)
+        {
+            return $"{dateTime.Year}-{dateTime.Month.Pad(2)}-{dateTime.Day.Pad(2)} {dateTime.Hour.Pad(2)}:{dateTime.Minute.Pad(2)}:{dateTime.Second.Pad(2)}";
         }
     }
 }

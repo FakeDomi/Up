@@ -94,5 +94,13 @@
         ///   Success? (bool)
         /// </summary>
         public const int DeleteFile = 8;
+
+        /// <summary>
+        /// Request:
+        ///   (Empty)
+        /// Response:
+        ///   Link format (string)
+        /// </summary>
+        public const int LinkFormat = 9;
     }
 }

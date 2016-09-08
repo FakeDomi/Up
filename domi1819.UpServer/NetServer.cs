@@ -22,11 +22,11 @@ namespace domi1819.UpServer
         private AutoResetEvent resetEvent;
         private RSACryptoServiceProvider rsaProvider;
         private ArrayPool<byte> messageBufferPool;
-        private ArrayPool<byte> fileBufferPool; 
+        private ArrayPool<byte> fileBufferPool;
         private Dictionary<string, UploadUnit> fileTransfersByKey;
         private byte encryptionMode;
         private bool shutdown;
-        
+
         internal void Start(int port, string privateKeyFile)
         {
             this.Port = port;
@@ -147,7 +147,7 @@ namespace domi1819.UpServer
                     CryptoStream inStream = new CryptoStream(stream, decryptor, CryptoStreamMode.Read);
                     user.InStream = inStream;
 
-                    MessageSerializer serializer = new MessageSerializer { Bytes = this.messageBufferPool.Get(), Stream = outStream};
+                    MessageSerializer serializer = new MessageSerializer { Bytes = this.messageBufferPool.Get(), Stream = outStream };
                     user.SerializeBuffer = serializer.Bytes;
 
                     MessageDeserializer deserializer = new MessageDeserializer { Bytes = this.messageBufferPool.Get(), Stream = inStream };
@@ -159,7 +159,7 @@ namespace domi1819.UpServer
                     serializer.WriteNextInt(deserializer.ReadNextInt() + 1);
                     serializer.WriteNextInt(Constants.Server.MinClientBuild);
                     serializer.Flush();
-                    
+
                     stream.ReadTimeout = Timeout.Infinite;
 
                     this.RunMessageLoop(serializer, deserializer, user);
@@ -179,7 +179,7 @@ namespace domi1819.UpServer
             finally
             {
                 Util.SafeDispose(user.OutStream, user.InStream, user.BaseStream, user.Encryptor, user.Decryptor);
-                
+
                 if (user.SerializeBuffer != null)
                 {
                     this.messageBufferPool.Return(user.SerializeBuffer);
@@ -480,6 +480,18 @@ namespace domi1819.UpServer
                         {
                             serializer.WriteNextBool(false);
                         }
+
+                        serializer.Flush();
+
+                        break;
+                    }
+                    case NetworkMethods.LinkFormat:
+                    {
+                        ServerConfigSettings settings = UpServer.Instance.Settings;
+
+                        serializer.Start(NetworkMethods.LinkFormat);
+                            
+                        serializer.WriteNextString($"{(string.IsNullOrEmpty(settings.OverrideAddress) ? $"http://{settings.HostName}{(settings.WebPort == 80 ? "" : $":{settings.WebPort}")}" : $"{settings.OverrideAddress}")}/d?{{0}}");
 
                         serializer.Flush();
 

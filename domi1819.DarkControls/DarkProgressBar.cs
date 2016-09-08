@@ -36,25 +36,13 @@ namespace domi1819.DarkControls
             }
         }
 
-        public int GlowX
-        {
-            get { return this.Location.X + this.DisplayRectangle.X; }
-        }
+        public int GlowX => this.Location.X + this.DisplayRectangle.X;
 
-        public int GlowY
-        {
-            get { return this.Location.Y + this.DisplayRectangle.Y; }
-        }
+        public int GlowY => this.Location.Y + this.DisplayRectangle.Y;
 
-        public int GlowW
-        {
-            get { return this.DisplayRectangle.Width; }
-        }
+        public int GlowW => this.DisplayRectangle.Width;
 
-        public int GlowH
-        {
-            get { return this.DisplayRectangle.Height; }
-        }
+        public int GlowH => this.DisplayRectangle.Height;
 
         public DarkProgressBar()
         {

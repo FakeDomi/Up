@@ -17,7 +17,21 @@ namespace domi1819.DarkControls
             get { return this.Text; }
             set { this.Text = value; }
         }
-        
+
+        public bool UseSystemPasswordChar
+        {
+            get { return this.textBox.UseSystemPasswordChar; }
+            set { this.textBox.UseSystemPasswordChar = value; }
+        }
+
+        public int GlowX => this.Location.X + this.DisplayRectangle.X;
+
+        public int GlowY => this.Location.Y + this.DisplayRectangle.Y;
+
+        public int GlowW => this.DisplayRectangle.Width;
+
+        public int GlowH => this.DisplayRectangle.Height;
+
         public DarkTextBox()
         {
             this.InitializeComponent();
@@ -32,12 +46,6 @@ namespace domi1819.DarkControls
 
             this.textBox.MouseEnter += (sender, args) => { this.OnMouseEnter(args); };
             this.textBox.MouseLeave += (sender, args) => { this.OnMouseLeave(args); };
-        }
-
-        public bool UseSystemPasswordChar
-        {
-            get { return this.textBox.UseSystemPasswordChar; }
-            set { this.textBox.UseSystemPasswordChar = value; }
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -86,26 +94,6 @@ namespace domi1819.DarkControls
                 parent.GlowComponent = null;
                 parent.Invalidate();
             }
-        }
-
-        public int GlowX
-        {
-            get { return this.Location.X + this.DisplayRectangle.X; }
-        }
-
-        public int GlowY
-        {
-            get { return this.Location.Y + this.DisplayRectangle.Y; }
-        }
-
-        public int GlowW
-        {
-            get { return this.DisplayRectangle.Width; }
-        }
-
-        public int GlowH
-        {
-            get { return this.DisplayRectangle.Height; }
         }
     }
 }

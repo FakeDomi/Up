@@ -7,6 +7,8 @@ namespace domi1819.DarkControls
     {
         public bool DisableGlow { get; set; }
 
+        internal IGlowComponent GlowComponent { get; set; }
+
         public DarkForm()
         {
             this.BackColor = DarkColors.Workspace;
@@ -14,8 +16,6 @@ namespace domi1819.DarkControls
 
             this.DoubleBuffered = true;
         }
-
-        internal IGlowComponent GlowComponent { get; set; }
 
         protected override void OnPaint(PaintEventArgs e)
         {

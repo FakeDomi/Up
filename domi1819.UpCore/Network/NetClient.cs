@@ -26,6 +26,8 @@ namespace domi1819.UpCore.Network
         public int Port { get; set; }
         public bool Connected { get; private set; }
 
+        public delegate bool AddItemCallback(string fileId, string fileName, long fileSize, DateTime updateDate, int downloads);
+
         public NetClient(string address, int port)
         {
             this.Address = address;
@@ -139,6 +141,11 @@ namespace domi1819.UpCore.Network
 
                 return this.deserializer.ReadNextBool();
             }
+        }
+
+        public bool Login(Config.Config config)
+        {
+            return this.Login(config.UserId, config.Password);
         }
 
         public StorageInfo GetStorageInfo()
@@ -257,6 +264,35 @@ namespace domi1819.UpCore.Network
             }
         }
 
+        public int ListFiles(AddItemCallback addItemCallback, int offset, DateTime fromDate, DateTime toDate, long fromSize, long toSize, string fileNameFilter, int filterMatchMode)
+        {
+            this.CheckConnected();
+
+            lock (this.messageLock)
+            {
+                this.serializer.Start(NetworkMethods.ListFiles);
+                this.serializer.WriteNextInt(offset);
+                this.serializer.WriteNextDateTime(fromDate);
+                this.serializer.WriteNextDateTime(toDate);
+                this.serializer.WriteNextLong(fromSize);
+                this.serializer.WriteNextLong(toSize);
+                this.serializer.WriteNextString(fileNameFilter);
+                this.serializer.WriteNextInt(filterMatchMode);
+                this.serializer.Flush();
+
+                this.deserializer.ReadMessage(NetworkMethods.ListFiles);
+
+                int maxRead = this.deserializer.ReadNextInt();
+
+                for (int i = 0; i < maxRead; i++)
+                {
+                    addItemCallback.Invoke(this.deserializer.ReadNextString(), this.deserializer.ReadNextString(), this.deserializer.ReadNextLong(), this.deserializer.ReadNextDateTime(), this.deserializer.ReadNextInt());
+                }
+
+                return this.deserializer.ReadNextInt();
+            }
+        }
+
         public bool DeleteFile(string fileId)
         {
             this.CheckConnected();
@@ -270,6 +306,21 @@ namespace domi1819.UpCore.Network
                 this.deserializer.ReadMessage(NetworkMethods.DeleteFile);
 
                 return this.deserializer.ReadNextBool();
+            }
+        }
+
+        public string GetLinkFormat()
+        {
+            this.CheckConnected();
+
+            lock (this.messageLock)
+            {
+                this.serializer.Start(NetworkMethods.LinkFormat);
+                this.serializer.Flush();
+
+                this.deserializer.ReadMessage(NetworkMethods.LinkFormat);
+
+                return this.deserializer.ReadNextString();
             }
         }
 

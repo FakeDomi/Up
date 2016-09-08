@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Windows.Forms;
 using domi1819.DarkControls;
 using domi1819.UpClient.StorageExplorer;
+using domi1819.UpCore.Network;
 
 namespace domi1819.UpClient.Forms
 {
@@ -14,10 +19,12 @@ namespace domi1819.UpClient.Forms
 
         private readonly FileIconCache icons = new FileIconCache();
 
-        private readonly BindingList<FileItem> files = new BindingList<FileItem>();
+        private readonly List<FileItem> files = new List<FileItem>();
 
         private readonly ToolStripItem itemCopyLink, itemCopyWithNames, itemOpenInBrowser, itemDelete;
         private readonly ContextMenuStrip contextMenu = new ContextMenuStrip();
+
+        private string linkFormat;
 
         internal StorageExplorerForm(UpClient upClient)
         {
@@ -26,17 +33,7 @@ namespace domi1819.UpClient.Forms
             this.uiDataGridView.GetType().InvokeMember("DoubleBuffered", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty, null, this.uiDataGridView, new object[] { true });
 
             this.upClient = upClient;
-
-            this.files.Add(new FileItem("aabbccdd", this.icons[".exe"], "runme.exe", "2.4 KB", "2016-08-22 13:37"));
-
-            this.uiDataGridView.DataSource = this.files;
-
-            this.uiDataGridView.Columns[0].Width = 16;
-            this.uiDataGridView.Columns[2].Width = 55;
-            this.uiDataGridView.Columns[3].Width = 110;
             
-            this.ResizeColumns();
-
             this.uiDataGridView.DefaultCellStyle.SelectionBackColor = DarkColors.StrongColor;
 
             this.upClient.ConfigurationForm.ThemeColorChanged += this.ConfigurationFormOnThemeColorChanged;
@@ -50,6 +47,8 @@ namespace domi1819.UpClient.Forms
             this.contextMenu.Items.Add(this.itemCopyWithNames);
             this.contextMenu.Items.Add(this.itemOpenInBrowser);
             this.contextMenu.Items.Add(this.itemDelete);
+
+            this.uiBackgroundWorker.RunWorkerAsync(upClient.NetClient);
         }
         
         protected override void OnResize(EventArgs e)
@@ -76,9 +75,23 @@ namespace domi1819.UpClient.Forms
             GC.Collect();
         }
 
+        private void Rebind()
+        {
+            this.uiDataGridView.DataSource = null;
+            this.uiDataGridView.DataSource = this.files;
+
+            this.uiDataGridView.Columns[0].Width = 16;
+            this.uiDataGridView.Columns[2].Width = 55;
+            this.uiDataGridView.Columns[3].Width = 45;
+            this.uiDataGridView.Columns[3].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+            this.uiDataGridView.Columns[4].Width = 110;
+
+            this.ResizeColumns();
+        }
+
         private void ResizeColumns()
         {
-            int otherColumns = this.uiDataGridView.Columns[0].Width + this.uiDataGridView.Columns[2].Width + this.uiDataGridView.Columns[3].Width;
+            int otherColumns = this.uiDataGridView.Columns[0].Width + this.uiDataGridView.Columns[2].Width + this.uiDataGridView.Columns[3].Width + this.uiDataGridView.Columns[4].Width;
             VScrollBar bar = this.uiDataGridView.Controls.OfType<VScrollBar>().First();
 
             if (bar.Visible)
@@ -107,18 +120,18 @@ namespace domi1819.UpClient.Forms
                         row.Selected = true;
                     }
 
-                    if (this.uiDataGridView.SelectedRows.Count > 1)
+                    if (this.uiDataGridView.SelectedRows.Count == 1)
                     {
                         this.itemCopyLink.Text = "Copy download link";
                         this.itemCopyWithNames.Text = "Copy link and file name";
-                        this.itemOpenInBrowser.Enabled = false;
+                        this.itemOpenInBrowser.Enabled = true;
                         this.itemDelete.Text = "Delete file";
                     }
                     else
                     {
                         this.itemCopyLink.Text = "Copy download links";
                         this.itemCopyWithNames.Text = "Copy links and file names";
-                        this.itemOpenInBrowser.Enabled = true;
+                        this.itemOpenInBrowser.Enabled = false;
                         this.itemDelete.Text = "Delete files";
                     }
 
@@ -137,34 +150,108 @@ namespace domi1819.UpClient.Forms
             this.uiDataGridView.Refresh();
         }
 
-        private void ItemCopyOnClick(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
         private void uiBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
+            BackgroundWorker worker = (BackgroundWorker)sender;
+            NetClient client = (NetClient)e.Argument;
+
+            this.files.Clear();
+
+            //try
+            //{
+                client.ClaimConnectHandle();
+
+            this.linkFormat = client.GetLinkFormat();
+
+            client.Login(this.upClient.Config);
+
+                client.ListFiles(this.AddItemCallback, 0, DateTime.MinValue, DateTime.MaxValue, 0, long.MaxValue, "", 0);
+
+                worker.ReportProgress(0);
+            //}
+            //catch (Exception)
+            //{
+            //    InfoForm.Show("Storage explorer", "Error while fetching file list.", 2500);
+            //}
+            
+            client.ReleaseConnectHandle();
+        }
+
+        private bool AddItemCallback(string fileId, string fileName, long fileSize, DateTime updateDate, int downloads)
+        {
+            this.files.Add(FileItem.Construct(fileId, fileName, fileSize, updateDate, downloads, this.icons));
+
+            return true;
+        }
+        
+        private void uiBackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            this.Rebind();
+        }
+
+        private void uiBackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
 
         }
 
-        private void uiBackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        private void ItemCopyOnClick(object sender, EventArgs e)
         {
+            StringBuilder builder = new StringBuilder();
+            bool first = true;
 
+            foreach (DataGridViewRow row in this.uiDataGridView.SelectedRows)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    builder.AppendLine();
+                }
+
+                builder.Append(string.Format(this.linkFormat, ((FileItem)row.DataBoundItem).Identifier));
+            }
+
+            Clipboard.SetText(builder.ToString());
         }
 
         private void ItemCopyWithNamesOnClick(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            StringBuilder builder = new StringBuilder();
+            bool first = true;
+
+            foreach (DataGridViewRow row in this.uiDataGridView.SelectedRows)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    builder.AppendLine();
+                }
+
+                FileItem item = (FileItem)row.DataBoundItem;
+
+                builder.Append(string.Format(this.linkFormat, item.Identifier));
+                builder.Append(" [");
+                builder.Append(item.Name);
+                builder.Append(']');
+            }
+
+            Clipboard.SetText(builder.ToString());
         }
 
         private void ItemOpenOnClick(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            FileItem file = (FileItem)this.uiDataGridView.SelectedRows[0].DataBoundItem;
+
+            Process.Start(string.Format(this.linkFormat, file.Identifier));
         }
 
         private void ItemDeleteOnClick(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
         }
     }
 }

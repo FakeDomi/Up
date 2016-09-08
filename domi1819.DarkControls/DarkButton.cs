@@ -5,6 +5,14 @@ namespace domi1819.DarkControls
 {
     public class DarkButton : Button, IGlowComponent
     {
+        public int GlowX => this.Location.X + this.DisplayRectangle.X;
+
+        public int GlowY => this.Location.Y + this.DisplayRectangle.Y;
+
+        public int GlowW => this.DisplayRectangle.Width;
+
+        public int GlowH => this.DisplayRectangle.Height;
+
         public DarkButton()
         {
             this.ForeColor = DarkColors.Foreground;
@@ -47,26 +55,6 @@ namespace domi1819.DarkControls
                 parent.GlowComponent = null;
                 parent.Invalidate();
             }
-        }
-
-        public int GlowX
-        {
-            get { return this.Location.X + this.DisplayRectangle.X; }
-        }
-
-        public int GlowY
-        {
-            get { return this.Location.Y + this.DisplayRectangle.Y; }
-        }
-
-        public int GlowW
-        {
-            get { return this.DisplayRectangle.Width; }
-        }
-
-        public int GlowH
-        {
-            get { return this.DisplayRectangle.Height; }
         }
     }
 }

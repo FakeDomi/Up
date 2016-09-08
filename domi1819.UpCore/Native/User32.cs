@@ -6,6 +6,9 @@ namespace domi1819.UpCore.Native
     public static class User32
     {
         [DllImport("user32")]
+        public static extern int SendMessage(IntPtr hWnd, uint uMsg, int wParam, int lParam);
+
+        [DllImport("user32")]
         public static extern bool RegisterHotKey(IntPtr hWnd, int id, int fsModifiers, int vk);
 
         [DllImport("user32")]

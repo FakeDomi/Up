@@ -186,6 +186,8 @@ namespace domi1819.UpClient.Forms
             }
             
             settings.Save();
+
+            this.CancelButtonOnClick(sender, e);
         }
 
         private void CancelButtonOnClick(object sender, EventArgs e)

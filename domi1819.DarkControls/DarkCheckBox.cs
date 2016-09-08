@@ -9,7 +9,15 @@ namespace domi1819.DarkControls
         private bool hover;
         private bool mouseDown;
 
-        private static readonly Bitmap Check;
+        public bool RadioStyle { get; set; }
+
+        public int GlowX => this.Location.X + this.Padding.Left;
+
+        public int GlowY => this.Location.Y + this.Height / 2 - 6;
+
+        public int GlowW => 13;
+
+        public int GlowH => 13;
 
         public DarkCheckBox()
         {
@@ -86,31 +94,11 @@ namespace domi1819.DarkControls
             this.Invalidate();
         }
 
-        public bool RadioStyle { get; set; }
-
-        public int GlowX
-        {
-            get { return this.Location.X + this.Padding.Left; }
-        }
-
-        public int GlowY
-        {
-            get { return this.Location.Y + this.Height / 2 - 6; }
-        }
-
-        public int GlowW
-        {
-            get { return 13; }
-        }
-
-        public int GlowH
-        {
-            get { return 13; }
-        }
+        private static readonly Bitmap Check;
 
         static DarkCheckBox()
         {
-            long image = 292205365999747200;
+            const long image = 292205365999747200;
             long checkBit = 1L;
 
             Check = new Bitmap(9, 9);
