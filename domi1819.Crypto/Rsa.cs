@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
-using System.Text;
 
 namespace domi1819.Crypto
 {
@@ -57,25 +56,55 @@ namespace domi1819.Crypto
             }
         }
 
+        public static RSACryptoServiceProvider GetProvider(string keyFilePath)
+        {
+            RSACryptoServiceProvider rsaProvider;
+            byte[][] rsaParams;
+            bool privateKey = false;
+
+            using (FileStream stream = new FileStream(keyFilePath, FileMode.Open, FileAccess.Read))
+            {
+                int index = 0;
+                int keyType = ReadFormatted(ref index, stream);
+
+                if (keyType == 0x01)
+                {
+                    privateKey = true;
+                }
+                else if (keyType != 0x00)
+                {
+                    throw new CryptographicException("Invalid key type \"{0}\". Public (0) or private (1) key required.", keyType.ToString());
+                }
+                
+                byte[] size = new byte[RsaParamLengthSize];
+                
+                ReadFormatted(size, ref index, stream);
+                
+                rsaParams = new byte[privateKey ? RsaPrivateParamCount : RsaPublicParamCount][];
+                rsaProvider = new RSACryptoServiceProvider(Unsplit(size));
+
+                for (int i = 0; i < rsaParams.Length; i++)
+                {
+                    ReadFormatted(size, ref index, stream);
+                    rsaParams[i] = new byte[Unsplit(size)];
+                    ReadFormatted(rsaParams[i], ref index, stream);
+                }
+            }
+
+            rsaProvider.ImportParameters(privateKey ? new RSAParameters { Modulus = rsaParams[0], Exponent = rsaParams[1], P = rsaParams[2], Q = rsaParams[3], DP = rsaParams[4], DQ = rsaParams[5], InverseQ = rsaParams[6], D = rsaParams[7] } : new RSAParameters { Modulus = rsaParams[0], Exponent = rsaParams[1] });
+
+            return rsaProvider;
+        }
+
         private static void WriteFormatted(byte[] data, ref int index, Stream stream)
         {
             foreach (byte b in data)
             {
-                if (index == 16)
-                {
-                    stream.WriteByte(10);
-                    index = 0;
-                }
-
-                stream.WriteByte(GetHexChar(b >> 4));
-                stream.WriteByte(GetHexChar(b));
-                stream.WriteByte(32);
-
-                index++;
+                WriteFormatted(b, ref index, stream);
             }
         }
 
-        private static void WriteFormatted(byte data, ref int index, FileStream stream)
+        private static void WriteFormatted(byte data, ref int index, Stream stream)
         {
             if (index == 16)
             {
@@ -90,6 +119,30 @@ namespace domi1819.Crypto
             index++;
         }
 
+        private static void ReadFormatted(byte[] output, ref int index, Stream stream)
+        {
+            for (int i = 0; i < output.Length; i++)
+            {
+                output[i] = ReadFormatted(ref index, stream);
+            }
+        }
+
+        private static byte ReadFormatted(ref int index, Stream stream)
+        {
+            if (index == 16)
+            {
+                stream.ReadByte();
+                index = 0;
+            }
+
+            index++;
+
+            byte retValue = (byte)(GetHexValue(stream.ReadByte()) << 4 | GetHexValue(stream.ReadByte()));
+            stream.ReadByte();
+
+            return retValue;
+        }
+
         private static byte GetHexChar(int value)
         {
             int loNibble = value & 0x0F;
@@ -97,45 +150,14 @@ namespace domi1819.Crypto
             return (byte)(loNibble + (loNibble < 10 ? 48 : 65 - 10));
         }
 
-        public static RSACryptoServiceProvider GetProvider(string keyFilePath)
+        private static byte GetHexValue(int chr)
         {
-            RSACryptoServiceProvider rsaProvider;
-            byte[][] rsaParams;
-            bool privateKey = false;
-
-            using (FileStream stream = new FileStream(keyFilePath, FileMode.Open, FileAccess.Read))
+            if (chr < 48 || chr > 70 || (chr > 57 && chr < 65))
             {
-                byte[] size = new byte[RsaParamLengthSize];
-                byte[] header = new byte[8];
-
-                stream.Read(header, 0, header.Length);
-                stream.Read(size, 0, size.Length);
-
-                int keyType = stream.ReadByte();
-
-                if (keyType == 0x01)
-                {
-                    privateKey = true;
-                }
-                else if (keyType != 0x00)
-                {
-                    throw new CryptographicException("Invalid key type \"{0}\". Public (0) or private (1) key required.", keyType.ToString());
-                }
-
-                rsaParams = new byte[privateKey ? RsaPrivateParamCount : RsaPublicParamCount][];
-                rsaProvider = new RSACryptoServiceProvider(Unsplit(size));
-
-                for (int i = 0; i < rsaParams.Length; i++)
-                {
-                    stream.Read(size, 0, size.Length);
-                    rsaParams[i] = new byte[Unsplit(size)];
-                    stream.Read(rsaParams[i], 0, rsaParams[i].Length);
-                }
+                throw new CryptographicException($"Invalid char {chr} in hex key file.");
             }
 
-            rsaProvider.ImportParameters(privateKey ? new RSAParameters { Modulus = rsaParams[0], Exponent = rsaParams[1], P = rsaParams[2], Q = rsaParams[3], DP = rsaParams[4], DQ = rsaParams[5], InverseQ = rsaParams[6], D = rsaParams[7] } : new RSAParameters { Modulus = rsaParams[0], Exponent = rsaParams[1] });
-
-            return rsaProvider;
+            return (byte)((chr >= 65 ? (chr - 7) : chr) - 48);
         }
 
         private static void Split(int value, IList<byte> target)
