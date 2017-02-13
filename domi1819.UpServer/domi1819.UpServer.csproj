@@ -56,12 +56,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\domi1819.Crypto\domi1819.Crypto.csproj">
-      <Project>{aa4f4cd3-6f63-4c1c-aa2d-ee05f6266271}</Project>
-      <Name>domi1819.Crypto</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\domi1819.NanoDB\domi1819.NanoDB.csproj">
-      <Project>{AA32B774-EC0F-4853-929F-F432887639BE}</Project>
+    <ProjectReference Include="..\..\nanodb\NanoDB\domi1819.NanoDB.csproj">
+      <Project>{aa32b774-ec0f-4853-929f-f432887639be}</Project>
       <Name>domi1819.NanoDB</Name>
     </ProjectReference>
     <ProjectReference Include="..\domi1819.UpCore\domi1819.UpCore.csproj">

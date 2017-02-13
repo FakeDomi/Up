@@ -62,12 +62,6 @@
     <Compile Include="Utilities\Util.cs" />
     <Compile Include="Config\Hotkey.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\domi1819.Crypto\domi1819.Crypto.csproj">
-      <Project>{aa4f4cd3-6f63-4c1c-aa2d-ee05f6266271}</Project>
-      <Name>domi1819.Crypto</Name>
-    </ProjectReference>
-  </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
