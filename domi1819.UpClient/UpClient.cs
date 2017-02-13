@@ -22,6 +22,8 @@ namespace domi1819.UpClient
 
         internal UploadManager UploadManager { get; private set; }
 
+        internal RsaCache RsaCache { get; private set; }
+
         internal ScreenshotForm ScreenshotForm => this.screenshotForm ?? (this.screenshotForm = new ScreenshotForm(this));
 
         internal AboutForm AboutForm => this.aboutForm ?? (this.aboutForm = new AboutForm());
@@ -52,7 +54,8 @@ namespace domi1819.UpClient
             Application.SetCompatibleTextRenderingDefault(false);
 
             this.Config = Config.Load();
-            this.NetClient = new NetClient(this.Config.ServerAddress, this.Config.ServerPort);
+            this.RsaCache = new RsaCache(this.Config.TrustFolder);
+            this.NetClient = new NetClient(this.Config.ServerAddress, this.Config.ServerPort, this.RsaCache);
             this.ActionManager = new ActionManager(this);
             this.ConfigurationForm = new ConfigurationForm(this);
             this.UploadManager = new UploadManager(this);

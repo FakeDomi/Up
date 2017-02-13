@@ -42,12 +42,13 @@
     <Compile Include="NetServer.cs" />
     <Compile Include="NetServerUser.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="ServerConfigSettings.cs" />
+    <Compile Include="ServerConfig.cs" />
     <Compile Include="UploadUnit.cs" />
     <Compile Include="UpServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UpWebService.cs" />
     <Compile Include="UserRegister.cs" />
+    <Compile Include="WrappedXmlWriter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

@@ -5,7 +5,7 @@ namespace domi1819.UpCore.Native
 {
     public static class Shell32
     {
-        [DllImport("shell32")]
+        [DllImport("shell32.dll")]
         // ReSharper disable once InconsistentNaming
         public static extern IntPtr SHGetFileInfo(string pszPath, uint dwFileAttributes, ref SHFILEINFO psfi, uint cbSizeFileInfo, uint uFlags);
         

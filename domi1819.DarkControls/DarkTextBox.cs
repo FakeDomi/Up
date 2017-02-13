@@ -24,6 +24,12 @@ namespace domi1819.DarkControls
             set { this.textBox.UseSystemPasswordChar = value; }
         }
 
+        public bool ReadOnly
+        {
+            get { return this.textBox.ReadOnly; }
+            set { this.textBox.ReadOnly = value; }
+        }
+
         public int GlowX => this.Location.X + this.DisplayRectangle.X;
 
         public int GlowY => this.Location.Y + this.DisplayRectangle.Y;

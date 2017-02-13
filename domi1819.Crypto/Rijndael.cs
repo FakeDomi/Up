@@ -111,7 +111,7 @@ namespace domi1819.Crypto
 
             if (this.destroyed)
             {
-                throw new Exception("The key has already been destroyed.");
+                throw new Exception("The key has been destroyed already.");
             }
 
             if (this.cipherDirection == CipherDirection.Cipher)

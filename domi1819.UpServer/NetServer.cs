@@ -6,7 +6,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Threading;
-using domi1819.Crypto;
 using domi1819.NanoDB;
 using domi1819.UpCore.Network;
 using domi1819.UpCore.Utilities;
@@ -20,41 +19,30 @@ namespace domi1819.UpServer
 
         private TcpListener listener;
         private AutoResetEvent resetEvent;
-        private RSACryptoServiceProvider rsaProvider;
         private ArrayPool<byte> messageBufferPool;
-        private ArrayPool<byte> fileBufferPool;
         private Dictionary<string, UploadUnit> fileTransfersByKey;
-        private byte encryptionMode;
         private bool shutdown;
 
-        internal void Start(int port, string privateKeyFile)
+        private RSACryptoServiceProvider rsaCsp;
+        private byte[] rsaModulus;
+        private byte[] rsaExponent;
+        private byte[] rsaFingerprint;
+
+        internal void Start(int port, RsaKey rsaKey)
         {
             this.Port = port;
 
             this.listener = new TcpListener(IPAddress.Any, this.Port);
             this.resetEvent = new AutoResetEvent(false);
-            this.rsaProvider = Rsa.GetProvider(privateKeyFile);
+
+            this.rsaCsp = rsaKey.Csp;
+            this.rsaModulus = rsaKey.Modulus;
+            this.rsaExponent = rsaKey.Exponent;
+            this.rsaFingerprint = rsaKey.Fingerprint;
+            
             this.messageBufferPool = new ArrayPool<byte>(Constants.Network.MessageBufferSize);
-            this.fileBufferPool = new ArrayPool<byte>(Constants.Network.FileBufferSize);
             this.fileTransfersByKey = new Dictionary<string, UploadUnit>();
-
-            this.encryptionMode = (byte)EncryptionMode.Aes128;
-
-            switch (this.rsaProvider.KeySize)
-            {
-                case 1024:
-                    this.encryptionMode |= (byte)EncryptionMode.Rsa1024;
-                    break;
-                case 2048:
-                    this.encryptionMode |= (byte)EncryptionMode.Rsa2048;
-                    break;
-                case 4096:
-                    this.encryptionMode |= (byte)EncryptionMode.Rsa4096;
-                    break;
-                default:
-                    throw new Exception($"Invalid RSA keysize {this.rsaProvider.KeySize}. FileServer only supports 1024, 2048 and 4096 bit keys.");
-            }
-
+            
             new Thread(this.Run) { Name = "NetServerMain" }.Start();
         }
 
@@ -96,19 +84,26 @@ namespace domi1819.UpServer
 
             try
             {
-                Console.WriteLine("Client {0} connected.", client.Client.RemoteEndPoint);
+                Console.WriteLine("Client {0} connected.", client.Client.RemoteEndPoint); //TODO
 
                 NetworkStream stream = client.GetStream();
 
                 user.BaseStream = stream;
                 stream.ReadTimeout = Constants.Network.Timeout;
 
+                stream.Write(this.rsaFingerprint, 0, this.rsaFingerprint.Length);
+                
                 int mode = stream.ReadByte();
 
-                if (mode == this.encryptionMode)
+                if (mode == 0x01) // Send full key
+                {
+                    stream.Write(this.rsaModulus, 0, this.rsaModulus.Length);
+                    stream.Write(this.rsaExponent, 0, this.rsaExponent.Length);
+                }
+                else if (mode == 0x00) // Normal connection
                 {
                     int position = 0;
-                    byte[] buffer = new byte[(this.encryptionMode & (int)EncryptionMode.Rsa) * 128];
+                    byte[] buffer = new byte[Constants.Encryption.RsaModulusBytes];
 
                     while (position < buffer.Length)
                     {
@@ -121,7 +116,7 @@ namespace domi1819.UpServer
                         }
                     }
 
-                    byte[] secret = this.rsaProvider.Decrypt(buffer, true);
+                    byte[] secret = this.rsaCsp.Decrypt(buffer, true);
 
                     byte[] key = new byte[16];
                     byte[] ivEncrypt = new byte[16];
@@ -164,16 +159,17 @@ namespace domi1819.UpServer
 
                     this.RunMessageLoop(serializer, deserializer, user);
 
-                    Console.WriteLine("Client {0} disconnected.", client.Client.RemoteEndPoint);
+                    Console.WriteLine($"Client {client.Client.RemoteEndPoint} disconnected.");
                 }
                 else
                 {
-                    Console.WriteLine("Client {0} tried to connect with unsupported encryption methods.", client.Client.RemoteEndPoint);
+                    Console.WriteLine($"Client {client.Client.RemoteEndPoint} tried to connect with unknown request mode {mode}. Disconnected.");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Client {0} did something stupid, I guess...", client.Client.RemoteEndPoint);
+                // TODO change, currently crashes when socket is not connected
+                Console.WriteLine($"Client {client.Client.RemoteEndPoint} did something stupid, I guess...");
                 Console.WriteLine(ex.Message);
             }
             finally
@@ -311,7 +307,7 @@ namespace domi1819.UpServer
                                     key = Util.GetRandomString(8);
                                 } while (this.fileTransfersByKey.ContainsKey(key));
 
-                                UploadUnit unit = new UploadUnit { Key = key, User = currentUser, FileName = fileName, Size = fileSize, FileStream = new FileStream(Path.Combine(Constants.Server.FileTransferFolder, key + ".tmp"), FileMode.Create, FileAccess.Write) };
+                                UploadUnit unit = new UploadUnit { Key = key, User = currentUser, FileName = fileName, Size = fileSize, FileStream = new FileStream(Path.Combine(UpServer.Instance.Settings.FileTransferFolder, key + ".tmp"), FileMode.Create, FileAccess.Write) };
 
                                 this.fileTransfersByKey.Add(key, unit);
                                 user.UploadUnits.Add(unit);
@@ -371,7 +367,7 @@ namespace domi1819.UpServer
 
                         UpServer.Instance.Files.AddFile(fileKey, unit.FileName, currentUser, this.fileTransfersByKey[key].Size);
 
-                        File.Move(Path.Combine(Constants.Server.FileTransferFolder, key + ".tmp"), Path.Combine(Constants.Server.FileStorageFolder, fileKey));
+                        File.Move(Path.Combine(UpServer.Instance.Settings.FileTransferFolder, key + ".tmp"), Path.Combine(UpServer.Instance.Settings.FileStorageFolder, fileKey));
 
                         UpServer.Instance.Files.SetDownloadable(fileKey, true);
 
@@ -420,7 +416,7 @@ namespace domi1819.UpServer
 
                             serializer.Index += 4;
 
-                            while (writtenFiles < Constants.MaxFilesPerPacket && currentFileIndex < files.Count)
+                            while (writtenFiles < Constants.Network.MaxFilesPerPacket && currentFileIndex < files.Count)
                             {
                                 if (fileReg.SerializeFileInfo(files[currentFileIndex], serializer, fromDate, toDate, fromSize, toSize, filter, filterMatchMode))
                                 {
@@ -459,7 +455,7 @@ namespace domi1819.UpServer
                             {
                                 try
                                 {
-                                    File.Delete(Path.Combine(Constants.Server.FileStorageFolder, fileId));
+                                    File.Delete(Path.Combine(UpServer.Instance.Settings.FileStorageFolder, fileId));
                                     serializer.WriteNextBool(true);
                                     tries = int.MaxValue;
 
@@ -487,7 +483,7 @@ namespace domi1819.UpServer
                     }
                     case NetworkMethods.LinkFormat:
                     {
-                        ServerConfigSettings settings = UpServer.Instance.Settings;
+                        ServerConfig settings = UpServer.Instance.Settings;
 
                         serializer.Start(NetworkMethods.LinkFormat);
                             

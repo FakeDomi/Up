@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -72,7 +71,7 @@ namespace domi1819.UpClient.Forms
         {
             base.OnClosed(e);
             
-            GC.Collect();
+            GC.Collect(); // TODO
         }
 
         private void Rebind()
@@ -152,22 +151,35 @@ namespace domi1819.UpClient.Forms
 
         private void uiBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
+            Stopwatch watch = Stopwatch.StartNew();
+
             BackgroundWorker worker = (BackgroundWorker)sender;
             NetClient client = (NetClient)e.Argument;
 
             this.files.Clear();
 
+            Console.WriteLine(watch.Elapsed);
+
             //try
             //{
                 client.ClaimConnectHandle();
 
+            Console.WriteLine(watch.Elapsed);
+
             this.linkFormat = client.GetLinkFormat();
 
+            Console.WriteLine(watch.Elapsed);
+            
             client.Login(this.upClient.Config);
 
-                client.ListFiles(this.AddItemCallback, 0, DateTime.MinValue, DateTime.MaxValue, 0, long.MaxValue, "", 0);
+            Console.WriteLine(watch.Elapsed);
 
-                worker.ReportProgress(0);
+            client.ListFiles(this.AddItemCallback, 0, DateTime.MinValue, DateTime.MaxValue, 0, long.MaxValue, "", 0);
+
+            Console.WriteLine(watch.Elapsed);
+
+            worker.ReportProgress(0);
+
             //}
             //catch (Exception)
             //{

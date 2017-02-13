@@ -129,7 +129,7 @@ namespace domi1819.DarkControls
 
         private void RefreshLabelText()
         {
-            this.uiColorLabel.Text = (this.CustomText ?? "") + this.color.ToHex();
+            this.uiColorLabel.Text = (this.CustomText ?? "") + this.color.ToHexString();
         }
     }
 }

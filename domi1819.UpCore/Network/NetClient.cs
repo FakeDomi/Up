@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Security.Cryptography;
-using domi1819.Crypto;
 using domi1819.UpCore.Utilities;
 
 namespace domi1819.UpCore.Network
@@ -16,7 +15,9 @@ namespace domi1819.UpCore.Network
 
         private MessageSerializer serializer;
         private MessageDeserializer deserializer;
-
+        
+        private readonly RsaCache rsaCache;
+        
         private readonly object messageLock = new object();
         private readonly object connectLock = new object();
 
@@ -28,10 +29,12 @@ namespace domi1819.UpCore.Network
 
         public delegate bool AddItemCallback(string fileId, string fileName, long fileSize, DateTime updateDate, int downloads);
 
-        public NetClient(string address, int port)
+        public NetClient(string address, int port, RsaCache rsaCache)
         {
             this.Address = address;
             this.Port = port;
+
+            this.rsaCache = rsaCache;
         }
 
         public void ClaimConnectHandle()
@@ -61,27 +64,49 @@ namespace domi1819.UpCore.Network
             }
         }
 
-        public void Connect()
+        public bool Connect()
         {
             lock (this.messageLock)
             {
                 this.client = new TcpClient();
-
                 this.client.Connect(this.Address, this.Port);
 
                 NetworkStream netStream = this.client.GetStream();
+                byte[] keyFingerprint = new byte[Constants.Encryption.FingerprintSize];
+                string serverAddress = $"{this.Address}:{this.Port}";
 
-                RSACryptoServiceProvider rsaProvider = Rsa.GetProvider("public.key");
-                RNGCryptoServiceProvider rngProvider = new RNGCryptoServiceProvider();
+                netStream.Read(keyFingerprint, 0, keyFingerprint.Length);
+
+                if (!this.rsaCache.LoadKey(serverAddress))
+                {
+                    // TODO: No valid key found.
+                    return false;
+                }
+
+                RsaKey rsaKey = this.rsaCache.Key;
+                byte[] serverFingerprint = rsaKey.Fingerprint;
+
+                for (int i = 0; i < keyFingerprint.Length; i++)
+                {
+                    if (keyFingerprint[i] != serverFingerprint[i])
+                    {
+                        // TODO: Server key fingerprint doesn't match local key fingerprint.
+                        return false;
+                    }
+                }
+
+                netStream.WriteByte(0x00);
+
+                RSACryptoServiceProvider rsaCsp = rsaKey.Csp;
+                RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider();
 
                 byte[] secret = new byte[48];
 
-                rngProvider.GetBytes(secret);
+                rngCsp.GetBytes(secret);
 
-                byte[] encryptedKey = rsaProvider.Encrypt(secret, true);
-
-                netStream.WriteByte((byte)(EncryptionMode.Aes128 | EncryptionMode.Rsa4096));
-                netStream.Write(encryptedKey, 0, encryptedKey.Length);
+                byte[] encryptedSecret = rsaCsp.Encrypt(secret, true);
+                
+                netStream.Write(encryptedSecret, 0, encryptedSecret.Length);
 
                 byte[] key = new byte[16];
                 byte[] ivEncrypt = new byte[16];
@@ -101,12 +126,12 @@ namespace domi1819.UpCore.Network
                 this.deserializer = new MessageDeserializer { Bytes = new byte[65536], Stream = this.inStream };
 
                 this.serializer.Start(NetworkMethods.GetServerVersion);
-                this.serializer.WriteNextInt(Constants.DefaultPort);
+                this.serializer.WriteNextInt(Constants.Server.DefaultPort);
                 this.serializer.Flush();
 
                 this.deserializer.ReadMessage(NetworkMethods.GetServerVersion);
 
-                if (this.deserializer.ReadNextInt() != Constants.DefaultPort + 1)
+                if (this.deserializer.ReadNextInt() != Constants.Server.DefaultPort + 1)
                 {
                     throw new Exception("The connection could not be established: Connection test failed.");
                 }
@@ -117,6 +142,32 @@ namespace domi1819.UpCore.Network
                 }
 
                 this.Connected = true;
+            }
+
+            return true;
+        }
+
+        public RsaKey FetchKey()
+        {
+            lock (this.messageLock)
+            {
+                TcpClient tempClient = new TcpClient();
+
+                tempClient.Connect(this.Address, this.Port);
+
+                NetworkStream netStream = tempClient.GetStream();
+                byte[] keyFingerprint = new byte[Constants.Encryption.FingerprintSize];
+                
+                netStream.Read(keyFingerprint, 0, keyFingerprint.Length);
+                netStream.WriteByte(0x01);
+                
+                byte[] rsaModulus = new byte[Constants.Encryption.RsaModulusBytes];
+                byte[] rsaExponent = new byte[Constants.Encryption.RsaExponentBytes];
+
+                netStream.Read(rsaModulus, 0, rsaModulus.Length);
+                netStream.Read(rsaExponent, 0, rsaExponent.Length);
+
+                return RsaKey.FromParams(rsaModulus, rsaExponent);
             }
         }
 

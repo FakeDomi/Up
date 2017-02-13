@@ -3,7 +3,6 @@ using System.Windows.Forms;
 using domi1819.DarkControls;
 using domi1819.UpCore.Config;
 using domi1819.UpCore.Network;
-using domi1819.UpCore.Utilities;
 
 namespace domi1819.UpClient.Forms
 {
@@ -32,7 +31,7 @@ namespace domi1819.UpClient.Forms
             this.contextMenuHandler = new ContextMenuHandler(upClient);
 
             this.uiNotifyIcon.ContextMenu = new ContextMenu();
-            this.RebuildMenu();
+            this.RebuildContextMenu();
         }
 
         protected override void WndProc(ref Message m)
@@ -72,7 +71,7 @@ namespace domi1819.UpClient.Forms
             this.uiNotifyIcon.Visible = false;
         }
 
-        internal void RebuildMenu()
+        internal void RebuildContextMenu()
         {
             this.contextMenuHandler.Rebuild(this.uiNotifyIcon.ContextMenu.MenuItems);
         }
@@ -84,7 +83,6 @@ namespace domi1819.UpClient.Forms
             this.uiServerAddressTextBox.Text = settings.ServerAddress + (settings.ServerPort == 1819 ? string.Empty : ":" + settings.ServerPort);
             this.uiUserIdTextBox.Text = settings.UserId;
             this.uiPasswordTextBox.Text = settings.Password;
-            this.uiCryptoKeyTextBox.Text = settings.KeyFile;
 
             this.uiLocalCopyCheckBox.Checked = settings.LocalScreenshotCopy;
             this.uiSnapFileAreaCheckBox.Checked = settings.DropArea.Snap;
@@ -129,65 +127,29 @@ namespace domi1819.UpClient.Forms
 
         private void SaveButtonOnClick(object sender, EventArgs e)
         {
-            Config settings = this.upClient.Config;
-            string[] addressSplit = this.uiServerAddressTextBox.Text.Split(':');
+            Config config = this.upClient.Config;
 
-            string newAddress;
-            int newPort;
+            string oldAddress = config.ServerAddress;
+            int oldPort = config.ServerPort;
 
-            if (addressSplit.Length == 1)
+            if (this.FillConfig(config, true))
             {
-                newAddress = addressSplit[0];
-                newPort = Constants.DefaultPort;
-            }
-            else if (addressSplit.Length == 2)
-            {
-                newAddress = addressSplit[0];
-                
-                if (!int.TryParse(addressSplit[1], out newPort))
+                this.contextMenuHandler.Rebuild(this.uiNotifyIcon.ContextMenu.MenuItems);
+
+                if (oldAddress != config.ServerAddress || oldPort != config.ServerPort)
                 {
-                    MessageBox.Show("Invalid address!");
-                    return;
+                    NetClient client = this.upClient.NetClient;
+
+                    client.Disconnect();
+
+                    client.Address = config.ServerAddress;
+                    client.Port = config.ServerPort;
                 }
+
+                config.SaveFile();
+
+                this.CancelButtonOnClick(sender, e);
             }
-            else
-            {
-                MessageBox.Show("Invalid address!");
-                return;
-            }
-
-            bool connectionDirty = newAddress != settings.ServerAddress || newPort != settings.ServerPort;
-            
-            settings.ServerAddress = newAddress;
-            settings.ServerPort = newPort;
-
-            settings.UserId = this.uiUserIdTextBox.Text;
-            settings.Password = this.uiPasswordTextBox.Text;
-            settings.KeyFile = this.uiCryptoKeyTextBox.Text;
-
-            settings.LocalScreenshotCopy = this.uiLocalCopyCheckBox.Checked;
-            settings.DropArea.Snap = this.uiSnapFileAreaCheckBox.Checked;
-            settings.PngScreenshots = this.uiPngFormatCheckBox.Checked;
-            settings.UpdateBehavior = this.uiIndicateUpdatesCheckBox.Checked ? UpdateBehavior.Indicate : this.uiNeverCheckForUpdatesCheckBox.Checked ? UpdateBehavior.NeverCheck : UpdateBehavior.AutoInstall;
-            settings.ThemeColor = WrappedColor.Of(this.uiDarkColorView.Color);
-
-            this.hotkeyForm.SaveToConfig(this.upClient.Config);
-            
-            this.contextMenuHandler.Rebuild(this.uiNotifyIcon.ContextMenu.MenuItems);
-
-            if (connectionDirty)
-            {
-                NetClient client = this.upClient.NetClient;
-
-                client.Disconnect();
-
-                client.Address = newAddress;
-                client.Port = newPort;
-            }
-            
-            settings.Save();
-
-            this.CancelButtonOnClick(sender, e);
         }
 
         private void CancelButtonOnClick(object sender, EventArgs e)
@@ -239,61 +201,23 @@ namespace domi1819.UpClient.Forms
 
             this.suppressUpdateStyleCheckedChanged = false;
         }
-
-        private void CryptoKeyBrowseButtonClick(object sender, EventArgs e)
-        {
-            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            OpenFileDialog openFileDialog = new OpenFileDialog { InitialDirectory = baseDir };
-
-            if (openFileDialog.ShowDialog(this) == DialogResult.OK)
-            {
-                string fileName = openFileDialog.FileName;
-
-                if (fileName.StartsWith(baseDir))
-                {
-                    fileName = fileName.Substring(baseDir.Length);
-                }
-
-                this.uiCryptoKeyTextBox.Text = fileName;
-            }
-        }
         
+        private void VerifyKeyButtonClicked(object sender, EventArgs e)
+        {
+            Config testConfig = new Config();
+
+            this.FillConfig(testConfig);
+
+            this.AccountDetailsButtonClick(null, e);
+        }
+
         private void AccountDetailsButtonClick(object sender, EventArgs e)
         {
-            Config testSettings = new Config();
+            Config testConfig = new Config();
 
-            string[] addressSplit = this.uiServerAddressTextBox.Text.Split(':');
+            this.FillConfig(testConfig);
 
-            if (addressSplit.Length == 1)
-            {
-                testSettings.ServerAddress = addressSplit[0];
-                testSettings.ServerPort = 1819;
-            }
-            else if (addressSplit.Length == 2)
-            {
-                testSettings.ServerAddress = addressSplit[0];
-
-                int port;
-
-                if (!int.TryParse(addressSplit[1], out port))
-                {
-                    MessageBox.Show("Invalid address!");
-                    return;
-                }
-
-                testSettings.ServerPort = port;
-            }
-            else
-            {
-                MessageBox.Show("Invalid address!");
-                return;
-            }
-
-            testSettings.UserId = this.uiUserIdTextBox.Text;
-            testSettings.Password = this.uiPasswordTextBox.Text;
-            testSettings.KeyFile = this.uiCryptoKeyTextBox.Text;
-
-            new AccountDetailsForm().ShowDetails(testSettings, this);
+            new AccountDetailsForm().ShowDetails(testConfig, this.upClient.RsaCache, this, sender == null);
         }
 
         private void darkButton2_Click(object sender, EventArgs e)
@@ -303,11 +227,56 @@ namespace domi1819.UpClient.Forms
             this.hotkeyManager.ActivateHotkeys(this.upClient.Config);
         }
         
-
         private void DarkColorViewColorSelected(object sender, EventArgs e)
         {
             DarkColors.StrongColor = this.uiDarkColorView.Color;
             this.ThemeColorChanged?.Invoke(this, new ColorChangedEventArgs(this.uiDarkColorView.Color));
+        }
+
+        private bool FillConfig(Config config, bool fillHotkeys = false)
+        {
+            string[] addressSplit = this.uiServerAddressTextBox.Text.Split(':');
+            
+            if (addressSplit.Length == 1)
+            {
+                config.ServerAddress = addressSplit[0];
+                config.ServerPort = 1819;
+            }
+            else if (addressSplit.Length == 2)
+            {
+                config.ServerAddress = addressSplit[0];
+
+                int port;
+
+                if (!int.TryParse(addressSplit[1], out port) || port <= 0 || port >= 65536)
+                {
+                    MessageBox.Show("Invalid address!");
+                    return false;
+                }
+
+                config.ServerPort = port;
+            }
+            else
+            {
+                MessageBox.Show("Invalid address!");
+                return false;
+            }
+            
+            config.UserId = this.uiUserIdTextBox.Text;
+            config.Password = this.uiPasswordTextBox.Text;
+
+            config.LocalScreenshotCopy = this.uiLocalCopyCheckBox.Checked;
+            config.DropArea.Snap = this.uiSnapFileAreaCheckBox.Checked;
+            config.PngScreenshots = this.uiPngFormatCheckBox.Checked;
+            config.UpdateBehavior = this.uiIndicateUpdatesCheckBox.Checked ? UpdateBehavior.Indicate : this.uiNeverCheckForUpdatesCheckBox.Checked ? UpdateBehavior.NeverCheck : UpdateBehavior.AutoInstall;
+            config.ThemeColor = WrappedColor.Of(this.uiDarkColorView.Color);
+
+            if (fillHotkeys)
+            {
+                this.hotkeyForm.FillConfig(this.upClient.Config);
+            }
+
+            return true;
         }
     }
 }

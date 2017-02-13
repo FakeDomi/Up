@@ -37,8 +37,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Crypto\Blake2.cs" />
+    <Compile Include="Crypto\Rsa.cs" />
     <Compile Include="Native\Shell32.cs" />
     <Compile Include="Native\User32.cs" />
+    <Compile Include="Network\RsaCache.cs" />
+    <Compile Include="Network\RsaKey.cs" />
     <Compile Include="Utilities\ArrayPool.cs" />
     <Compile Include="Config\Config.cs" />
     <Compile Include="Config\WrappedColor.cs" />
@@ -64,6 +68,7 @@
       <Name>domi1819.Crypto</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

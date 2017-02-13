@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using domi1819.NanoDB;
@@ -13,17 +14,17 @@ namespace domi1819.UpServer
         private readonly NanoDBFile dbFile;
         private readonly List<NanoDBLine> emptyFilterList = new List<NanoDBLine>(0);
         
-        internal FileRegister(Logger logger)
+        internal FileRegister(UpServer upServer)
         {
             Console.WriteLine("Initializing file register...");
 
-            this.dbFile = new NanoDBFile("files.nano");
+            this.dbFile = new NanoDBFile(Path.Combine(upServer.Settings.DataFolder, Constants.Database.FileDbName));
 
             InitializeResult initResult = this.dbFile.Initialize();
 
             if (initResult == InitializeResult.VersionMismatch)
             {
-                logger.Log("File database could not be read because it was saved in an unsupported format. Please fix or delete the file database.");
+                //logger.Log("File database could not be read because it was saved in an unsupported format. Please fix or delete the file database.");
                 throw new Exception("Database version not supported.");
             }
 
@@ -40,7 +41,7 @@ namespace domi1819.UpServer
 
             if (loadResult != LoadResult.Okay && loadResult != LoadResult.HasDuplicates)
             {
-                logger.Log("File database could not be read because it seems to be corrupt. Please fix or delete the file database.");
+                //logger.Log("File database could not be read because it seems to be corrupt. Please fix or delete the file database.");
                 throw new Exception("Database file corrupt.");
             }
 

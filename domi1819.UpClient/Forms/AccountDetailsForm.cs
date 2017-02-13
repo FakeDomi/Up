@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows.Forms;
 using domi1819.DarkControls;
 using domi1819.UpCore.Config;
@@ -10,36 +11,51 @@ namespace domi1819.UpClient.Forms
 {
     public partial class AccountDetailsForm : DarkForm
     {
+        private Config config;
+        private RsaCache rsaCache;
         private Form parent;
+        private bool fetchKey;
 
         public AccountDetailsForm()
         {
             this.InitializeComponent();
         }
 
-        internal void ShowDetails(Config settings, Form parentForm)
+        internal void ShowDetails(Config config, RsaCache rsaCache, Form parentForm, bool fetchKey)
         {
+            this.config = config;
+            this.rsaCache = rsaCache;
             this.parent = parentForm;
-            this.uiBackgroundWorker.RunWorkerAsync(settings);
+            this.fetchKey = fetchKey;
+            this.uiBackgroundWorker.RunWorkerAsync();
         }
 
         private void BackgroundWorkerDoWork(object sender, DoWorkEventArgs e)
         {
-            Config settings = (Config)e.Argument;
+            //UpClient upClient = (UpClient)e.Argument;
 
-            NetClient client = new NetClient(settings.ServerAddress, settings.ServerPort);
+            NetClient client = new NetClient(this.config.ServerAddress, this.config.ServerPort, this.rsaCache);
 
             try
             {
-                client.Connect();
-
-                if (client.Login(settings.UserId, settings.Password))
+                if (this.fetchKey)
                 {
-                    e.Result = client.GetStorageInfo();
+                    e.Result = client.FetchKey();
+                }
+                else if (client.Connect())
+                {
+                    if (client.Login(this.config.UserId, this.config.Password))
+                    {
+                        e.Result = client.GetStorageInfo();
+                    }
+                    else
+                    {
+                        e.Result = new InfoForm("Login failed", "Invalid username / password", 5000);
+                    }
                 }
                 else
                 {
-                    e.Result = new InfoForm("Login failed", "Invalid username / password", 5000);
+                   e.Result = new InfoForm("Connection failed!", "Server key not trusted.", 3000);
                 }
             }
             catch (Exception ex)
@@ -59,26 +75,58 @@ namespace domi1819.UpClient.Forms
 
         private void BackgroundWorkerRunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            StorageInfo storageInfo = e.Result as StorageInfo;
-
-            if (storageInfo != null)
+            if (e.Result is StorageInfo)
             {
+                StorageInfo storageInfo = (StorageInfo)e.Result;
+
                 this.uiRightLabel.Text = string.Format("{1}{0}{0}{2}{0}{3} Byte{0}{0}{4}{0}{5} Byte", Environment.NewLine, storageInfo.FileCount, Util.GetByteSizeText(storageInfo.MaxCapacity), storageInfo.MaxCapacity, Util.GetByteSizeText(storageInfo.UsedCapacity), storageInfo.UsedCapacity);
                 this.uiProgressBar.Value = (float)storageInfo.UsedCapacity / storageInfo.MaxCapacity;
 
                 this.ShowDialog(this.parent);
             }
-            else
+            else if (e.Result is InfoForm)
             {
-                InfoForm infoForm = e.Result as InfoForm;
+                InfoForm infoForm = (InfoForm)e.Result;
 
-                if (infoForm != null)
+                infoForm.Show();
+
+                this.Close();
+                this.Dispose();
+            }
+            else if (e.Result is RsaKey)
+            {
+                RsaKey rsaKey = (RsaKey)e.Result;
+                string serverAddress = $"{this.config.ServerAddress}:{this.config.ServerPort}";
+
+                RsaCache tempRsaCache = new RsaCache(this.rsaCache.Path);
+
+                tempRsaCache.LoadKey(serverAddress);
+
+                if (tempRsaCache.Key?.Fingerprint.SequenceEqual(rsaKey.Fingerprint) ?? false)
                 {
-                    infoForm.Show();
-
-                    this.Close();
-                    this.Dispose();
+                    InfoForm.Show("Key is trusted", "You are already trusting this key.", 3000);
                 }
+                else
+                {
+                    KeyAcceptForm feedbackForm = new KeyAcceptForm(serverAddress, rsaKey.Fingerprint, tempRsaCache.Key?.Fingerprint);
+
+                    feedbackForm.ShowDialog(this.parent);
+
+                    if (feedbackForm.Accept)
+                    {
+                        this.rsaCache.Key = rsaKey;
+                        this.rsaCache.ServerAddress = serverAddress;
+                        this.rsaCache.SaveKey();
+
+                        InfoForm.Show("Key accepted", "Saved!", 3000);
+                    }
+                    else
+                    {
+                        InfoForm.Show("Key denied", "Rip.", 3000);
+                    }
+                }
+
+                tempRsaCache.Dispose();
             }
         }
     }

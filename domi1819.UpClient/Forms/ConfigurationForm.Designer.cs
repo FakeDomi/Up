@@ -49,15 +49,13 @@ namespace domi1819.UpClient.Forms
             this.uiCancelButton = new domi1819.DarkControls.DarkButton();
             this.uiSaveButton = new domi1819.DarkControls.DarkButton();
             this.uiNotifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
-            this.uiCryptoKeyTextBox = new domi1819.DarkControls.DarkTextBox();
-            this.uiCryptoKeyBrowseButton = new domi1819.DarkControls.DarkButton();
-            this.uiCryptoKeyLabel = new System.Windows.Forms.Label();
             this.darkButton1 = new domi1819.DarkControls.DarkButton();
             this.uiPngFormatCheckBox = new domi1819.DarkControls.DarkCheckBox();
             this.uiJpgFormatCheckBox = new domi1819.DarkControls.DarkCheckBox();
             this.uiScreenshotFormatLabel = new System.Windows.Forms.Label();
             this.darkButton2 = new domi1819.DarkControls.DarkButton();
             this.uiDarkColorView = new domi1819.DarkControls.DarkColorView();
+            this.darkButton3 = new domi1819.DarkControls.DarkButton();
             this.SuspendLayout();
             // 
             // uiConnectionGroupLabel
@@ -103,6 +101,7 @@ namespace domi1819.UpClient.Forms
             this.uiPasswordTextBox.Location = new System.Drawing.Point(68, 82);
             this.uiPasswordTextBox.MinimumSize = new System.Drawing.Size(20, 20);
             this.uiPasswordTextBox.Name = "uiPasswordTextBox";
+            this.uiPasswordTextBox.ReadOnly = false;
             this.uiPasswordTextBox.Size = new System.Drawing.Size(154, 20);
             this.uiPasswordTextBox.TabIndex = 3;
             this.uiPasswordTextBox.TextValue = "";
@@ -114,6 +113,7 @@ namespace domi1819.UpClient.Forms
             this.uiUserIdTextBox.Location = new System.Drawing.Point(68, 56);
             this.uiUserIdTextBox.MinimumSize = new System.Drawing.Size(20, 20);
             this.uiUserIdTextBox.Name = "uiUserIdTextBox";
+            this.uiUserIdTextBox.ReadOnly = false;
             this.uiUserIdTextBox.Size = new System.Drawing.Size(154, 20);
             this.uiUserIdTextBox.TabIndex = 2;
             this.uiUserIdTextBox.TextValue = "";
@@ -125,6 +125,7 @@ namespace domi1819.UpClient.Forms
             this.uiServerAddressTextBox.Location = new System.Drawing.Point(68, 30);
             this.uiServerAddressTextBox.MinimumSize = new System.Drawing.Size(20, 20);
             this.uiServerAddressTextBox.Name = "uiServerAddressTextBox";
+            this.uiServerAddressTextBox.ReadOnly = false;
             this.uiServerAddressTextBox.Size = new System.Drawing.Size(154, 20);
             this.uiServerAddressTextBox.TabIndex = 1;
             this.uiServerAddressTextBox.TextValue = "";
@@ -260,42 +261,6 @@ namespace domi1819.UpClient.Forms
             this.uiNotifyIcon.Visible = true;
             this.uiNotifyIcon.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.NotifyIconOnMouseDoubleClick);
             // 
-            // uiCryptoKeyTextBox
-            // 
-            this.uiCryptoKeyTextBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
-            this.uiCryptoKeyTextBox.Location = new System.Drawing.Point(68, 109);
-            this.uiCryptoKeyTextBox.MinimumSize = new System.Drawing.Size(20, 20);
-            this.uiCryptoKeyTextBox.Name = "uiCryptoKeyTextBox";
-            this.uiCryptoKeyTextBox.Size = new System.Drawing.Size(124, 20);
-            this.uiCryptoKeyTextBox.TabIndex = 4;
-            this.uiCryptoKeyTextBox.TextValue = "";
-            this.uiCryptoKeyTextBox.UseSystemPasswordChar = false;
-            // 
-            // uiCryptoKeyBrowseButton
-            // 
-            this.uiCryptoKeyBrowseButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
-            this.uiCryptoKeyBrowseButton.FlatAppearance.BorderSize = 0;
-            this.uiCryptoKeyBrowseButton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
-            this.uiCryptoKeyBrowseButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(42)))), ((int)(((byte)(44)))));
-            this.uiCryptoKeyBrowseButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.uiCryptoKeyBrowseButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
-            this.uiCryptoKeyBrowseButton.Location = new System.Drawing.Point(198, 109);
-            this.uiCryptoKeyBrowseButton.Name = "uiCryptoKeyBrowseButton";
-            this.uiCryptoKeyBrowseButton.Size = new System.Drawing.Size(24, 20);
-            this.uiCryptoKeyBrowseButton.TabIndex = 5;
-            this.uiCryptoKeyBrowseButton.Text = "...";
-            this.uiCryptoKeyBrowseButton.UseVisualStyleBackColor = false;
-            this.uiCryptoKeyBrowseButton.Click += new System.EventHandler(this.CryptoKeyBrowseButtonClick);
-            // 
-            // uiCryptoKeyLabel
-            // 
-            this.uiCryptoKeyLabel.AutoSize = true;
-            this.uiCryptoKeyLabel.Location = new System.Drawing.Point(9, 113);
-            this.uiCryptoKeyLabel.Name = "uiCryptoKeyLabel";
-            this.uiCryptoKeyLabel.Size = new System.Drawing.Size(57, 13);
-            this.uiCryptoKeyLabel.TabIndex = 13;
-            this.uiCryptoKeyLabel.Text = "Crypto key";
-            // 
             // darkButton1
             // 
             this.darkButton1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
@@ -304,9 +269,9 @@ namespace domi1819.UpClient.Forms
             this.darkButton1.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(42)))), ((int)(((byte)(44)))));
             this.darkButton1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.darkButton1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
-            this.darkButton1.Location = new System.Drawing.Point(12, 135);
+            this.darkButton1.Location = new System.Drawing.Point(12, 112);
             this.darkButton1.Name = "darkButton1";
-            this.darkButton1.Size = new System.Drawing.Size(210, 23);
+            this.darkButton1.Size = new System.Drawing.Size(102, 23);
             this.darkButton1.TabIndex = 6;
             this.darkButton1.Text = "Account details";
             this.darkButton1.UseVisualStyleBackColor = false;
@@ -381,6 +346,22 @@ namespace domi1819.UpClient.Forms
             this.uiDarkColorView.TabIndex = 10;
             this.uiDarkColorView.ColorSelected += new System.EventHandler(this.DarkColorViewColorSelected);
             // 
+            // darkButton3
+            // 
+            this.darkButton3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
+            this.darkButton3.FlatAppearance.BorderSize = 0;
+            this.darkButton3.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
+            this.darkButton3.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(42)))), ((int)(((byte)(44)))));
+            this.darkButton3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.darkButton3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
+            this.darkButton3.Location = new System.Drawing.Point(120, 112);
+            this.darkButton3.Name = "darkButton3";
+            this.darkButton3.Size = new System.Drawing.Size(102, 23);
+            this.darkButton3.TabIndex = 6;
+            this.darkButton3.Text = "Verify key";
+            this.darkButton3.UseVisualStyleBackColor = false;
+            this.darkButton3.Click += new System.EventHandler(this.VerifyKeyButtonClicked);
+            // 
             // ConfigurationForm
             // 
             this.AcceptButton = this.uiSaveButton;
@@ -389,10 +370,8 @@ namespace domi1819.UpClient.Forms
             this.ClientSize = new System.Drawing.Size(234, 474);
             this.Controls.Add(this.uiDarkColorView);
             this.Controls.Add(this.darkButton2);
+            this.Controls.Add(this.darkButton3);
             this.Controls.Add(this.darkButton1);
-            this.Controls.Add(this.uiCryptoKeyLabel);
-            this.Controls.Add(this.uiCryptoKeyBrowseButton);
-            this.Controls.Add(this.uiCryptoKeyTextBox);
             this.Controls.Add(this.uiSaveButton);
             this.Controls.Add(this.uiCancelButton);
             this.Controls.Add(this.uiScreenshotFormatLabel);
@@ -442,14 +421,12 @@ namespace domi1819.UpClient.Forms
         private DarkButton uiCancelButton;
         private DarkButton uiSaveButton;
         private System.Windows.Forms.NotifyIcon uiNotifyIcon;
-        private DarkTextBox uiCryptoKeyTextBox;
-        private DarkButton uiCryptoKeyBrowseButton;
-        private System.Windows.Forms.Label uiCryptoKeyLabel;
         private DarkButton darkButton1;
         private DarkCheckBox uiPngFormatCheckBox;
         private DarkCheckBox uiJpgFormatCheckBox;
         private System.Windows.Forms.Label uiScreenshotFormatLabel;
         private DarkButton darkButton2;
         private DarkColorView uiDarkColorView;
+        private DarkButton darkButton3;
     }
 }

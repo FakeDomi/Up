@@ -1,27 +1,22 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using domi1819.Crypto;
+using domi1819.UpCore.Crypto;
+using domi1819.UpCore.Network;
 using domi1819.UpCore.Utilities;
 
 namespace domi1819.UpServer
 {
     internal class UpServer
     {
-        internal const int RsaKeySize = 4096;
-        internal const int MessageServerPort = 1819;
-        internal const int TransferServerPort = 1820;
-
-        internal const string KeyFileName = "private.key";
-
         internal static UpServer Instance { get; private set; }
 
-        internal ServerConfigSettings Settings { get; private set; }
+        internal ServerConfig Settings { get; private set; }
 
         internal UserRegister Users { get; private set; }
         internal FileRegister Files { get; private set; }
 
-        private Logger logger;
+        //private Logger logger;
 
         private NetServer messageServer;
 
@@ -41,49 +36,60 @@ namespace domi1819.UpServer
             Console.WriteLine("All rights reserved");
             Console.WriteLine("================================\n");
 
-            this.Settings = ServerConfigSettings.Load();
+            this.Settings = ServerConfig.Load();
             this.Settings.Save();
 
-            if (args.Length > 0 && args[0].Equals("generate-rsa") || !File.Exists(KeyFileName))
-            {
-                Console.Write("Generating a RSA-{0} key. This might take a few seconds... ", RsaKeySize);
+            this.TryCreateDirectory(this.Settings.DataFolder);
+            this.TryCreateDirectory(this.Settings.FileStorageFolder);
+            this.TryCreateDirectory(this.Settings.FileTransferFolder);
+            
+            string privateKeyPath = Path.Combine(this.Settings.DataFolder, Constants.Encryption.PrivateKeyFile);
+            string publicKeyPath = Path.Combine(this.Settings.DataFolder, Constants.Encryption.PublicKeyFile);
 
-                Rsa.GenerateKeyPair("private.key", "public.key", RsaKeySize);
+            if (!File.Exists(privateKeyPath))
+            {
+                Console.Write($"Generating a RSA-{Constants.Encryption.RsaKeySize} key. This might take a few seconds... ");
+
+                Rsa.GenerateKeyPair(privateKeyPath, publicKeyPath, Constants.Encryption.RsaKeySize);
 
                 Console.WriteLine("Done.");
             }
-
-            if (!Directory.Exists(Constants.Server.FileStorageFolder))
-            {
-                Directory.CreateDirectory(Constants.Server.FileStorageFolder);
-            }
-
-            if (!Directory.Exists(Constants.Server.FileTransferFolder))
-            {
-                Directory.CreateDirectory(Constants.Server.FileTransferFolder);
-            }
-
+            
             Console.WriteLine("Starting UpServer...");
 
-            this.logger = new Logger("upserver.log");
+            //this.logger = new Logger("upserver.log");
+
+            RsaKey rsaKey = RsaKey.FromFile(privateKeyPath);
+            
+            if (rsaKey.Csp.KeySize != Constants.Encryption.RsaKeySize)
+            {
+                Console.WriteLine($"Unsupported key size {rsaKey.Csp.KeySize}. Expected: {Constants.Encryption.RsaKeySize}");
+                return;
+            }
 
             this.messageServer = new NetServer();
-            this.messageServer.Start(MessageServerPort, "private.key");
+            this.messageServer.Start(this.Settings.ServerPort, rsaKey);
 
-            Console.WriteLine("Message server listening on port {0}.", MessageServerPort);
-
-            this.Users = new UserRegister(this.logger);
-            this.Files = new FileRegister(this.logger);
+            Console.WriteLine($"Message server listening on port {this.Settings.ServerPort}.");
+            
+            this.Users = new UserRegister(this);
+            this.Files = new FileRegister(this);
 
             Console.WriteLine("UpServer started.");
             
-            //server.Start(555, "");
-
             UpWebService webService = new UpWebService();
 
             while (true)
             {
                 Console.ReadKey(true);
+            }
+        }
+
+        private void TryCreateDirectory(string path)
+        {
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
             }
         }
     }

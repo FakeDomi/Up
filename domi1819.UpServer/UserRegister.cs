@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using domi1819.NanoDB;
 using domi1819.UpCore.Utilities;
@@ -13,17 +14,17 @@ namespace domi1819.UpServer
 
         private readonly NanoDBFile dbFile;
 
-        internal UserRegister(Logger logger)
+        internal UserRegister(UpServer upServer)
         {
             Console.WriteLine("Initializing user register...");
 
-            this.dbFile = new NanoDBFile("users.nano");
+            this.dbFile = new NanoDBFile(Path.Combine(upServer.Settings.DataFolder, Constants.Database.UserDbName));
 
             InitializeResult initResult = this.dbFile.Initialize();
 
             if (initResult == InitializeResult.VersionMismatch)
             {
-                logger.Log("User database could not be read because it was saved in an unsupported format. Please fix or delete the file database.", LogLevel.Error);
+                //logger.Log("User database could not be read because it was saved in an unsupported format. Please fix or delete the file database.", LogLevel.Error);
                 throw new Exception("Database version not supported.");
             }
 
@@ -44,7 +45,7 @@ namespace domi1819.UpServer
 
             if (loadResult != LoadResult.Okay && loadResult != LoadResult.HasDuplicates)
             {
-                logger.Log("User database could not be read because it seems to be corrupt. Please fix or delete the file database.", LogLevel.Error);
+                //logger.Log("User database could not be read because it seems to be corrupt. Please fix or delete the file database.", LogLevel.Error);
                 throw new Exception("Database file corrupt.");
             }
 

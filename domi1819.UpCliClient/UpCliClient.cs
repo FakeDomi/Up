@@ -15,14 +15,14 @@ namespace domi1819.UpCliClient
         {
             Config settings = Config.Load();
 
-            Console.WriteLine("Server    " + settings.ServerAddress + (settings.ServerPort == Constants.DefaultPort ? string.Empty : ":" + settings.ServerPort));
+            Console.WriteLine("Server    " + settings.ServerAddress + (settings.ServerPort == Constants.Server.DefaultPort ? string.Empty : ":" + settings.ServerPort));
             Console.WriteLine("User ID   " + settings.UserId);
             Console.WriteLine("Password  " + new string('*', settings.Password.Length) + "\n");
 
             Console.Write("New server address (leave empty to skip): ");
 
             string serverAddress = Console.ReadLine();
-
+            
             if (serverAddress != string.Empty)
             {
                 // ReSharper disable once PossibleNullReferenceException
@@ -31,7 +31,7 @@ namespace domi1819.UpCliClient
                 if (addressSplit.Length == 1)
                 {
                     settings.ServerAddress = addressSplit[0];
-                    settings.ServerPort = Constants.DefaultPort;
+                    settings.ServerPort = Constants.Server.DefaultPort;
                 }
                 else if (addressSplit.Length == 2)
                 {
@@ -88,7 +88,7 @@ namespace domi1819.UpCliClient
                 }
             }
 
-            settings.Save();
+            settings.SaveFile();
 
             Console.WriteLine("Settings saved.");
         }
@@ -98,7 +98,7 @@ namespace domi1819.UpCliClient
             Console.WriteLine("Connection test...");
 
             Config settings = Config.Load();
-            NetClient client = new NetClient(settings.ServerAddress, settings.ServerPort);
+            NetClient client = new NetClient(settings.ServerAddress, settings.ServerPort, null);
 
             try
             {
@@ -118,7 +118,7 @@ namespace domi1819.UpCliClient
         internal void GetStorageInfo()
         {
             Config settings = Config.Load();
-            NetClient client = new NetClient(settings.ServerAddress, settings.ServerPort);
+            NetClient client = new NetClient(settings.ServerAddress, settings.ServerPort, null);
 
             try
             {
@@ -151,7 +151,7 @@ namespace domi1819.UpCliClient
         internal void ChangePassword()
         {
             Config settings = Config.Load();
-            NetClient client = new NetClient(settings.ServerAddress, settings.ServerPort);
+            NetClient client = new NetClient(settings.ServerAddress, settings.ServerPort, null);
 
             try
             {
@@ -176,7 +176,7 @@ namespace domi1819.UpCliClient
                             if (client.SetPassword(password))
                             {
                                 settings.Password = password;
-                                settings.Save();
+                                settings.SaveFile();
 
                                 Console.WriteLine("Settings saved.");
                             }
@@ -213,7 +213,7 @@ namespace domi1819.UpCliClient
             }
 
             Config settings = Config.Load();
-            NetClient client = new NetClient(settings.ServerAddress, settings.ServerPort);
+            NetClient client = new NetClient(settings.ServerAddress, settings.ServerPort, null);
 
             try
             {
@@ -297,7 +297,7 @@ namespace domi1819.UpCliClient
             }
 
             Config settings = Config.Load();
-            NetClient client = new NetClient(settings.ServerAddress, settings.ServerPort);
+            NetClient client = new NetClient(settings.ServerAddress, settings.ServerPort, null);
 
             try
             {
@@ -464,7 +464,7 @@ namespace domi1819.UpCliClient
             }
 
             Config settings = Config.Load();
-            NetClient client = new NetClient(settings.ServerAddress, settings.ServerPort);
+            NetClient client = new NetClient(settings.ServerAddress, settings.ServerPort, null);
 
             try
             {

@@ -131,7 +131,7 @@ namespace domi1819.UpClient.Forms
                 }
 
                 config.DropArea.Location = this.Location;
-                config.Save();
+                config.SaveFile();
             }
 
             base.OnMouseUp(e);
@@ -162,7 +162,7 @@ namespace domi1819.UpClient.Forms
         private void LockOnClick(object o, EventArgs e)
         {
             this.upClient.Config.DropArea.Lock = !this.upClient.Config.DropArea.Lock;
-            this.upClient.Config.Save();
+            this.upClient.Config.SaveFile();
 
             this.menuItemLock.Text = this.upClient.Config.DropArea.Lock ? "Unlock" : "Lock";
         }

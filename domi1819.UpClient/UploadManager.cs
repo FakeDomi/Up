@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net.Sockets;
 using System.Windows.Forms;
 using domi1819.UpClient.Forms;
@@ -85,7 +86,14 @@ namespace domi1819.UpClient
             }
             catch (Exception)
             {
-                //WTF
+                // Could not connect or smth
+
+                foreach (UploadItem item in this.UploadItems.Where(item => item.TemporaryFile))
+                {
+                    this.CleanupTempFile(item.FolderPath, item.FileName, item.FileExtension);
+                }
+
+                this.UploadItems.Clear();
 
                 return null;
             }

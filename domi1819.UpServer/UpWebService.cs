@@ -15,8 +15,11 @@ namespace domi1819.UpServer
 
         internal UpWebService()
         {
-            this.icon = File.ReadAllBytes("favicon.ico");
-
+            if (File.Exists(Path.Combine(UpServer.Instance.Settings.DataFolder, "favicon.ico")))
+            {
+                this.icon = File.ReadAllBytes(Path.Combine(UpServer.Instance.Settings.DataFolder, "favicon.ico"));
+            }
+            
             this.mimeDict = new Dictionary<string, string>();
 
             this.mimeDict.Add(".jpg", "image/jpeg");
@@ -31,6 +34,11 @@ namespace domi1819.UpServer
             this.mimeDict.Add(".log", "text/plain");
             this.mimeDict.Add(".pdf", "application/pdf");
 
+            this.mimeDict.Add("t", "text/plain");
+            this.mimeDict.Add("i", "image/*");
+            this.mimeDict.Add("v", "video/*");
+            this.mimeDict.Add("a", "audio/*");
+
             Thread t = new Thread(this.Run);
             t.Start();
         }
@@ -41,7 +49,7 @@ namespace domi1819.UpServer
 
             string hostName = UpServer.Instance.Settings.HostName;
 
-            listener.Prefixes.Add($"http://+:{UpServer.Instance.Settings.WebPort}/");
+            listener.Prefixes.Add($"http://*:{UpServer.Instance.Settings.WebPort}/");
 
             try
             {
@@ -72,6 +80,14 @@ namespace domi1819.UpServer
 
                 if (reqUrl.StartsWith("/favicon.ico"))
                 {
+                    if (this.icon == null)
+                    {
+                        res.StatusCode = (int)HttpStatusCode.NotFound;
+                        res.Close();
+
+                        return;
+                    }
+
                     res.ContentLength64 = this.icon.Length;
                     res.OutputStream.Write(this.icon, 0, this.icon.Length);
                     res.OutputStream.Close();
@@ -95,13 +111,15 @@ namespace domi1819.UpServer
 
         private void ProcessDownload(string reqUrl, HttpListenerResponse res)
         {
-            string fileId = reqUrl.Replace("/d?", "").Replace("!", "");
+            // Sample URL: /d?12345678.t
+            string fileId = reqUrl.Substring(3, reqUrl.Length - 3 - Math.Max(reqUrl.IndexOf('.'), 0));
+            string forceType = reqUrl.IndexOf('.') > 0 && reqUrl.LastIndexOf('.') < reqUrl.Length ? reqUrl[reqUrl.IndexOf('.') + 1].ToString() : null;
 
             if (UpServer.Instance.Files.HasFile(fileId) && UpServer.Instance.Files.GetDownloadableFlag(fileId))
             {
                 string fileName = UpServer.Instance.Files.GetFileName(fileId);
 
-                using (FileStream fs = File.OpenRead(Path.Combine("filestor", fileId)))
+                using (FileStream fs = File.OpenRead(Path.Combine(UpServer.Instance.Settings.FileStorageFolder, fileId)))
                 {
                     res.ContentLength64 = fs.Length;
 
@@ -111,7 +129,14 @@ namespace domi1819.UpServer
 
                     string fileExt = Path.GetExtension(fileName) ?? string.Empty;
 
-                    if (this.mimeDict.ContainsKey(fileExt) && !reqUrl.EndsWith("!"))
+                    Console.WriteLine(forceType);
+
+                    if (forceType != null && this.mimeDict.ContainsKey(forceType))
+                    {
+                        res.AddHeader("Content-disposition", "inline; filename=\"" + fileName + "\"");
+                        res.ContentType = this.mimeDict[forceType];
+                    }
+                    else if (this.mimeDict.ContainsKey(fileExt) && !reqUrl.EndsWith("!"))
                     {
                         res.AddHeader("Content-disposition", "inline; filename=\"" + fileName + "\"");
                         res.ContentType = this.mimeDict[fileExt];

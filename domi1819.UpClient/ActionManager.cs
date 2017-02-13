@@ -130,10 +130,10 @@ namespace domi1819.UpClient
         internal void ToggleFileDropArea()
         {
             this.upClient.Config.DropArea.Show = !this.upClient.Config.DropArea.Show;
-            this.upClient.Config.Save();
+            this.upClient.Config.SaveFile();
 
             this.upClient.FileDropForm.Reload();
-            this.upClient.ConfigurationForm.RebuildMenu();
+            this.upClient.ConfigurationForm.RebuildContextMenu();
         }
 
         internal void ShowFiles()

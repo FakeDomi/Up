@@ -51,7 +51,7 @@ namespace domi1819.UpClient.Forms
             this.uiSaveLocalClipboardKeyBox.RefreshText();
         }
 
-        public void SaveToConfig(Config settings)
+        public void FillConfig(Config settings)
         {
             Hotkeys hotkeys = settings.Hotkeys;
 
