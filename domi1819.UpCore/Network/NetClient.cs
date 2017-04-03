@@ -23,8 +23,8 @@ namespace domi1819.UpCore.Network
 
         private int connectHandles;
 
-        public string Address { get; set; }
-        public int Port { get; set; }
+        public string Address { private get; set; }
+        public int Port { private get; set; }
         public bool Connected { get; private set; }
 
         public delegate bool AddItemCallback(string fileId, string fileName, long fileSize, DateTime updateDate, int downloads);
@@ -37,18 +37,24 @@ namespace domi1819.UpCore.Network
             this.rsaCache = rsaCache;
         }
 
-        public void ClaimConnectHandle()
+        public bool ClaimConnectHandle()
         {
             lock (this.connectLock)
             {
                 if (!this.Connected)
                 {
-                    this.Connect();
+                    if (!this.Connect())
+                    {
+                        return false;
+                    }
+
                     this.connectHandles = 0;
                 }
 
                 this.connectHandles++;
             }
+
+            return true;
         }
 
         public void ReleaseConnectHandle()
@@ -80,6 +86,7 @@ namespace domi1819.UpCore.Network
                 if (!this.rsaCache.LoadKey(serverAddress))
                 {
                     // TODO: No valid key found.
+                    this.client.Close();
                     return false;
                 }
 
@@ -91,6 +98,7 @@ namespace domi1819.UpCore.Network
                     if (keyFingerprint[i] != serverFingerprint[i])
                     {
                         // TODO: Server key fingerprint doesn't match local key fingerprint.
+                        this.client.Close();
                         return false;
                     }
                 }

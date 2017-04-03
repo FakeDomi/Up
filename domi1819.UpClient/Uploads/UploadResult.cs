@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 
-namespace domi1819.UpClient
+namespace domi1819.UpClient.Uploads
 {
     internal class UploadResult
     {
-        internal List<string> FileLinks { get; set; }
+        internal List<string> FileLinks { get; } = new List<string>();
 
         internal int SucceededFiles { get; set; }
 
@@ -13,10 +13,5 @@ namespace domi1819.UpClient
         internal string Title { get; set; }
 
         internal string Message { get; set; }
-
-        internal UploadResult()
-        {
-            this.FileLinks = new List<string>();
-        }
     }
 }

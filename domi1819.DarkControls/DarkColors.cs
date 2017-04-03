@@ -2,7 +2,7 @@
 
 namespace domi1819.DarkControls
 {
-    public class DarkColors
+    public static class DarkColors
     {
         private static Color strongColor;
 

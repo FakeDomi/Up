@@ -11,99 +11,122 @@ using domi1819.UpCore.Config;
 using domi1819.UpCore.Network;
 using domi1819.UpCore.Utilities;
 
-namespace domi1819.UpClient
+namespace domi1819.UpClient.Uploads
 {
     internal class UploadManager
     {
-        private readonly UpClient upClient;
-        private readonly UploadQueueForm uploadForm;
-        
-        internal List<UploadItem> UploadItems { get; }
+        private readonly Config config;
+        private readonly NetClient netClient;
+
+        private readonly UploadQueueForm queueForm;
+
+        private readonly List<UploadItem> uploadItems = new List<UploadItem>();
 
         internal UploadManager(UpClient upClient)
         {
-            this.upClient = upClient;
+            this.config = upClient.Config;
+            this.netClient = upClient.NetClient;
 
-            this.UploadItems = new List<UploadItem>();
-            this.uploadForm = new UploadQueueForm(upClient, this);
+            this.queueForm = new UploadQueueForm(upClient);
+            
+            this.queueForm.BackgroundWorker.DoWork += this.StartUpload;
+            this.queueForm.BackgroundWorker.RunWorkerCompleted += this.UploadCompleted;
+
         }
 
         internal void AddItem(UploadItem item)
         {
-            this.UploadItems.Add(item);
+            lock (this.uploadItems)
+            {
+                this.uploadItems.Add(item);
+            }
+
             this.Refresh();
         }
 
         internal void AddItems(IEnumerable<string> paths)
         {
-            foreach (string path in paths)
+            lock (this.uploadItems)
             {
-                this.UploadItems.Add(new UploadItem { FolderPath = Path.GetDirectoryName(path), FileName = Path.GetFileNameWithoutExtension(path), FileExtension = Path.GetExtension(path) });
+                foreach (string path in paths)
+                {
+                    this.uploadItems.Add(new UploadItem { FolderPath = Path.GetDirectoryName(path), FileName = Path.GetFileNameWithoutExtension(path), FileExtension = Path.GetExtension(path) });
+                }
             }
 
             this.Refresh();
         }
 
-        internal void Refresh()
+        private void Refresh()
         {
-            this.uploadForm.FitSize(this.uploadForm.RefreshList(this.UploadItems));
+            this.queueForm.FitSize(this.queueForm.RefreshList(this.uploadItems));
 
-            if (!this.uploadForm.BackgroundWorker.IsBusy)
+            if (!this.queueForm.BackgroundWorker.IsBusy)
             {
-                this.uploadForm.KeepVisible = true;
-                this.uploadForm.BackgroundWorker.RunWorkerAsync();
+                this.queueForm.KeepVisible = true;
+                this.queueForm.BackgroundWorker.RunWorkerAsync();
             }
-
-            this.uploadForm.Show();
+            
+            this.queueForm.Show();
         }
 
-        internal void StartUpload(object sender, DoWorkEventArgs args)
+        private void StartUpload(object sender, DoWorkEventArgs args)
         {
             BackgroundWorker worker = (BackgroundWorker)sender;
-
-            Config settings = this.upClient.Config;
-            NetClient client = this.upClient.NetClient;
-
+            
             try
             {
-                client.ClaimConnectHandle();
+                if (!this.netClient.ClaimConnectHandle())
+                {
+                    args.Result = new UploadResult { Title = "Connection failed!", Message = "Key is not trusted or has changed." };
+                    return;
+                }
             }
             catch (SocketException ex)
             {
+                List<UploadItem> cleanupItems;
+
+                lock (this.uploadItems)
+                {
+                    cleanupItems = this.uploadItems.Where(item => item.TemporaryFile).ToList();
+                    this.uploadItems.Clear();
+                }
+
+                foreach (UploadItem item in cleanupItems)
+                {
+                    CleanupTempFile(item.FolderPath, item.FileName, item.FileExtension, this.config.LocalScreenshotCopy);
+                }
+
                 args.Result = new UploadResult { Title = "Connection failed!", Message = ex.Message };
                 return;
             }
 
-            args.Result = client.Login(settings.UserId, settings.Password) ? this.Upload(worker, client) : new UploadResult { Title = "Login failed!", Message = "Please check your account settings." };
-            client.ReleaseConnectHandle();
+            if (this.netClient.Login(this.config.UserId, this.config.Password))
+            {
+                args.Result = this.Upload(worker, this.netClient);
+            }
+            else
+            {
+                args.Result = new UploadResult { Title = "Login failed!", Message = "Please check your account settings." };
+            }
+
+            this.netClient.ReleaseConnectHandle();
         }
 
-        internal UploadResult Upload(BackgroundWorker worker, NetClient client)
+        private UploadResult Upload(BackgroundWorker worker, NetClient client)
         {
-            try
-            {
-                client.ClaimConnectHandle();
-            }
-            catch (Exception)
-            {
-                // Could not connect or smth
-
-                foreach (UploadItem item in this.UploadItems.Where(item => item.TemporaryFile))
-                {
-                    this.CleanupTempFile(item.FolderPath, item.FileName, item.FileExtension);
-                }
-
-                this.UploadItems.Clear();
-
-                return null;
-            }
-
             byte[] fileBuf = new byte[4096];
             UploadResult result = new UploadResult();
 
-            while (this.UploadItems.Count > 0)
+            while (this.uploadItems.Count > 0)
             {
-                UploadItem item = this.UploadItems[0];
+                UploadItem item;
+
+                lock (this.uploadItems)
+                {
+                    item = this.uploadItems[0];
+                } 
+
                 string file = Path.Combine(item.FolderPath, $"{item.FileName}{item.FileExtension}");
 
                 if (File.Exists(file))
@@ -148,6 +171,8 @@ namespace domi1819.UpClient
                     {
                         result.FailedFiles++;
                     }
+
+                    this.queueForm.Invoke(new Action(this.Refresh));
                 }
                 else
                 {
@@ -156,23 +181,25 @@ namespace domi1819.UpClient
 
                 if (item.TemporaryFile) // Screenshot or clipboard dump
                 {
-                    this.CleanupTempFile(item.FolderPath, item.FileName, item.FileExtension);
+                    CleanupTempFile(item.FolderPath, item.FileName, item.FileExtension, this.config.LocalScreenshotCopy);
                 }
 
-                this.UploadItems.RemoveAt(0);
+                lock (this.uploadItems)
+                {
+                    this.uploadItems.RemoveAt(0);
+                }
+
                 worker.ReportProgress(100, 0L);
             }
-
-            client.ReleaseConnectHandle();
 
             return result;
         }
 
-        internal void UploadCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void UploadCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             UploadResult result = (UploadResult)e.Result;
 
-            this.uploadForm.Hide();
+            this.queueForm.Hide();
 
             if (result.SucceededFiles + result.FailedFiles == 0)
             {
@@ -195,25 +222,25 @@ namespace domi1819.UpClient
             }
         }
 
-        internal void CleanupTempFile(string folderPath, string fileName, string fileExtension, bool showInExplorer = false)
+        internal static void CleanupTempFile(string folderPath, string fileName, string fileExtension, bool copyLocal, bool showInExplorer = false)
         {
-            if (!Directory.Exists(Constants.Client.LocalItemsFolder))
+            if (copyLocal || showInExplorer)
             {
-                Directory.CreateDirectory(Constants.Client.LocalItemsFolder);
-            }
+                if (!Directory.Exists(Constants.Client.LocalItemsFolder))
+                {
+                    Directory.CreateDirectory(Constants.Client.LocalItemsFolder);
+                }
 
-            string sourcePath = Path.Combine(folderPath, $"{fileName}{fileExtension}");
-            string destinationPath = Path.Combine(Constants.Client.LocalItemsFolder, $"{fileName}{fileExtension}");
-            int tries = 0;
-            
-            while (File.Exists(destinationPath))
-            {
-                tries++;
-                destinationPath = Path.Combine(Constants.Client.LocalItemsFolder, $"{fileName}_{tries}{fileExtension}");
-            }
+                string sourcePath = Path.Combine(folderPath, $"{fileName}{fileExtension}");
+                string destinationPath = Path.Combine(Constants.Client.LocalItemsFolder, $"{fileName}{fileExtension}");
+                int tries = 0;
 
-            if (this.upClient.Config.LocalScreenshotCopy || showInExplorer)
-            {
+                while (File.Exists(destinationPath))
+                {
+                    tries++;
+                    destinationPath = Path.Combine(Constants.Client.LocalItemsFolder, $"{fileName}_{tries}{fileExtension}");
+                }
+
                 File.Move(sourcePath, destinationPath);
 
                 if (showInExplorer)

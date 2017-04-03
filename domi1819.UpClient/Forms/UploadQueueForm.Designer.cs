@@ -30,7 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UploadQueueForm));
-            this.listBox1 = new System.Windows.Forms.ListBox();
+            this.uiUploadItemsListBox = new System.Windows.Forms.ListBox();
             this.coloredBox1 = new domi1819.DarkControls.ColoredBox();
             this.uiProgressBar = new domi1819.DarkControls.DarkProgressBar();
             this.uiSpeedLabel = new System.Windows.Forms.Label();
@@ -38,18 +38,18 @@
             this.uiHideTimer = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
-            // listBox1
+            // uiUploadItemsListBox
             // 
-            this.listBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
-            this.listBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.listBox1.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.listBox1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(12, 89);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(190, 91);
-            this.listBox1.TabIndex = 0;
-            this.listBox1.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.ListBoxDrawItem);
+            this.uiUploadItemsListBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
+            this.uiUploadItemsListBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.uiUploadItemsListBox.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.uiUploadItemsListBox.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
+            this.uiUploadItemsListBox.FormattingEnabled = true;
+            this.uiUploadItemsListBox.Location = new System.Drawing.Point(12, 89);
+            this.uiUploadItemsListBox.Name = "uiUploadItemsListBox";
+            this.uiUploadItemsListBox.Size = new System.Drawing.Size(190, 91);
+            this.uiUploadItemsListBox.TabIndex = 0;
+            this.uiUploadItemsListBox.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.ListBoxDrawItem);
             // 
             // coloredBox1
             // 
@@ -97,7 +97,7 @@
             this.Controls.Add(this.uiSpeedLabel);
             this.Controls.Add(this.uiProgressBar);
             this.Controls.Add(this.coloredBox1);
-            this.Controls.Add(this.listBox1);
+            this.Controls.Add(this.uiUploadItemsListBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
@@ -112,7 +112,7 @@
 
         #endregion
 
-        private System.Windows.Forms.ListBox listBox1;
+        private System.Windows.Forms.ListBox uiUploadItemsListBox;
         private DarkControls.ColoredBox coloredBox1;
         private DarkControls.DarkProgressBar uiProgressBar;
         private System.Windows.Forms.Label uiSpeedLabel;

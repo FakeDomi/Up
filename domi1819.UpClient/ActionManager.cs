@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using domi1819.UpClient.Uploads;
 using domi1819.UpCore.Utilities;
 
 namespace domi1819.UpClient
@@ -69,7 +70,7 @@ namespace domi1819.UpClient
 
                 if (local)
                 {
-                    this.upClient.UploadManager.CleanupTempFile(tempFolderPath, fileName, fileExt, true);
+                    UploadManager.CleanupTempFile(tempFolderPath, fileName, fileExt, true);
                 }
                 else
                 {

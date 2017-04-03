@@ -5,22 +5,23 @@ using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
 using domi1819.DarkControls;
+using domi1819.UpClient.Uploads;
 using domi1819.UpCore.Utilities;
 
 namespace domi1819.UpClient.Forms
 {
     internal partial class UploadQueueForm : DarkForm
     {
-        private readonly UpClient upClient;
-        
         internal bool KeepVisible { get; set; }
-        internal bool IsVisible { get; set; }
-        
+
+        private int totalItemCount;
+        private bool isVisible;
+
         // ReSharper disable once ConvertToAutoProperty
         internal BackgroundWorker BackgroundWorker => this.uiBackgroundWorker;
 
         protected override bool ShowWithoutActivation => true;
-
+        
         protected override CreateParams CreateParams
         {
             get
@@ -32,26 +33,21 @@ namespace domi1819.UpClient.Forms
             }
         }
         
-        public UploadQueueForm(UpClient upClient, UploadManager manager)
+        public UploadQueueForm(UpClient upClient)
         {
             this.InitializeComponent();
-
-            this.upClient = upClient;
-
-            this.BackgroundWorker.DoWork += manager.StartUpload;
-            this.BackgroundWorker.RunWorkerCompleted += manager.UploadCompleted;
-
+            
             Screen screen = Screen.FromPoint(this.Location);
             this.Location = new Point(screen.WorkingArea.Right - this.Width, screen.WorkingArea.Bottom - this.Height);
             
-            this.upClient.ConfigurationForm.ThemeColorChanged += this.ConfigurationFormOnThemeColorChanged;
+            upClient.ConfigurationForm.ThemeColorChanged += this.ConfigurationFormOnThemeColorChanged;
         }
 
         internal new void Show()
         {
             this.uiHideTimer.Stop();
 
-            if (!this.IsVisible)
+            if (!this.isVisible)
             {
                 this.Location = new Point(Screen.PrimaryScreen.WorkingArea.Right - this.Width, Screen.PrimaryScreen.WorkingArea.Bottom - this.Height + 55);
 
@@ -70,7 +66,7 @@ namespace domi1819.UpClient.Forms
                     Thread.Sleep(10);
                 }
 
-                this.IsVisible = true;
+                this.isVisible = true;
             }
 
             if (!this.KeepVisible)
@@ -92,26 +88,29 @@ namespace domi1819.UpClient.Forms
             }
 
             base.Hide();
-            this.IsVisible = false;
+            this.isVisible = false;
         }
 
         internal int RefreshList(IList<UploadItem> items)
         {
-            ListBox.ObjectCollection visualItems = this.listBox1.Items;
+            int maxItemCount = Constants.Client.UploadQueueMaxItemCount;
+            ListBox.ObjectCollection visualItems = this.uiUploadItemsListBox.Items;
 
             visualItems.Clear();
 
-            for (int i = 0; i < 7; i++)
+            for (int i = 0; i < maxItemCount; i++)
             {
-                if (i == 6 && items.Count > 7)
+                if (items.Count > maxItemCount && i == maxItemCount - 1)
                 {
-                    visualItems.Add(items.Count - 6 + " more files");
+                    visualItems.Add($"{items.Count - (maxItemCount - 1)} more files");
                 }
                 else if (i < items.Count)
                 {
                     visualItems.Add($"{items[i].FileName}{items[i].FileExtension}");
                 }
             }
+
+            this.totalItemCount = items.Count;
 
             return visualItems.Count;
         }
@@ -165,18 +164,13 @@ namespace domi1819.UpClient.Forms
         {
             this.uiProgressBar.ValueInt = e.ProgressPercentage;
             this.uiSpeedLabel.Text = $"{Util.GetByteSizeText((long)e.UserState)}/s";
-
-            if (e.ProgressPercentage == 100 && (long)e.UserState == 0L)
-            {
-                this.FitSize(this.RefreshList(this.upClient.UploadManager.UploadItems));
-            }
         }
         
         private void ListBoxDrawItem(object sender, DrawItemEventArgs e)
         {
-            int uploadItemCount = this.upClient.UploadManager.UploadItems.Count;
+            int maxItemCount = Constants.Client.UploadQueueMaxItemCount;
 
-            if (e.Index < 0 || e.Index >= uploadItemCount || e.Index >= 7)
+            if (e.Index < 0 || e.Index >= this.totalItemCount || e.Index >= maxItemCount)
             {
                 return;
             }
@@ -187,13 +181,13 @@ namespace domi1819.UpClient.Forms
             {
                 font = new Font(e.Font, FontStyle.Bold);
             }
-            else if (e.Index == 6 && uploadItemCount > 7)
+            else if (this.totalItemCount > maxItemCount && e.Index == maxItemCount - 1)
             {
                 font = new Font(e.Font, FontStyle.Italic);
             }
 
             e.DrawBackground();
-            e.Graphics.DrawString(((ListBox)(sender)).Items[e.Index].ToString(), font, new SolidBrush(e.ForeColor), e.Bounds);
+            e.Graphics.DrawString(this.uiUploadItemsListBox.Items[e.Index].ToString(), font, new SolidBrush(e.ForeColor), e.Bounds);
             e.DrawFocusRectangle();
         }
 
@@ -202,6 +196,7 @@ namespace domi1819.UpClient.Forms
             this.uiHideTimer.Stop();
             this.Hide();
         }
+
         private void ConfigurationFormOnThemeColorChanged(object sender, ColorChangedEventArgs colorChangedEventArgs)
         {
             this.uiProgressBar.BarColor = colorChangedEventArgs.NewColor;

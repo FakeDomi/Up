@@ -3,19 +3,19 @@ using System.IO;
 using System.Text;
 using System.Xml;
 
-namespace domi1819.UpServer
+namespace domi1819.UpCore.Utilities
 {
-    internal class WrappedXmlWriter : XmlWriter
+    public class FancyXmlWriter : XmlWriter
     {
         private readonly XmlWriter xmlWriter;
 
         public override WriteState WriteState => this.xmlWriter.WriteState;
 
-        internal WrappedXmlWriter(TextWriter writer)
+        public FancyXmlWriter(TextWriter writer)
         {
             this.xmlWriter = Create(writer, new XmlWriterSettings { Encoding = Encoding.UTF8, NewLineChars = Environment.NewLine, Indent = true });
         }
-        
+
         public override void WriteStartDocument()
         {
             this.xmlWriter.WriteStartDocument();

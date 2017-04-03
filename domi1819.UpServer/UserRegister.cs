@@ -18,7 +18,7 @@ namespace domi1819.UpServer
         {
             Console.WriteLine("Initializing user register...");
 
-            this.dbFile = new NanoDBFile(Path.Combine(upServer.Settings.DataFolder, Constants.Database.UserDbName));
+            this.dbFile = new NanoDBFile(Path.Combine(upServer.Config.DataFolder, Constants.Database.UserDbName));
 
             InitializeResult initResult = this.dbFile.Initialize();
 

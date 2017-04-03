@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using domi1819.UpCore.Native;
+using domi1819.UpCore.Windows;
 
 namespace domi1819.UpClient.StorageExplorer
 {

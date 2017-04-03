@@ -10,52 +10,53 @@ namespace domi1819.UpServer
 {
     internal class UpWebService
     {
-        private readonly byte[] icon;
-        private readonly Dictionary<string, string> mimeDict;
+        private static readonly Dictionary<string, string> MimeDict = new Dictionary<string, string>();
 
-        internal UpWebService()
+        private static byte[] iconData;
+
+        private readonly ServerConfig config;
+        private readonly FileManager files;
+
+        internal UpWebService(UpServer upServer)
         {
-            if (File.Exists(Path.Combine(UpServer.Instance.Settings.DataFolder, "favicon.ico")))
+            this.config = upServer.Config;
+            this.files = upServer.Files;
+
+            if (File.Exists(Path.Combine(this.config.DataFolder, "favicon.ico")))
             {
-                this.icon = File.ReadAllBytes(Path.Combine(UpServer.Instance.Settings.DataFolder, "favicon.ico"));
+                iconData = File.ReadAllBytes(Path.Combine(this.config.DataFolder, "favicon.ico"));
             }
             
-            this.mimeDict = new Dictionary<string, string>();
+            MimeDict.Add(".jpg", "image/jpeg");
+            MimeDict.Add(".jpeg", "image/jpeg");
+            MimeDict.Add(".png", "image/png");
+            MimeDict.Add(".txt", "text/plain");
+            MimeDict.Add(".xml", "text/plain");
+            MimeDict.Add(".java", "text/plain");
+            MimeDict.Add(".cs", "text/plain");
+            MimeDict.Add(".cfg", "text/plain");
+            MimeDict.Add(".conf", "text/plain");
+            MimeDict.Add(".log", "text/plain");
+            MimeDict.Add(".pdf", "application/pdf");
+        }
 
-            this.mimeDict.Add(".jpg", "image/jpeg");
-            this.mimeDict.Add(".jpeg", "image/jpeg");
-            this.mimeDict.Add(".png", "image/png");
-            this.mimeDict.Add(".txt", "text/plain");
-            this.mimeDict.Add(".xml", "text/plain");
-            this.mimeDict.Add(".java", "text/plain");
-            this.mimeDict.Add(".cs", "text/plain");
-            this.mimeDict.Add(".cfg", "text/plain");
-            this.mimeDict.Add(".conf", "text/plain");
-            this.mimeDict.Add(".log", "text/plain");
-            this.mimeDict.Add(".pdf", "application/pdf");
-
-            this.mimeDict.Add("t", "text/plain");
-            this.mimeDict.Add("i", "image/*");
-            this.mimeDict.Add("v", "video/*");
-            this.mimeDict.Add("a", "audio/*");
-
-            Thread t = new Thread(this.Run);
-            t.Start();
+        internal void Start()
+        {
+            Thread thread = new Thread(this.Run) { Name = "Up HTTP Server Dispatcher" };
+            thread.Start();
         }
 
         private void Run()
         {
             HttpListener listener = new HttpListener();
-
-            string hostName = UpServer.Instance.Settings.HostName;
-
-            listener.Prefixes.Add($"http://*:{UpServer.Instance.Settings.WebPort}/");
+            
+            listener.Prefixes.Add($"http://{this.config.HttpServerListenerName}:{this.config.HttpServerPort}/");
 
             try
             {
                 listener.Start();
 
-                Console.WriteLine($"Listening for HTTP connections ({hostName}:{UpServer.Instance.Settings.WebPort})");
+                Console.WriteLine($"Listening for HTTP connections ({this.config.HostName}:{this.config.HttpServerPort})");
 
                 while (true)
                 {
@@ -80,7 +81,7 @@ namespace domi1819.UpServer
 
                 if (reqUrl.StartsWith("/favicon.ico"))
                 {
-                    if (this.icon == null)
+                    if (iconData == null)
                     {
                         res.StatusCode = (int)HttpStatusCode.NotFound;
                         res.Close();
@@ -88,19 +89,19 @@ namespace domi1819.UpServer
                         return;
                     }
 
-                    res.ContentLength64 = this.icon.Length;
-                    res.OutputStream.Write(this.icon, 0, this.icon.Length);
+                    res.ContentLength64 = iconData.Length;
+                    res.OutputStream.Write(iconData, 0, iconData.Length);
                     res.OutputStream.Close();
 
                     res.Close();
                 }
-                else if (reqUrl.StartsWith("/d?"))
+                else if (reqUrl.StartsWith("/d/"))
                 {
-                    this.ProcessDownload(reqUrl, res);
+                    this.ProcessFileDownload(reqUrl, res);
                 }
-                else if (reqUrl.StartsWith("/f?"))
+                else if (reqUrl.StartsWith("/i/"))
                 {
-                    this.ProcessFileQuery(reqUrl, res);
+                    this.ProcessFileInfo(reqUrl, res);
                 }
             }
             catch (Exception ex)
@@ -109,68 +110,50 @@ namespace domi1819.UpServer
             }
         }
 
-        private void ProcessDownload(string reqUrl, HttpListenerResponse res)
+        private void ProcessFileDownload(string reqUrl, HttpListenerResponse res)
         {
-            // Sample URL: /d?12345678.t
-            string fileId = reqUrl.Substring(3, reqUrl.Length - 3 - Math.Max(reqUrl.IndexOf('.'), 0));
-            string forceType = reqUrl.IndexOf('.') > 0 && reqUrl.LastIndexOf('.') < reqUrl.Length ? reqUrl[reqUrl.IndexOf('.') + 1].ToString() : null;
-
-            if (UpServer.Instance.Files.HasFile(fileId) && UpServer.Instance.Files.GetDownloadableFlag(fileId))
+            // Link format: /d/12345678
+            string fileId = reqUrl.Substring(3, Constants.Server.FileIdLength);
+            
+            if (this.files.FileExists(fileId) && this.files.GetDownloadableFlag(fileId))
             {
-                string fileName = UpServer.Instance.Files.GetFileName(fileId);
+                string fileName = this.files.GetFileName(fileId);
 
-                using (FileStream fs = File.OpenRead(Path.Combine(UpServer.Instance.Settings.FileStorageFolder, fileId)))
+                using (FileStream fileStream = File.OpenRead(Path.Combine(this.config.FileStorageFolder, fileId)))
                 {
-                    res.ContentLength64 = fs.Length;
-
-                    //Console.WriteLine("Sending file " + fileId + " (" + fileName + ")| size=" + fs.Length + "b");
-
-                    res.SendChunked = false;
+                    res.ContentLength64 = fileStream.Length;
 
                     string fileExt = Path.GetExtension(fileName) ?? string.Empty;
-
-                    Console.WriteLine(forceType);
-
-                    if (forceType != null && this.mimeDict.ContainsKey(forceType))
+                    
+                    if (MimeDict.ContainsKey(fileExt) && !reqUrl.EndsWith("!"))
                     {
                         res.AddHeader("Content-disposition", "inline; filename=\"" + fileName + "\"");
-                        res.ContentType = this.mimeDict[forceType];
-                    }
-                    else if (this.mimeDict.ContainsKey(fileExt) && !reqUrl.EndsWith("!"))
-                    {
-                        res.AddHeader("Content-disposition", "inline; filename=\"" + fileName + "\"");
-                        res.ContentType = this.mimeDict[fileExt];
+                        res.ContentType = MimeDict[fileExt];
                     }
                     else
                     {
                         res.AddHeader("Content-disposition", "attachment; filename=\"" + fileName + "\"");
                         res.ContentType = "application/octet-stream";
                     }
-                    
+
+                    Stream outStream = res.OutputStream;
                     byte[] buffer = new byte[4 * 1024];
+                    int bytesRead;
 
-                    using (BinaryWriter bw = new BinaryWriter(res.OutputStream))
+                    while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) > 0)
                     {
-                        int read;
-
-                        while ((read = fs.Read(buffer, 0, buffer.Length)) > 0)
-                        {
-                            bw.Write(buffer, 0, read);
-                            bw.Flush();
-
-                            //if (!UpServer.Instance.Files.GetDownloadableFlag(fileId))
-                            //{
-                            //    throw new Exception("abort download");
-                            //}
-                        }
-
-                        res.OutputStream.Close();
-                        bw.Close();
+                        outStream.Write(buffer, 0, bytesRead);
+                        
+                        //if (!this.files.GetDownloadableFlag(fileId))
+                        //{
+                        //    throw new Exception("abort download");
+                        //}
                     }
 
+                    res.OutputStream.Close();
                     res.Close();
 
-                    UpServer.Instance.Files.AddFileDownload(fileId);
+                    this.files.IncrementDownloadCount(fileId);
                 }
             }
             else
@@ -185,20 +168,21 @@ namespace domi1819.UpServer
             }
         }
 
-        private void ProcessFileQuery(string reqUrl, HttpListenerResponse res)
+        private void ProcessFileInfo(string reqUrl, HttpListenerResponse res)
         {
-            string fileId = reqUrl.Replace("/f?", "");
-
-            if (UpServer.Instance.Files.HasFile(fileId))
+            // Link format: /i/12345678
+            string fileId = reqUrl.Substring(3, Constants.Server.FileIdLength);
+            
+            if (this.files.FileExists(fileId))
             {
-                string fileName = UpServer.Instance.Files.GetFileName(fileId);
-                int downloads = UpServer.Instance.Files.GetFileDownloads(fileId);
-                long size = UpServer.Instance.Files.GetFileSize(fileId);
+                string fileName = this.files.GetFileName(fileId);
+                int downloads = this.files.GetFileDownloads(fileId);
+                long size = this.files.GetFileSize(fileId);
                 string sizeText = Util.GetByteSizeText(size) + (size >= 1024 ? " (" + size + (size == 1 ? " byte)" : " bytes)") : string.Empty);
                 string trafficCaused = Util.GetByteSizeText(size * (downloads + 1));
-                string timeStamp = UpServer.Instance.Files.GetUploadDate(fileId).ToString("yyyy-MM-dd HH:mm:ss");
+                string timeStamp = this.files.GetUploadDate(fileId).ToString("yyyy-MM-dd HH:mm:ss");
 
-                byte[] bytes = Encoding.UTF8.GetBytes($"<html><head><title>^up - File Details</title><style type=\"text/css\">td{{padding:2px 8px 2px 8px;}}</style></head><body bgcolor=\"#2D2D30\"><font color=\"#F1F1F1\"><table style=\"color: #F1F1F1; border: 1px solid #434344; background: #252526\"><tr><td>File name</td><td>{fileName}</td></tr><tr><td>Uploaded on</td><td>{timeStamp}</td></tr><tr><td>File size</td><td>{sizeText}</td></tr><tr><td>Downloads</td><td>{downloads}</td></tr><tr><td>Traffic caused</td><td>{trafficCaused}</td></tr></table><br><address>UpServer {Constants.Version} at {UpServer.Instance.Settings.HostName}</address></body></html>");
+                byte[] bytes = Encoding.UTF8.GetBytes($"<html><head><title>^up - File Details</title><style type=\"text/css\">td{{padding:2px 8px 2px 8px;}}</style></head><body bgcolor=\"#2D2D30\"><font color=\"#F1F1F1\"><table style=\"color: #F1F1F1; border: 1px solid #434344; background: #252526\"><tr><td>File name</td><td>{fileName}</td></tr><tr><td>Uploaded on</td><td>{timeStamp}</td></tr><tr><td>File size</td><td>{sizeText}</td></tr><tr><td>Downloads</td><td>{downloads}</td></tr><tr><td>Traffic caused</td><td>{trafficCaused}</td></tr></table><br><address>UpServer {Constants.Version} at {this.config.HostName}</address></body></html>");
 
                 res.ContentLength64 = bytes.Length;
                 res.OutputStream.Write(bytes, 0, bytes.Length);
@@ -214,7 +198,7 @@ namespace domi1819.UpServer
 
         private void SendFileNotFound(HttpListenerResponse res, string fileId)
         {
-            byte[] bytes = Encoding.UTF8.GetBytes($"<html><head><title>^up - File not found</title></head><body bgcolor=\"#2D2D30\"><font color=\"#F1F1F1\">The requested file {fileId} doesn't exist.<br><address>UpServer { Constants.Version } at {UpServer.Instance.Settings.HostName}</address></body></html>");
+            byte[] bytes = Encoding.UTF8.GetBytes($"<html><head><title>^up - File not found</title></head><body bgcolor=\"#2D2D30\"><font color=\"#F1F1F1\">The requested file {fileId} doesn't exist.<br><address>UpServer { Constants.Version } at {this.config.HostName}</address></body></html>");
 
             res.ContentLength64 = bytes.Length;
             res.OutputStream.Write(bytes, 0, bytes.Length);

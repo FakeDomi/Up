@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using domi1819.DarkControls;
+using domi1819.UpClient.Uploads;
 using domi1819.UpCore.Config;
 using domi1819.UpCore.Utilities;
 
@@ -223,7 +224,7 @@ namespace domi1819.UpClient.Forms
 
                 if (this.localScreenshot)
                 {
-                    this.upClient.UploadManager.CleanupTempFile(tempFolderPath, fileName, fileExtension, true);
+                    UploadManager.CleanupTempFile(tempFolderPath, fileName, fileExtension, true);
                 }
                 else
                 {

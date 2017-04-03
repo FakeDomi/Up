@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace domi1819.UpCore.Native
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable FieldCanBeMadeReadOnly.Global
+namespace domi1819.UpCore.Windows
 {
     public static class User32
     {

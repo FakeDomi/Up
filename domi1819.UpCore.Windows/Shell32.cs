@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace domi1819.UpCore.Native
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable FieldCanBeMadeReadOnly.Global
+namespace domi1819.UpCore.Windows
 {
     public static class Shell32
     {
         [DllImport("shell32.dll")]
-        // ReSharper disable once InconsistentNaming
         public static extern IntPtr SHGetFileInfo(string pszPath, uint dwFileAttributes, ref SHFILEINFO psfi, uint cbSizeFileInfo, uint uFlags);
         
         [StructLayout(LayoutKind.Sequential)]

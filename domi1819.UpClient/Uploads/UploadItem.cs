@@ -1,4 +1,4 @@
-﻿namespace domi1819.UpClient
+﻿namespace domi1819.UpClient.Uploads
 {
     internal class UploadItem
     {

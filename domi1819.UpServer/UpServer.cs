@@ -11,10 +11,11 @@ namespace domi1819.UpServer
     {
         internal static UpServer Instance { get; private set; }
 
-        internal ServerConfig Settings { get; private set; }
+        internal ServerConfig Config { get; private set; }
 
         internal UserRegister Users { get; private set; }
-        internal FileRegister Files { get; private set; }
+
+        internal FileManager Files { get; private set; }
 
         //private Logger logger;
 
@@ -27,24 +28,20 @@ namespace domi1819.UpServer
 
         internal void RunServer(string[] args)
         {
-            Constants.IsServer = true;
-
             Console.WriteLine("================================");
-            Console.WriteLine("UpServer " + Assembly.GetExecutingAssembly().GetName().Version);
+            Console.WriteLine($"UpServer {Assembly.GetExecutingAssembly().GetName().Version}");
             Console.WriteLine("https://up.domi1819.xyz");
-            Console.WriteLine("2016 domi1819");
-            Console.WriteLine("All rights reserved");
             Console.WriteLine("================================\n");
 
-            this.Settings = ServerConfig.Load();
-            this.Settings.Save();
-
-            this.TryCreateDirectory(this.Settings.DataFolder);
-            this.TryCreateDirectory(this.Settings.FileStorageFolder);
-            this.TryCreateDirectory(this.Settings.FileTransferFolder);
+            this.Config = ServerConfig.Load();
+            this.Config.Save();
             
-            string privateKeyPath = Path.Combine(this.Settings.DataFolder, Constants.Encryption.PrivateKeyFile);
-            string publicKeyPath = Path.Combine(this.Settings.DataFolder, Constants.Encryption.PublicKeyFile);
+            TryCreateDirectory(this.Config.DataFolder);
+            TryCreateDirectory(this.Config.FileStorageFolder);
+            TryCreateDirectory(this.Config.FileTransferFolder);
+
+            string publicKeyPath = Path.Combine(this.Config.DataFolder, Constants.Encryption.PublicKeyFile);
+            string privateKeyPath = Path.Combine(this.Config.DataFolder, Constants.Encryption.PrivateKeyFile);
 
             if (!File.Exists(privateKeyPath))
             {
@@ -56,9 +53,7 @@ namespace domi1819.UpServer
             }
             
             Console.WriteLine("Starting UpServer...");
-
-            //this.logger = new Logger("upserver.log");
-
+            
             RsaKey rsaKey = RsaKey.FromFile(privateKeyPath);
             
             if (rsaKey.Csp.KeySize != Constants.Encryption.RsaKeySize)
@@ -68,16 +63,17 @@ namespace domi1819.UpServer
             }
 
             this.messageServer = new NetServer();
-            this.messageServer.Start(this.Settings.ServerPort, rsaKey);
+            this.messageServer.Start(this.Config.UpServerPort, rsaKey);
 
-            Console.WriteLine($"Message server listening on port {this.Settings.ServerPort}.");
+            Console.WriteLine($"Message server listening on port {this.Config.UpServerPort}.");
             
             this.Users = new UserRegister(this);
-            this.Files = new FileRegister(this);
+            this.Files = new FileManager(this);
 
             Console.WriteLine("UpServer started.");
             
-            UpWebService webService = new UpWebService();
+            UpWebService webService = new UpWebService(this);
+            webService.Start();
 
             while (true)
             {
@@ -85,7 +81,7 @@ namespace domi1819.UpServer
             }
         }
 
-        private void TryCreateDirectory(string path)
+        private static void TryCreateDirectory(string path)
         {
             if (!Directory.Exists(path))
             {

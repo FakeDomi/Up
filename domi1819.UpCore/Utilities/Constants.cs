@@ -5,11 +5,10 @@ namespace domi1819.UpCore.Utilities
 {
     public static class Constants
     {
-        public static readonly int BuildYear = 2016;
+        public static readonly int BuildYear = 2017;
 
-        public static int Build { get; set; }
-        public static string Version { get; set; }
-        public static bool IsServer { get; set; }
+        public static int Build { get; }
+        public static string Version { get; }
 
         static Constants()
         {
@@ -23,7 +22,7 @@ namespace domi1819.UpCore.Utilities
         {
             public static readonly int MaxUsernameLength = 32;
             public static readonly int PasswordMaxLength = 256;
-
+            
             public static readonly string FileDbName = "files.nano";
             public static readonly string UserDbName = "users.nano";
         }
@@ -48,7 +47,6 @@ namespace domi1819.UpCore.Utilities
             public static readonly int Timeout = 10000;
             public static readonly int MessageHeaderSize = 8;
             public static readonly int MessageBufferSize = 65536;
-            public static readonly int FileBufferSize = 32768;
         }
 
         public static class Server
@@ -56,15 +54,19 @@ namespace domi1819.UpCore.Utilities
             public static readonly int MinClientBuild = 1;
 
             public static readonly int DefaultPort = 1819;
+
+            public static readonly int FileIdLength = 8;
+
+            public static readonly string ConfigFileName = "config.xml";
         }
 
         public static class Client
         {
             public static readonly string LocalItemsFolder = "local";
-
-
-
+            
             public static readonly string ConfigFileName = "up.xml";
+
+            public static readonly int UploadQueueMaxItemCount = 7;
         }
     }
 }

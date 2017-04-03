@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 
 namespace domi1819.UpCore.Crypto
 {
-    public class Blake2
+    public static class Blake2
     {
         private const int BlockLength = 128;
 
@@ -116,6 +116,21 @@ namespace domi1819.UpCore.Crypto
                 v14 ^= 0xFFFFFFFFFFFFFFFF;
             }
 
+            Compress1(block, ref v0, ref v1, ref v2, ref v3, ref v4, ref v5, ref v6, ref v7, ref v8, ref v9, ref v10, ref v11, ref v12, ref v13, ref v14, ref v15);
+            Compress2(block, ref v0, ref v1, ref v2, ref v3, ref v4, ref v5, ref v6, ref v7, ref v8, ref v9, ref v10, ref v11, ref v12, ref v13, ref v14, ref v15);
+
+            state[0] ^= v0 ^ v8;
+            state[1] ^= v1 ^ v9;
+            state[2] ^= v2 ^ v10;
+            state[3] ^= v3 ^ v11;
+            state[4] ^= v4 ^ v12;
+            state[5] ^= v5 ^ v13;
+            state[6] ^= v6 ^ v14;
+            state[7] ^= v7 ^ v15;
+        }
+
+        private static void Compress1(ulong[] block, ref ulong v0, ref ulong v1, ref ulong v2, ref ulong v3, ref ulong v4, ref ulong v5, ref ulong v6, ref ulong v7, ref ulong v8, ref ulong v9, ref ulong v10, ref ulong v11, ref ulong v12, ref ulong v13, ref ulong v14, ref ulong v15)
+        {
             // Round 1
             v0 = v0 + v4 + block[0];
             v12 ^= v0;
@@ -745,7 +760,10 @@ namespace domi1819.UpCore.Crypto
             v9 = v9 + v14;
             v4 ^= v9;
             v4 = ((v4 >> 63) | (v4 << (64 - 63)));
+        }
 
+        private static void Compress2(ulong[] block, ref ulong v0, ref ulong v1, ref ulong v2, ref ulong v3, ref ulong v4, ref ulong v5, ref ulong v6, ref ulong v7, ref ulong v8, ref ulong v9, ref ulong v10, ref ulong v11, ref ulong v12, ref ulong v13, ref ulong v14, ref ulong v15)
+        {
             // Round 7
             v0 = v0 + v4 + block[12];
             v12 ^= v0;
@@ -1375,15 +1393,6 @@ namespace domi1819.UpCore.Crypto
             v9 = v9 + v14;
             v4 ^= v9;
             v4 = ((v4 >> 63) | (v4 << (64 - 63)));
-
-            state[0] ^= v0 ^ v8;
-            state[1] ^= v1 ^ v9;
-            state[2] ^= v2 ^ v10;
-            state[3] ^= v3 ^ v11;
-            state[4] ^= v4 ^ v12;
-            state[5] ^= v5 ^ v13;
-            state[6] ^= v6 ^ v14;
-            state[7] ^= v7 ^ v15;
         }
     }
 }

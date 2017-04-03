@@ -9,16 +9,16 @@ using domi1819.UpCore.Utilities;
 
 namespace domi1819.UpServer
 {
-    internal class FileRegister
+    internal class FileManager
     {
         private readonly NanoDBFile dbFile;
         private readonly List<NanoDBLine> emptyFilterList = new List<NanoDBLine>(0);
         
-        internal FileRegister(UpServer upServer)
+        internal FileManager(UpServer upServer)
         {
-            Console.WriteLine("Initializing file register...");
+            Console.WriteLine("Initializing file manager...");
 
-            this.dbFile = new NanoDBFile(Path.Combine(upServer.Settings.DataFolder, Constants.Database.FileDbName));
+            this.dbFile = new NanoDBFile(Path.Combine(upServer.Config.DataFolder, Constants.Database.FileDbName));
 
             InitializeResult initResult = this.dbFile.Initialize();
 
@@ -27,8 +27,7 @@ namespace domi1819.UpServer
                 //logger.Log("File database could not be read because it was saved in an unsupported format. Please fix or delete the file database.");
                 throw new Exception("Database version not supported.");
             }
-
-            /*else*/
+            
             if (initResult != InitializeResult.Success)
             {
                 Console.WriteLine("File database does not exist or could not be read. Creating a new one...");
@@ -48,14 +47,21 @@ namespace domi1819.UpServer
             this.dbFile.Bind();
         }
 
-        internal bool HasFile(string key)
+        internal bool FileExists(string key)
         {
             return this.dbFile.ContainsKey(key);
         }
 
-        internal bool IsOwner(string key, string user)
+        internal string GetNewFileId()
         {
-            return this.dbFile.ContainsKey(key) && this.dbFile.GetLine(key)[Index.Owner].Equals(user);
+            string suggestion = Util.GetRandomString(Constants.Server.FileIdLength);
+
+            while (this.FileExists(suggestion))
+            {
+                suggestion = Util.GetRandomString(Constants.Server.FileIdLength);
+            }
+
+            return suggestion;
         }
 
         internal bool AddFile(string key, string fileName, string owner, long fileSize)
@@ -69,22 +75,9 @@ namespace domi1819.UpServer
 
             return success;
         }
-
-        internal void SetDownloadable(string key, bool downloadable)
+        internal bool IsOwner(string key, string user)
         {
-            this.dbFile.GetLine(key)[Index.DirectDownloadFlag] = downloadable;
-        }
-
-        internal string GetNextFileId()
-        {
-            string suggestion = Util.GetRandomString(8);
-
-            while (this.HasFile(suggestion))
-            {
-                suggestion = Util.GetRandomString(8);
-            }
-
-            return suggestion;
+            return this.dbFile.ContainsKey(key) && this.dbFile.GetLine(key)[Index.Owner].Equals(user);
         }
 
         internal string GetFileName(string key)
@@ -102,11 +95,6 @@ namespace domi1819.UpServer
             return (DateTime)this.dbFile.GetLine(key)[Index.UploadDate];
         }
 
-        internal void AddFileDownload(string key)
-        {
-            this.dbFile.GetLine(key)[Index.Downloads] = this.GetFileDownloads(key) + 1;
-        }
-
         internal int GetFileDownloads(string key)
         {
             return (int?)this.dbFile.GetLine(key)[Index.Downloads] ?? 0;
@@ -120,6 +108,16 @@ namespace domi1819.UpServer
         internal List<NanoDBLine> GetFiles(string user)
         {
             return this.dbFile.GetSortedList(user) ?? this.emptyFilterList;
+        }
+        
+        internal void SetDownloadable(string key, bool downloadable)
+        {
+            this.dbFile.GetLine(key)[Index.DirectDownloadFlag] = downloadable;
+        }
+
+        internal void IncrementDownloadCount(string key)
+        {
+            this.dbFile.GetLine(key)[Index.Downloads] = this.GetFileDownloads(key) + 1;
         }
 
         internal bool SerializeFileInfo(NanoDBLine line, MessageSerializer serializer, DateTime fromDate, DateTime toDate, long fromSize, long toSize, string filter, int filterMatchMode)
@@ -192,6 +190,20 @@ namespace domi1819.UpServer
             this.dbFile.Unbind();
         }
 
+        internal string GetLinkFormat()
+        {
+            ServerConfig config = UpServer.Instance.Config;
+
+            if (!string.IsNullOrEmpty(config.UrlOverride))
+            {
+                return $"{config.UrlOverride}/d/{{0}}";
+            }
+
+            string port = config.HttpServerPort == 80 ? "" : $":{config.HttpServerPort}";
+
+            return $"http://{config.HostName}{port}/d/{{0}}";
+        }
+        
         private static class Index
         {
             internal const int FileId = 0;
