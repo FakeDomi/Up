@@ -1,14 +1,23 @@
 ﻿using System;
+using System.IO;
 
 namespace domi1819.Proton
 {
     public class MessageContext
     {
-        public bool Cancel { get; set; }
+        public bool Disconnect { get; set; }
 
-        public MessageReader MessageReader { get; private set; }
+        public bool ShouldPushResponse { get; set; }
 
-        public MessageWriter MessageWriter { get; private set; }
+        public MessageReader MessageReader { get; }
+
+        public MessageWriter MessageWriter { get; }
+
+        public MessageContext(Stream readerStream, byte[] readerBytes, Stream writerStream, byte[] writerBytes)
+        {
+            this.MessageReader = new MessageReader { Stream = readerStream, Bytes = readerBytes };
+            this.MessageWriter = new MessageWriter { Stream = writerStream, Bytes = writerBytes };
+        }
 
         public bool ReadNextBool()
         {
@@ -58,6 +67,21 @@ namespace domi1819.Proton
         public void WriteNextDateTime(DateTime dateTime)
         {
             this.MessageWriter.WriteNextDateTime(dateTime);
+        }
+
+        internal int FetchRequestMessage()
+        {
+            this.ShouldPushResponse = true;
+
+            return 0;
+        }
+
+        internal void PushResponseMessage()
+        {
+            if (this.ShouldPushResponse)
+            {
+                
+            }
         }
     }
 }

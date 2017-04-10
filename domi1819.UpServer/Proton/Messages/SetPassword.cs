@@ -10,7 +10,7 @@ namespace domi1819.UpServer.Proton.Messages
 
             if (!UpServer.Instance.Users.HasUser(userId))
             {
-                context.Cancel = true;
+                context.Disconnect = true;
                 return;
             }
 

@@ -8,16 +8,17 @@ using domi1819.UpCore.Utilities;
 
 namespace domi1819.Proton
 {
-    public class ProtonServer
+    public class ProtonServer<T> where T : new()
     {
-
+        private readonly ArrayPool<byte> messageBufferPool = new ArrayPool<byte>(Constants.Network.MessageBufferSize);
         private TcpListener listener;
-        private ArrayPool<byte> messageBufferPool;
 
         private RSACryptoServiceProvider rsaCsp;
         private byte[] rsaModulus;
         private byte[] rsaExponent;
         private byte[] rsaFingerprint;
+
+        public MessageRegistry<T> MessageRegistry { get; } = new MessageRegistry<T>();
         
         public void Start(int port, RsaKey rsaKey)
         {
@@ -27,9 +28,7 @@ namespace domi1819.Proton
             this.rsaModulus = rsaKey.Modulus;
             this.rsaExponent = rsaKey.Exponent;
             this.rsaFingerprint = rsaKey.Fingerprint;
-
-            this.messageBufferPool = new ArrayPool<byte>(Constants.Network.MessageBufferSize);
-
+            
             new Thread(this.Run) { Name = "ProtonServerDispatcher" }.Start();
         }
 
@@ -103,21 +102,82 @@ namespace domi1819.Proton
                     using (RijndaelManaged rijndaelEncrypt = new RijndaelManaged { Key = key, IV = ivEncrypt, Mode = CipherMode.CBC, Padding = PaddingMode.None })
                     {
                         encryptor = rijndaelEncrypt.CreateEncryptor();
-                        connection.Encryptor = encryptor;
                     }
 
                     using (RijndaelManaged rijndaelDecrypt = new RijndaelManaged { Key = key, IV = ivDecrypt, Mode = CipherMode.CBC, Padding = PaddingMode.None })
                     {
                         decryptor = rijndaelDecrypt.CreateDecryptor();
-                        connection.Decryptor = decryptor;
                     }
 
+                    CryptoStream outStream = new CryptoStream(stream, encryptor, CryptoStreamMode.Write);
+                    CryptoStream inStream = new CryptoStream(stream, decryptor, CryptoStreamMode.Read);
+
+                    connection.Encryptor = encryptor;
+                    connection.Decryptor = decryptor;
+                    connection.BaseStream = stream;
+                    connection.OutStream = outStream;
+                    connection.InStream = inStream;
+                    connection.WriterBuffer = this.messageBufferPool.Get();
+                    connection.ReaderBuffer = this.messageBufferPool.Get();
+
+                    MessageContext context = new MessageContext(inStream, connection.ReaderBuffer, outStream, connection.WriterBuffer);
+
+                    context.FetchRequestMessage();
+
+                    context.WriteNextInt(context.ReadNextInt() + 1);
+                    context.WriteNextInt(Constants.Server.MinClientBuild);
+
+                    context.PushResponseMessage();
+
+                    stream.ReadTimeout = Timeout.Infinite;
+
+                    this.RunMessageLoop(context);
+
+                    Console.WriteLine($"Client {client.Client.RemoteEndPoint} disconnected.");
+                }
+                else
+                {
+                    Console.WriteLine($"Client {client.Client.RemoteEndPoint} tried to connect with unknown request mode {mode}. Disconnected.");
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                throw;
+                // TODO change, currently crashes when socket is not connected
+                Console.WriteLine($"Client {client.Client.RemoteEndPoint} did something stupid, I guess...");
+                Console.WriteLine(e.Message);
+            }
+            finally
+            {
+                Util.SafeDispose(connection.Encryptor, connection.Decryptor, connection.OutStream, connection.InStream, connection.BaseStream);
+                
+                this.messageBufferPool.Return(connection.WriterBuffer);
+                this.messageBufferPool.Return(connection.ReaderBuffer);
+
+                client.Close();
+            }
+        }
+
+        private void RunMessageLoop(MessageContext context)
+        {
+            T connectionObject = new T();
+
+            while (true)
+            {
+                //TODO: Proper error handling
+                
+                IMessageDefinition<T> message = this.MessageRegistry[context.FetchRequestMessage()];
+
+                if (message != null)
+                {
+                    message.OnMessage(context, connectionObject);
+
+                    if (context.Disconnect)
+                    {
+                        return;
+                    }
+                    
+                    context.PushResponseMessage();
+                }
             }
         }
     }

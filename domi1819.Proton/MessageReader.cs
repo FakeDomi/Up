@@ -7,13 +7,15 @@ namespace domi1819.Proton
     public class MessageReader
     {
         private int offset;
-        private byte[] bytes;
-        private Stream stream;
+
+        internal byte[] Bytes { get; set; }
+
+        internal Stream Stream { get; set; }
 
         public bool ReadNextBool()
         {
             this.offset++;
-            return this.bytes[this.offset - 1] != 0;
+            return this.Bytes[this.offset - 1] != 0;
         }
 
         public int ReadNextInt()
@@ -36,7 +38,7 @@ namespace domi1819.Proton
         {
             int length = this.ReadNextInt();
 
-            string result = Encoding.UTF8.GetString(this.bytes, this.offset, length);
+            string result = Encoding.UTF8.GetString(this.Bytes, this.offset, length);
 
             this.offset += length;
 
@@ -46,11 +48,11 @@ namespace domi1819.Proton
         public DateTime ReadNextDateTime()
         {
             int year = this.ReadNextInt();
-            int month = this.bytes[this.offset];
-            int day = this.bytes[this.offset + 1];
-            int hour = this.bytes[this.offset + 2];
-            int minute = this.bytes[this.offset + 3];
-            int second = this.bytes[this.offset + 4];
+            int month = this.Bytes[this.offset];
+            int day = this.Bytes[this.offset + 1];
+            int hour = this.Bytes[this.offset + 2];
+            int minute = this.Bytes[this.offset + 3];
+            int second = this.Bytes[this.offset + 4];
 
             this.offset += 5;
 
@@ -59,12 +61,12 @@ namespace domi1819.Proton
 
         private int ReadInt(int index)
         {
-            return this.bytes[index] << 24 | this.bytes[index + 1] << 16 | this.bytes[index + 2] << 8 | this.bytes[index + 3];
+            return this.Bytes[index] << 24 | this.Bytes[index + 1] << 16 | this.Bytes[index + 2] << 8 | this.Bytes[index + 3];
         }
 
         private long ReadLong(int index)
         {
-            return (long)this.bytes[index] << 56 | (long)this.bytes[index + 1] << 48 | (long)this.bytes[index + 2] << 40 | (long)this.bytes[index + 3] << 32 | (long)this.bytes[index + 4] << 24 | (long)this.bytes[index + 5] << 16 | (long)this.bytes[index + 6] << 8 | this.bytes[index + 7];
+            return (long)this.Bytes[index] << 56 | (long)this.Bytes[index + 1] << 48 | (long)this.Bytes[index + 2] << 40 | (long)this.Bytes[index + 3] << 32 | (long)this.Bytes[index + 4] << 24 | (long)this.Bytes[index + 5] << 16 | (long)this.Bytes[index + 6] << 8 | this.Bytes[index + 7];
         }
     }
 }

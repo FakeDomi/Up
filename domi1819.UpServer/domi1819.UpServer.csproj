@@ -43,6 +43,7 @@
     <Compile Include="NetServerUser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Proton\Messages\GetStorageInfo.cs" />
+    <Compile Include="Proton\Messages\LinkFormat.cs" />
     <Compile Include="Proton\Messages\Login.cs" />
     <Compile Include="Proton\Messages\SetPassword.cs" />
     <Compile Include="Proton\User.cs" />
