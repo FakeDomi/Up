@@ -42,6 +42,10 @@
     <Compile Include="NetServer.cs" />
     <Compile Include="NetServerUser.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="Proton\Messages\GetStorageInfo.cs" />
+    <Compile Include="Proton\Messages\Login.cs" />
+    <Compile Include="Proton\Messages\SetPassword.cs" />
+    <Compile Include="Proton\User.cs" />
     <Compile Include="ServerConfig.cs" />
     <Compile Include="UploadUnit.cs" />
     <Compile Include="UpServer.cs" />
@@ -58,6 +62,10 @@
     <ProjectReference Include="..\..\nanodb\NanoDB\domi1819.NanoDB.csproj">
       <Project>{aa32b774-ec0f-4853-929f-f432887639be}</Project>
       <Name>domi1819.NanoDB</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\domi1819.Proton\domi1819.Proton.csproj">
+      <Project>{47388c2e-99a5-4748-9486-4d71fdce0b15}</Project>
+      <Name>domi1819.Proton</Name>
     </ProjectReference>
     <ProjectReference Include="..\domi1819.UpCore\domi1819.UpCore.csproj">
       <Project>{f08ac443-d347-48ec-b853-5ee0e1290adb}</Project>
