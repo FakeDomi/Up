@@ -30,13 +30,13 @@ namespace domi1819.UpServer
             MimeDict.Add(".jpg", "image/jpeg");
             MimeDict.Add(".jpeg", "image/jpeg");
             MimeDict.Add(".png", "image/png");
-            MimeDict.Add(".txt", "text/plain");
-            MimeDict.Add(".xml", "text/plain");
-            MimeDict.Add(".java", "text/plain");
-            MimeDict.Add(".cs", "text/plain");
-            MimeDict.Add(".cfg", "text/plain");
-            MimeDict.Add(".conf", "text/plain");
-            MimeDict.Add(".log", "text/plain");
+            MimeDict.Add(".txt", "text/plain; charset=UTF-8");
+            MimeDict.Add(".xml", "text/plain; charset=UTF-8");
+            MimeDict.Add(".java", "text/plain; charset=UTF-8");
+            MimeDict.Add(".cs", "text/plain; charset=UTF-8");
+            MimeDict.Add(".cfg", "text/plain; charset=UTF-8");
+            MimeDict.Add(".conf", "text/plain; charset=UTF-8");
+            MimeDict.Add(".log", "text/plain; charset=UTF-8");
             MimeDict.Add(".pdf", "application/pdf");
         }
 

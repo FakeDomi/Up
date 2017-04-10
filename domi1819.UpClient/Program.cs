@@ -14,7 +14,7 @@ namespace domi1819.UpClient
             AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
             {
                 // ReSharper disable once AssignNullToNotNullAttribute
-                string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "lib", new AssemblyName(args.Name).Name + ".dll");
+                string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "libs", new AssemblyName(args.Name).Name + ".dll");
 
                 return File.Exists(path) ? Assembly.LoadFrom(path) : null;
             };

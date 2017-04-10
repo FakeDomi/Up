@@ -196,7 +196,7 @@ namespace domi1819.UpServer
 
             if (!string.IsNullOrEmpty(config.UrlOverride))
             {
-                return $"{config.UrlOverride}/d/{{0}}";
+                return $"{config.UrlOverride}/{{0}}";
             }
 
             string port = config.HttpServerPort == 80 ? "" : $":{config.HttpServerPort}";
