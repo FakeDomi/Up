@@ -2,7 +2,7 @@
 
 namespace domi1819.UpServer
 {
-    internal class UploadUnit
+    internal class UploadUnitOld
     {
         internal string Key { get; set; }
         internal string User { get; set; }

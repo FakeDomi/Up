@@ -1,9 +1,10 @@
-﻿using System.Net.Sockets;
+﻿using System.Collections.Generic;
+using System.Net.Sockets;
 using System.Security.Cryptography;
 
-namespace domi1819.Proton
+namespace domi1819.UpServer
 {
-    internal class ProtonServerConnection
+    internal class NetServerConnection
     {
         public ICryptoTransform Encryptor { get; set; }
 
@@ -18,5 +19,12 @@ namespace domi1819.Proton
         public byte[] WriterBuffer { get; set; }
 
         public byte[] ReaderBuffer { get; set; }
+
+
+        // TODO remove vvvvvv
+
+        public List<UploadUnitOld> UploadUnits { get; set; }
+
+        public long ReservedBytes { get; set; }
     }
 }

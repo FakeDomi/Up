@@ -1,24 +1,31 @@
-﻿using domi1819.Proton;
+﻿//using domi1819.Proton.Message;
 
-namespace domi1819.UpServer.Proton.Messages
-{
-    internal class Login : IMessageDefinition<User>
-    {
-        public void OnMessage(MessageContext context, User user)
-        {
-            string userId = context.ReadNextString();
-            string password = context.ReadNextString();
+//namespace domi1819.UpServer.Proton.Messages
+//{
+//    internal class Login : IServerMessage<ProtonConnectionUser>
+//    {
+//        private readonly UserManager users;
 
-            if (UpServer.Instance.Users.Verify(userId, password))
-            {
-                context.WriteNextBool(true);
-                user.UserId = userId;
-            }
-            else
-            {
-                context.WriteNextBool(false);
-                user.UserId = null;
-            }
-        }
-    }
-}
+//        public Login(UserManager users)
+//        {
+//            this.users = users;
+//        }
+
+//        public void OnMessage(MessageContext context, ProtonConnectionUser protonConnectionUser)
+//        {
+//            string userId = context.ReadNextString();
+//            string password = context.ReadNextString();
+
+//            if (this.users.Verify(userId, password))
+//            {
+//                context.WriteNextBool(true);
+//                protonConnectionUser.UserId = userId;
+//            }
+//            else
+//            {
+//                context.WriteNextBool(false);
+//                protonConnectionUser.UserId = null;
+//            }
+//        }
+//    }
+//}

@@ -40,19 +40,26 @@
     <Compile Include="FileManager.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="NetServer.cs" />
-    <Compile Include="NetServerUser.cs" />
+    <Compile Include="NetServerConnection.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="Proton\Messages\FileUploadData.cs" />
+    <Compile Include="Proton\Messages\FinishUpload.cs" />
     <Compile Include="Proton\Messages\GetStorageInfo.cs" />
+    <Compile Include="Proton\Messages\InitiateUpload.cs" />
     <Compile Include="Proton\Messages\LinkFormat.cs" />
     <Compile Include="Proton\Messages\Login.cs" />
     <Compile Include="Proton\Messages\SetPassword.cs" />
-    <Compile Include="Proton\User.cs" />
+    <Compile Include="Proton\UploadUnit.cs" />
+    <Compile Include="Proton\ProtonConnectionUser.cs" />
     <Compile Include="ServerConfig.cs" />
-    <Compile Include="UploadUnit.cs" />
+    <Compile Include="Server\IMessageDefinition.cs" />
+    <Compile Include="Server\MessageContext.cs" />
+    <Compile Include="Server\MessageRegistry.cs" />
+    <Compile Include="UploadUnitOld.cs" />
     <Compile Include="UpServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UpWebService.cs" />
-    <Compile Include="UserRegister.cs" />
+    <Compile Include="UserManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
@@ -64,14 +71,13 @@
       <Project>{aa32b774-ec0f-4853-929f-f432887639be}</Project>
       <Name>domi1819.NanoDB</Name>
     </ProjectReference>
-    <ProjectReference Include="..\domi1819.Proton\domi1819.Proton.csproj">
-      <Project>{47388c2e-99a5-4748-9486-4d71fdce0b15}</Project>
-      <Name>domi1819.Proton</Name>
-    </ProjectReference>
     <ProjectReference Include="..\domi1819.UpCore\domi1819.UpCore.csproj">
       <Project>{f08ac443-d347-48ec-b853-5ee0e1290adb}</Project>
       <Name>domi1819.UpCore</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Server\Messages\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

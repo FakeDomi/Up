@@ -13,7 +13,7 @@ namespace domi1819.UpServer
 
         internal ServerConfig Config { get; private set; }
 
-        internal UserRegister Users { get; private set; }
+        internal UserManager Users { get; private set; }
 
         internal FileManager Files { get; private set; }
 
@@ -67,7 +67,7 @@ namespace domi1819.UpServer
 
             Console.WriteLine($"Message server listening on port {this.Config.UpServerPort}.");
             
-            this.Users = new UserRegister(this);
+            this.Users = new UserManager(this);
             this.Files = new FileManager(this);
 
             Console.WriteLine("UpServer started.");

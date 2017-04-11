@@ -9,18 +9,17 @@ using System.Threading;
 using domi1819.NanoDB;
 using domi1819.UpCore.Network;
 using domi1819.UpCore.Utilities;
+using domi1819.UpServer.Proton;
+using domi1819.UpServer.Server;
 
 namespace domi1819.UpServer
 {
     internal class NetServer
     {
-        internal int Port { get; private set; }
-        internal bool Running { get; private set; }
-
         private TcpListener listener;
-        private AutoResetEvent resetEvent;
+        
         private ArrayPool<byte> messageBufferPool;
-        private Dictionary<string, UploadUnit> fileTransfersByKey;
+        private Dictionary<string, UploadUnitOld> fileTransfersByKey;
         private bool shutdown;
 
         private RSACryptoServiceProvider rsaCsp;
@@ -30,10 +29,7 @@ namespace domi1819.UpServer
 
         internal void Start(int port, RsaKey rsaKey)
         {
-            this.Port = port;
-
-            this.listener = new TcpListener(IPAddress.Any, this.Port);
-            this.resetEvent = new AutoResetEvent(false);
+            this.listener = new TcpListener(IPAddress.Any, port);
 
             this.rsaCsp = rsaKey.Csp;
             this.rsaModulus = rsaKey.Modulus;
@@ -41,7 +37,7 @@ namespace domi1819.UpServer
             this.rsaFingerprint = rsaKey.Fingerprint;
             
             this.messageBufferPool = new ArrayPool<byte>(Constants.Network.MessageBufferSize);
-            this.fileTransfersByKey = new Dictionary<string, UploadUnit>();
+            this.fileTransfersByKey = new Dictionary<string, UploadUnitOld>();
             
             new Thread(this.Run) { Name = "NetServerMain" }.Start();
         }
@@ -49,38 +45,24 @@ namespace domi1819.UpServer
         private void Run()
         {
             this.listener.Start();
-            this.Running = true;
 
             while (!this.shutdown)
             {
                 if (this.listener.Pending())
                 {
-                    this.listener.BeginAcceptTcpClient(this.AcceptTcpClientCallback, this.listener);
-
-                    this.resetEvent.WaitOne();
+                    ThreadPool.QueueUserWorkItem(this.ProcessClient, this.listener.AcceptTcpClient());
                 }
                 else
                 {
                     Thread.Sleep(250);
                 }
             }
-
-            this.Running = false;
-        }
-
-        private void AcceptTcpClientCallback(IAsyncResult result)
-        {
-            TcpClient client = this.listener.EndAcceptTcpClient(result);
-
-            this.resetEvent.Set();
-
-            ThreadPool.QueueUserWorkItem(this.ProcessClient, client);
         }
 
         private void ProcessClient(object clientObject)
         {
             TcpClient client = (TcpClient)clientObject;
-            NetServerUser user = new NetServerUser();
+            NetServerConnection connection = new NetServerConnection();
 
             try
             {
@@ -88,8 +70,9 @@ namespace domi1819.UpServer
 
                 NetworkStream stream = client.GetStream();
 
-                user.BaseStream = stream;
-                stream.ReadTimeout = Constants.Network.Timeout;
+                connection.BaseStream = stream;
+
+                //stream.ReadTimeout = Constants.Network.Timeout;
 
                 stream.Write(this.rsaFingerprint, 0, this.rsaFingerprint.Length);
                 
@@ -126,27 +109,30 @@ namespace domi1819.UpServer
                     Array.Copy(secret, 16, ivDecrypt, 0, 16);
                     Array.Copy(secret, 32, ivEncrypt, 0, 16);
 
-                    RijndaelManaged rijndaelEncrypt = new RijndaelManaged { Key = key, IV = ivEncrypt, Mode = CipherMode.CBC, Padding = PaddingMode.None };
-                    ICryptoTransform encryptor = rijndaelEncrypt.CreateEncryptor();
-                    rijndaelEncrypt.Dispose();
-                    user.Encryptor = encryptor;
+                    ICryptoTransform encryptor, decryptor;
 
-                    RijndaelManaged rijndaelDecrypt = new RijndaelManaged { Key = key, IV = ivDecrypt, Mode = CipherMode.CBC, Padding = PaddingMode.None };
-                    ICryptoTransform decryptor = rijndaelDecrypt.CreateDecryptor();
-                    rijndaelDecrypt.Dispose();
-                    user.Decryptor = decryptor;
+                    using (RijndaelManaged rijndaelEncrypt = new RijndaelManaged { Key = key, IV = ivEncrypt, Mode = CipherMode.CBC, Padding = PaddingMode.None })
+                    {
+                        encryptor = rijndaelEncrypt.CreateEncryptor();
+                    }
+
+                    using (RijndaelManaged rijndaelDecrypt = new RijndaelManaged { Key = key, IV = ivDecrypt, Mode = CipherMode.CBC, Padding = PaddingMode.None })
+                    {
+                        decryptor = rijndaelDecrypt.CreateDecryptor();
+                    }
 
                     CryptoStream outStream = new CryptoStream(stream, encryptor, CryptoStreamMode.Write);
-                    user.OutStream = outStream;
-
                     CryptoStream inStream = new CryptoStream(stream, decryptor, CryptoStreamMode.Read);
-                    user.InStream = inStream;
-
-                    MessageSerializer serializer = new MessageSerializer { Bytes = this.messageBufferPool.Get(), Stream = outStream };
-                    user.SerializeBuffer = serializer.Bytes;
-
-                    MessageDeserializer deserializer = new MessageDeserializer { Bytes = this.messageBufferPool.Get(), Stream = inStream };
-                    user.DeserializeBuffer = deserializer.Bytes;
+                    
+                    connection.Encryptor = encryptor;
+                    connection.Decryptor = decryptor;
+                    connection.OutStream = outStream;
+                    connection.InStream = inStream;
+                    connection.WriterBuffer = this.messageBufferPool.Get();
+                    connection.ReaderBuffer = this.messageBufferPool.Get();
+                    
+                    MessageSerializer serializer = new MessageSerializer { Bytes = connection.WriterBuffer, Stream = outStream };
+                    MessageDeserializer deserializer = new MessageDeserializer { Bytes = connection.ReaderBuffer, Stream = inStream };
 
                     deserializer.ReadMessage(NetworkMethods.GetServerVersion);
 
@@ -157,7 +143,7 @@ namespace domi1819.UpServer
 
                     stream.ReadTimeout = Timeout.Infinite;
 
-                    this.RunMessageLoop(serializer, deserializer, user);
+                    this.RunMessageLoop(serializer, deserializer, connection);
 
                     Console.WriteLine($"Client {client.Client.RemoteEndPoint} disconnected.");
                 }
@@ -174,21 +160,21 @@ namespace domi1819.UpServer
             }
             finally
             {
-                Util.SafeDispose(user.OutStream, user.InStream, user.BaseStream, user.Encryptor, user.Decryptor);
+                Util.SafeDispose(connection.OutStream, connection.InStream, connection.BaseStream, connection.Encryptor, connection.Decryptor);
 
-                if (user.SerializeBuffer != null)
+                if (connection.WriterBuffer != null)
                 {
-                    this.messageBufferPool.Return(user.SerializeBuffer);
+                    this.messageBufferPool.Return(connection.WriterBuffer);
                 }
 
-                if (user.DeserializeBuffer != null)
+                if (connection.ReaderBuffer != null)
                 {
-                    this.messageBufferPool.Return(user.DeserializeBuffer);
+                    this.messageBufferPool.Return(connection.ReaderBuffer);
                 }
 
-                if (user.UploadUnits != null)
+                if (connection.UploadUnits != null)
                 {
-                    foreach (UploadUnit unit in user.UploadUnits.Where(unit => this.fileTransfersByKey.ContainsKey(unit.Key)))
+                    foreach (UploadUnitOld unit in connection.UploadUnits.Where(unit => this.fileTransfersByKey.ContainsKey(unit.Key)))
                     {
                         try
                         {
@@ -207,11 +193,21 @@ namespace domi1819.UpServer
             }
         }
 
-        private void RunMessageLoop(MessageSerializer serializer, MessageDeserializer deserializer, NetServerUser user)
+        private void RunMessageLoopNew(MessageContext context)
+        {
+            ProtonConnectionUser user = new ProtonConnectionUser();
+
+            while (true)
+            {
+                
+            }
+        }
+
+        private void RunMessageLoop(MessageSerializer serializer, MessageDeserializer deserializer, NetServerConnection user)
         {
             string currentUser = null;
 
-            user.UploadUnits = new List<UploadUnit>();
+            user.UploadUnits = new List<UploadUnitOld>();
 
             while (true)
             {
@@ -308,7 +304,7 @@ namespace domi1819.UpServer
             serializer.Flush();
         }
 
-        private void ProcessInitiateUploadPacket(MessageSerializer serializer, MessageDeserializer deserializer, string currentUser, NetServerUser user)
+        private void ProcessInitiateUploadPacket(MessageSerializer serializer, MessageDeserializer deserializer, string currentUser, NetServerConnection user)
         {
 
             if (!UpServer.Instance.Users.HasUser(currentUser))
@@ -345,7 +341,7 @@ namespace domi1819.UpServer
                         key = Util.GetRandomString(8);
                     } while (this.fileTransfersByKey.ContainsKey(key));
 
-                    UploadUnit unit = new UploadUnit { Key = key, User = currentUser, FileName = fileName, Size = fileSize, FileStream = new FileStream(Path.Combine(UpServer.Instance.Config.FileTransferFolder, key + ".tmp"), FileMode.Create, FileAccess.Write) };
+                    UploadUnitOld unit = new UploadUnitOld { Key = key, User = currentUser, FileName = fileName, Size = fileSize, FileStream = new FileStream(Path.Combine(UpServer.Instance.Config.FileTransferFolder, key + ".tmp"), FileMode.Create, FileAccess.Write) };
 
                     this.fileTransfersByKey.Add(key, unit);
                     user.UploadUnits.Add(unit);
@@ -369,7 +365,7 @@ namespace domi1819.UpServer
             string key = deserializer.ReadNextString();
             int byteCount = deserializer.ReadNextInt();
 
-            UploadUnit unit;
+            UploadUnitOld unit;
 
             if (!this.fileTransfersByKey.TryGetValue(key, out unit))
             {
@@ -383,10 +379,10 @@ namespace domi1819.UpServer
             //serializer.Flush();
         }
 
-        private void ProcessFinishUploadPacket(MessageSerializer serializer, MessageDeserializer deserializer, string currentUser, NetServerUser user)
+        private void ProcessFinishUploadPacket(MessageSerializer serializer, MessageDeserializer deserializer, string currentUser, NetServerConnection user)
         {
             string key = deserializer.ReadNextString();
-            UploadUnit unit;
+            UploadUnitOld unit;
 
             if (!this.fileTransfersByKey.TryGetValue(key, out unit) || unit.Size != unit.Progress)
             {

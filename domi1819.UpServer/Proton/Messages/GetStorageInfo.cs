@@ -1,22 +1,31 @@
-﻿using domi1819.Proton;
+﻿//using domi1819.Proton.Message;
 
-namespace domi1819.UpServer.Proton.Messages
-{
-    internal class GetStorageInfo : IMessageDefinition<User>
-    {
-        public void OnMessage(MessageContext context, User user)
-        {
-            string userId = user.UserId;
+//namespace domi1819.UpServer.Proton.Messages
+//{
+//    internal class GetStorageInfo : IServerMessage<ProtonConnectionUser>
+//    {
+//        private readonly FileManager files;
+//        private readonly UserManager users;
 
-            if (!UpServer.Instance.Users.HasUser(userId))
-            {
-                context.Disconnect = true;
-                return;
-            }
+//        public GetStorageInfo(FileManager files, UserManager users)
+//        {
+//            this.files = files;
+//            this.users = users;
+//        }
 
-            context.WriteNextLong(UpServer.Instance.Users.GetMaxCapacity(userId));
-            context.WriteNextLong(UpServer.Instance.Users.GetUsedCapacity(userId));
-            context.WriteNextInt(UpServer.Instance.Files.GetFiles(userId).Count);
-        }
-    }
-}
+//        public void OnMessage(MessageContext context, ProtonConnectionUser protonConnectionUser)
+//        {
+//            string userId = protonConnectionUser.UserId;
+
+//            if (!this.users.HasUser(userId))
+//            {
+//                context.Disconnect = true;
+//                return;
+//            }
+
+//            context.WriteNextLong(this.users.GetMaxCapacity(userId));
+//            context.WriteNextLong(this.users.GetUsedCapacity(userId));
+//            context.WriteNextInt(this.files.GetFiles(userId).Count);
+//        }
+//    }
+//}

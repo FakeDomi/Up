@@ -1,7 +1,9 @@
 ﻿namespace domi1819.UpServer.Proton
 {
-    internal class User
+    internal class ProtonConnectionUser
     {
         public string UserId { get; set; }
+
+        public UploadUnit UploadUnit { get; set; }
     }
 }

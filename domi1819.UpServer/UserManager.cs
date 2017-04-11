@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using domi1819.NanoDB;
@@ -6,7 +7,7 @@ using domi1819.UpCore.Utilities;
 
 namespace domi1819.UpServer
 {
-    internal class UserRegister
+    internal class UserManager
     {
         public const int UsernameMaxLength = 32;
         public const int PasswordMaxLength = 256;
@@ -14,7 +15,9 @@ namespace domi1819.UpServer
 
         private readonly NanoDBFile dbFile;
 
-        internal UserRegister(UpServer upServer)
+        private readonly Dictionary<string, long> transferStorageDictionary = new Dictionary<string, long>();
+
+        internal UserManager(UpServer upServer)
         {
             Console.WriteLine("Initializing user register...");
 
@@ -123,9 +126,50 @@ namespace domi1819.UpServer
             return this.HasUser(user) ? (long)this.dbFile.GetLine(user)[Index.CurCapacity] : -1;
         }
 
-        public void AddUsedCapacity(string owner, long fileSize)
+        public void AddUsedCapacity(string user, long fileSize)
         {
-            this.dbFile.GetLine(owner)[Index.CurCapacity] = this.GetUsedCapacity(owner) + fileSize;
+            this.dbFile.GetLine(user)[Index.CurCapacity] = this.GetUsedCapacity(user) + fileSize;
+        }
+
+        public long GetTransferStorage(string user)
+        {
+            long capacity;
+
+            return this.transferStorageDictionary.TryGetValue(user, out capacity) ? capacity : 0;
+        }
+
+        public void AddTransferStorage(string user, long value)
+        {
+            long newValue = 0;
+
+            if (this.transferStorageDictionary.ContainsKey(user))
+            {
+                newValue = this.transferStorageDictionary[user];
+            }
+
+            newValue += value;
+
+            if (newValue < 0)
+            {
+                newValue = 0;
+            }
+
+            this.transferStorageDictionary[user] = newValue;
+        }
+
+        public void RemoveTransferStorage(string user, long value)
+        {
+            this.AddTransferStorage(user, 0 - value);
+        }
+
+        public long GetFreeCapacity(string user)
+        {
+            if (!this.HasUser(user))
+            {
+                return -1;
+            }
+
+            return this.GetMaxCapacity(user) - this.GetUsedCapacity(user) - this.GetTransferStorage(user);
         }
 
         internal bool IsAdmin(string user)
