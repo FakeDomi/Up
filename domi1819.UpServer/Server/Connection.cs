@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Net.Sockets;
+﻿using System.Net.Sockets;
 using System.Security.Cryptography;
 
-namespace domi1819.UpServer
+namespace domi1819.UpServer.Server
 {
-    internal class NetServerConnection
+    internal class Connection
     {
         public ICryptoTransform Encryptor { get; set; }
 
@@ -20,11 +19,8 @@ namespace domi1819.UpServer
 
         public byte[] ReaderBuffer { get; set; }
 
+        public UploadUnit UploadUnit { get; set; }
 
-        // TODO remove vvvvvv
-
-        public List<UploadUnitOld> UploadUnits { get; set; }
-
-        public long ReservedBytes { get; set; }
+        public string UserId { get; set; }
     }
 }

@@ -39,22 +39,20 @@
   <ItemGroup>
     <Compile Include="FileManager.cs" />
     <Compile Include="Logger.cs" />
-    <Compile Include="NetServer.cs" />
-    <Compile Include="NetServerConnection.cs" />
+    <Compile Include="Server\NetServer.cs" />
+    <Compile Include="Server\Connection.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="Proton\Messages\FileUploadData.cs" />
-    <Compile Include="Proton\Messages\FinishUpload.cs" />
-    <Compile Include="Proton\Messages\GetStorageInfo.cs" />
-    <Compile Include="Proton\Messages\InitiateUpload.cs" />
-    <Compile Include="Proton\Messages\LinkFormat.cs" />
-    <Compile Include="Proton\Messages\Login.cs" />
-    <Compile Include="Proton\Messages\SetPassword.cs" />
-    <Compile Include="Proton\UploadUnit.cs" />
-    <Compile Include="Proton\ProtonConnectionUser.cs" />
+    <Compile Include="Server\Messages\FileUploadData.cs" />
+    <Compile Include="Server\Messages\FinishUpload.cs" />
+    <Compile Include="Server\Messages\GetStorageInfo.cs" />
+    <Compile Include="Server\Messages\InitiateUpload.cs" />
+    <Compile Include="Server\Messages\Login.cs" />
+    <Compile Include="Server\Messages\SetPassword.cs" />
+    <Compile Include="Server\UploadUnit.cs" />
     <Compile Include="ServerConfig.cs" />
-    <Compile Include="Server\IMessageDefinition.cs" />
+    <Compile Include="Server\IMessage.cs" />
     <Compile Include="Server\MessageContext.cs" />
-    <Compile Include="Server\MessageRegistry.cs" />
+    <Compile Include="Server\Messages\LinkFormat.cs" />
     <Compile Include="UploadUnitOld.cs" />
     <Compile Include="UpServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -76,9 +74,7 @@
       <Name>domi1819.UpCore</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Server\Messages\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -4,6 +4,7 @@ using System.Reflection;
 using domi1819.UpCore.Crypto;
 using domi1819.UpCore.Network;
 using domi1819.UpCore.Utilities;
+using domi1819.UpServer.Server;
 
 namespace domi1819.UpServer
 {
@@ -62,13 +63,13 @@ namespace domi1819.UpServer
                 return;
             }
 
-            this.messageServer = new NetServer();
+            this.Users = new UserManager(this);
+            this.Files = new FileManager(this);
+
+            this.messageServer = new NetServer(this);
             this.messageServer.Start(this.Config.UpServerPort, rsaKey);
 
             Console.WriteLine($"Message server listening on port {this.Config.UpServerPort}.");
-            
-            this.Users = new UserManager(this);
-            this.Files = new FileManager(this);
 
             Console.WriteLine("UpServer started.");
             

@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace domi1819.UpServer.Proton
+namespace domi1819.UpServer.Server
 {
     internal class UploadUnit
     {
