@@ -4,7 +4,6 @@ using domi1819.UpCore.Utilities;
 
 // ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
 // ReSharper disable MemberCanBePrivate.Global
-
 namespace domi1819.UpServer
 {
     public class ServerConfig
@@ -26,7 +25,7 @@ namespace domi1819.UpServer
         public string DataFolder { get; set; }
         
         private static readonly XmlSerializer Serializer = new XmlSerializer(typeof(ServerConfig));
-
+        
         public ServerConfig()
         {
             this.HostName = "localhost";
@@ -40,19 +39,19 @@ namespace domi1819.UpServer
             this.DataFolder = "data";
         }
 
-        public void Save()
+        public void Save(string filePath)
         {
-            using (StreamWriter writer = new StreamWriter(Constants.Server.ConfigFileName))
+            using (StreamWriter writer = new StreamWriter(filePath))
             {
                 Serializer.Serialize(new FancyXmlWriter(writer), this);
             }
         }
 
-        public static ServerConfig Load()
+        public static ServerConfig Load(string filePath)
         {
-            if (File.Exists(Constants.Server.ConfigFileName))
+            if (File.Exists(filePath))
             {
-                using (StreamReader reader = new StreamReader(Constants.Server.ConfigFileName))
+                using (StreamReader reader = new StreamReader(filePath))
                 {
                     return (ServerConfig)Serializer.Deserialize(reader);
                 }

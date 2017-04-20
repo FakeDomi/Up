@@ -23,15 +23,16 @@ namespace domi1819.UpCore.Network
 
         private int connectHandles;
 
-        public string Address { private get; set; }
+        public string Host { private get; set; }
         public int Port { private get; set; }
+
         public bool Connected { get; private set; }
 
         public delegate bool AddItemCallback(string fileId, string fileName, long fileSize, DateTime updateDate, int downloads);
 
-        public NetClient(string address, int port, RsaCache rsaCache)
+        public NetClient(string host, int port, RsaCache rsaCache)
         {
-            this.Address = address;
+            this.Host = host;
             this.Port = port;
 
             this.rsaCache = rsaCache;
@@ -75,11 +76,11 @@ namespace domi1819.UpCore.Network
             lock (this.messageLock)
             {
                 this.client = new TcpClient();
-                this.client.Connect(this.Address, this.Port);
+                this.client.Connect(this.Host, this.Port);
 
                 NetworkStream netStream = this.client.GetStream();
                 byte[] keyFingerprint = new byte[Constants.Encryption.FingerprintSize];
-                string serverAddress = $"{this.Address}:{this.Port}";
+                string serverAddress = $"{this.Host}:{this.Port}";
 
                 netStream.Read(keyFingerprint, 0, keyFingerprint.Length);
 
@@ -161,7 +162,7 @@ namespace domi1819.UpCore.Network
             {
                 TcpClient tempClient = new TcpClient();
 
-                tempClient.Connect(this.Address, this.Port);
+                tempClient.Connect(this.Host, this.Port);
 
                 NetworkStream netStream = tempClient.GetStream();
                 byte[] keyFingerprint = new byte[Constants.Encryption.FingerprintSize];
@@ -252,9 +253,8 @@ namespace domi1819.UpCore.Network
                 this.deserializer.ReadMessage(NetworkMethods.InitiateUpload);
 
                 bool shouldUpload = this.deserializer.ReadNextBool();
-                string transferKey = this.deserializer.ReadNextString();
-
-                return shouldUpload ? transferKey : null;
+                
+                return shouldUpload ? "12345678" : null; //TODO: Server doesn't need transfer keys anymore
             }
         }
 
@@ -265,7 +265,7 @@ namespace domi1819.UpCore.Network
             lock (this.messageLock)
             {
                 this.serializer.Start(NetworkMethods.UploadPacket);
-                this.serializer.WriteNextString(key);
+                //this.serializer.WriteNextString(key);
                 this.serializer.WriteNextInt(count);
 
                 Array.Copy(bytes, start, this.serializer.Bytes, this.serializer.Index, count - start);
@@ -285,7 +285,7 @@ namespace domi1819.UpCore.Network
             lock (this.messageLock)
             {
                 this.serializer.Start(NetworkMethods.FinishUpload);
-                this.serializer.WriteNextString(key);
+                //this.serializer.WriteNextString(key);
                 this.serializer.Flush();
 
                 this.deserializer.ReadMessage(NetworkMethods.FinishUpload);

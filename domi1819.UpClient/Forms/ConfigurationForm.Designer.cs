@@ -56,6 +56,7 @@ namespace domi1819.UpClient.Forms
             this.darkButton2 = new domi1819.DarkControls.DarkButton();
             this.uiDarkColorView = new domi1819.DarkControls.DarkColorView();
             this.darkButton3 = new domi1819.DarkControls.DarkButton();
+            this.changePasswordButton = new domi1819.DarkControls.DarkButton();
             this.SuspendLayout();
             // 
             // uiConnectionGroupLabel
@@ -104,7 +105,6 @@ namespace domi1819.UpClient.Forms
             this.uiPasswordTextBox.ReadOnly = false;
             this.uiPasswordTextBox.Size = new System.Drawing.Size(154, 20);
             this.uiPasswordTextBox.TabIndex = 3;
-            this.uiPasswordTextBox.TextValue = "";
             this.uiPasswordTextBox.UseSystemPasswordChar = true;
             // 
             // uiUserIdTextBox
@@ -116,7 +116,6 @@ namespace domi1819.UpClient.Forms
             this.uiUserIdTextBox.ReadOnly = false;
             this.uiUserIdTextBox.Size = new System.Drawing.Size(154, 20);
             this.uiUserIdTextBox.TabIndex = 2;
-            this.uiUserIdTextBox.TextValue = "";
             this.uiUserIdTextBox.UseSystemPasswordChar = false;
             // 
             // uiServerAddressTextBox
@@ -128,7 +127,6 @@ namespace domi1819.UpClient.Forms
             this.uiServerAddressTextBox.ReadOnly = false;
             this.uiServerAddressTextBox.Size = new System.Drawing.Size(154, 20);
             this.uiServerAddressTextBox.TabIndex = 1;
-            this.uiServerAddressTextBox.TextValue = "";
             this.uiServerAddressTextBox.UseSystemPasswordChar = false;
             // 
             // uiPreferencesGroupLabel
@@ -362,6 +360,22 @@ namespace domi1819.UpClient.Forms
             this.darkButton3.UseVisualStyleBackColor = false;
             this.darkButton3.Click += new System.EventHandler(this.VerifyKeyButtonClicked);
             // 
+            // changePasswordButton
+            // 
+            this.changePasswordButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
+            this.changePasswordButton.FlatAppearance.BorderSize = 0;
+            this.changePasswordButton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
+            this.changePasswordButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(42)))), ((int)(((byte)(44)))));
+            this.changePasswordButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.changePasswordButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
+            this.changePasswordButton.Location = new System.Drawing.Point(120, 141);
+            this.changePasswordButton.Name = "changePasswordButton";
+            this.changePasswordButton.Size = new System.Drawing.Size(102, 23);
+            this.changePasswordButton.TabIndex = 6;
+            this.changePasswordButton.Text = "Change password";
+            this.changePasswordButton.UseVisualStyleBackColor = false;
+            this.changePasswordButton.Click += new System.EventHandler(this.ChangePasswordButtonClick);
+            // 
             // ConfigurationForm
             // 
             this.AcceptButton = this.uiSaveButton;
@@ -370,6 +384,7 @@ namespace domi1819.UpClient.Forms
             this.ClientSize = new System.Drawing.Size(234, 474);
             this.Controls.Add(this.uiDarkColorView);
             this.Controls.Add(this.darkButton2);
+            this.Controls.Add(this.changePasswordButton);
             this.Controls.Add(this.darkButton3);
             this.Controls.Add(this.darkButton1);
             this.Controls.Add(this.uiSaveButton);
@@ -428,5 +443,6 @@ namespace domi1819.UpClient.Forms
         private DarkButton darkButton2;
         private DarkColorView uiDarkColorView;
         private DarkButton darkButton3;
+        private DarkButton changePasswordButton;
     }
 }

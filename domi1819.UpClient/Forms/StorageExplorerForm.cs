@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -144,6 +145,7 @@ namespace domi1819.UpClient.Forms
             foreach (DataGridViewColumn column in this.uiDataGridView.Columns)
             {
                 column.DefaultCellStyle.SelectionBackColor = DarkColors.StrongColor;
+                column.DefaultCellStyle.SelectionForeColor = DarkColors.StrongColor.GetBrightness() > 0.50 ? Color.Black : DarkColors.Foreground; //TODO: replace with better algorithm (yellow with brightness slightly lower than 0.5 is unreadable)
             }
 
             this.uiDataGridView.Refresh();

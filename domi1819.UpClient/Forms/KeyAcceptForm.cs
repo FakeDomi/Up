@@ -15,10 +15,10 @@ namespace domi1819.UpClient.Forms
         {
             this.InitializeComponent();
 
-            this.uiServerAddressTextBox.TextValue = serverAddress;
+            this.uiServerAddressTextBox.Text = serverAddress;
 
             this.fullRemoteFingerprint = remoteFingerprint.ToHexString(6);
-            this.uiRemoteFingerprintTextBox.TextValue = this.fullRemoteFingerprint.Substring(0, 41);
+            this.uiRemoteFingerprintTextBox.Text = this.fullRemoteFingerprint.Substring(0, 41);
 
             if (localFingerprint != null)
             {
@@ -28,7 +28,7 @@ or your connection is being intercepted by an attacker.
 Do you want to accept and store the new key?";
 
                 this.fullLocalFingerprint = localFingerprint.ToHexString(6);
-                this.uiLocalFingerprintTextBox.TextValue = this.fullLocalFingerprint.Substring(0, 41);
+                this.uiLocalFingerprintTextBox.Text = this.fullLocalFingerprint.Substring(0, 41);
             }
         }
 

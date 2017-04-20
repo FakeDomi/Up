@@ -37,7 +37,7 @@ namespace domi1819.UpInstaller
 
                 if (versionInfo.Length == 2)
                 {
-                    this.remoteVersionTextBox.TextValue = versionInfo[0];
+                    this.remoteVersionTextBox.Text = versionInfo[0];
                     this.downloadPath = versionInfo[1];
 
                     return;

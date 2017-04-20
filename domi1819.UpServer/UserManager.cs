@@ -9,9 +9,9 @@ namespace domi1819.UpServer
 {
     internal class UserManager
     {
-        public const int UsernameMaxLength = 32;
-        public const int PasswordMaxLength = 256;
-        public const int SaltLength = 8;
+        private const int PasswordMinLength = 6;
+        private const int PasswordMaxLength = 256;
+        private const int SaltLength = 8;
 
         private readonly NanoDBFile dbFile;
 
@@ -92,7 +92,7 @@ namespace domi1819.UpServer
 
         internal bool SetPassword(string user, string password)
         {
-            if (this.HasUser(user) && password.Length <= PasswordMaxLength)
+            if (this.HasUser(user) && password.Length <= PasswordMaxLength && password.Length >= PasswordMinLength)
             {
                 string salt = Util.GetRandomString(SaltLength);
                 byte[] hash = Util.Hash(password, salt);
@@ -133,9 +133,7 @@ namespace domi1819.UpServer
 
         public long GetTransferStorage(string user)
         {
-            long capacity;
-
-            return this.transferStorageDictionary.TryGetValue(user, out capacity) ? capacity : 0;
+            return this.transferStorageDictionary.TryGetValue(user, out long capacity) ? capacity : 0;
         }
 
         public void AddTransferStorage(string user, long value)

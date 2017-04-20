@@ -17,9 +17,7 @@ namespace domi1819.UpServer
         internal UserManager Users { get; private set; }
 
         internal FileManager Files { get; private set; }
-
-        //private Logger logger;
-
+        
         private NetServer messageServer;
 
         internal UpServer()
@@ -34,12 +32,12 @@ namespace domi1819.UpServer
             Console.WriteLine("https://up.domi1819.xyz");
             Console.WriteLine("================================\n");
 
-            this.Config = ServerConfig.Load();
-            this.Config.Save();
+            this.Config = ServerConfig.Load(Constants.Server.ConfigFileName);
+            this.Config.Save(Constants.Server.ConfigFileName);
             
-            TryCreateDirectory(this.Config.DataFolder);
-            TryCreateDirectory(this.Config.FileStorageFolder);
-            TryCreateDirectory(this.Config.FileTransferFolder);
+            Directory.CreateDirectory(this.Config.DataFolder);
+            Directory.CreateDirectory(this.Config.FileStorageFolder);
+            Directory.CreateDirectory(this.Config.FileTransferFolder);
 
             string publicKeyPath = Path.Combine(this.Config.DataFolder, Constants.Encryption.PublicKeyFile);
             string privateKeyPath = Path.Combine(this.Config.DataFolder, Constants.Encryption.PrivateKeyFile);
@@ -79,14 +77,6 @@ namespace domi1819.UpServer
             while (true)
             {
                 Console.ReadKey(true);
-            }
-        }
-
-        private static void TryCreateDirectory(string path)
-        {
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
             }
         }
     }

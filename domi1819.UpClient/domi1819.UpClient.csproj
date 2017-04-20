@@ -43,12 +43,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Address.cs" />
+    <Compile Include="Forms\ChangePasswordForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ChangePasswordForm.Designer.cs">
+      <DependentUpon>ChangePasswordForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\KeyAcceptForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\KeyAcceptForm.Designer.cs">
       <DependentUpon>KeyAcceptForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="InfoFormDefaults.cs" />
     <Compile Include="StorageExplorer\FileIconCache.cs" />
     <Compile Include="Forms\AccountDetailsForm.cs">
       <SubType>Form</SubType>
@@ -119,6 +127,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\AccountDetailsForm.resx">
       <DependentUpon>AccountDetailsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ChangePasswordForm.resx">
+      <DependentUpon>ChangePasswordForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ConfigurationForm.resx">
       <DependentUpon>ConfigurationForm.cs</DependentUpon>

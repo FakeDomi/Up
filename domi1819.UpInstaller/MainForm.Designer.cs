@@ -46,7 +46,6 @@
             this.localVersionTextBox.ReadOnly = false;
             this.localVersionTextBox.Size = new System.Drawing.Size(112, 20);
             this.localVersionTextBox.TabIndex = 0;
-            this.localVersionTextBox.TextValue = "";
             this.localVersionTextBox.UseSystemPasswordChar = false;
             // 
             // darkProgressBar1
@@ -69,7 +68,6 @@
             this.remoteVersionTextBox.ReadOnly = false;
             this.remoteVersionTextBox.Size = new System.Drawing.Size(112, 20);
             this.remoteVersionTextBox.TabIndex = 2;
-            this.remoteVersionTextBox.TextValue = "";
             this.remoteVersionTextBox.UseSystemPasswordChar = false;
             // 
             // label1

@@ -101,7 +101,7 @@
             this.uiRemoteFingerprintTextBox.ReadOnly = true;
             this.uiRemoteFingerprintTextBox.Size = new System.Drawing.Size(284, 20);
             this.uiRemoteFingerprintTextBox.TabIndex = 3;
-            this.uiRemoteFingerprintTextBox.TextValue = "001122-334455-667788-99AABB-CCDDEE-FFFFFF";
+            this.uiRemoteFingerprintTextBox.Text = "001122-334455-667788-99AABB-CCDDEE-FFFFFF";
             this.uiRemoteFingerprintTextBox.UseSystemPasswordChar = false;
             // 
             // uiRemoteLabel
@@ -124,7 +124,7 @@
             this.uiServerAddressTextBox.ReadOnly = true;
             this.uiServerAddressTextBox.Size = new System.Drawing.Size(332, 20);
             this.uiServerAddressTextBox.TabIndex = 3;
-            this.uiServerAddressTextBox.TextValue = "abc.xyz:1819";
+            this.uiServerAddressTextBox.Text = "abc.xyz:1819";
             this.uiServerAddressTextBox.UseSystemPasswordChar = false;
             // 
             // uiAddressLabel
@@ -147,7 +147,6 @@
             this.uiLocalFingerprintTextBox.ReadOnly = true;
             this.uiLocalFingerprintTextBox.Size = new System.Drawing.Size(284, 20);
             this.uiLocalFingerprintTextBox.TabIndex = 3;
-            this.uiLocalFingerprintTextBox.TextValue = "";
             this.uiLocalFingerprintTextBox.UseSystemPasswordChar = false;
             // 
             // uiLocalLabel

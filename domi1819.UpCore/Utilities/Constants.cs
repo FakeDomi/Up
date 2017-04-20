@@ -67,6 +67,9 @@ namespace domi1819.UpCore.Utilities
             public static readonly string ConfigFileName = "up.xml";
 
             public static readonly int UploadQueueMaxItemCount = 7;
+
+            public static readonly int InfoSuccessTimeout = 3000;
+            public static readonly int InfoErrorTimeout = 5000;
         }
     }
 }

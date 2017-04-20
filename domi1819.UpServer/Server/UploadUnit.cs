@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace domi1819.UpServer.Server
 {
@@ -13,5 +14,15 @@ namespace domi1819.UpServer.Server
         internal long Position { get; set; }
 
         internal FileStream FileStream { get; set; }
+
+        internal void Cleanup()
+        {
+            this.FileStream.Dispose();
+
+            if (File.Exists(this.TempFile))
+            {
+                File.Delete(this.TempFile);
+            }
+        }
     }
 }

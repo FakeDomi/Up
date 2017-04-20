@@ -3,6 +3,7 @@ using System.Windows.Forms;
 using domi1819.DarkControls;
 using domi1819.UpCore.Config;
 using domi1819.UpCore.Network;
+using domi1819.UpCore.Utilities;
 
 namespace domi1819.UpClient.Forms
 {
@@ -142,7 +143,7 @@ namespace domi1819.UpClient.Forms
 
                     client.Disconnect();
 
-                    client.Address = config.ServerAddress;
+                    client.Host = config.ServerAddress;
                     client.Port = config.ServerPort;
                 }
 
@@ -235,32 +236,16 @@ namespace domi1819.UpClient.Forms
 
         private bool FillConfig(Config config, bool fillHotkeys = false)
         {
-            string[] addressSplit = this.uiServerAddressTextBox.Text.Split(':');
-            
-            if (addressSplit.Length == 1)
-            {
-                config.ServerAddress = addressSplit[0];
-                config.ServerPort = 1819;
-            }
-            else if (addressSplit.Length == 2)
-            {
-                config.ServerAddress = addressSplit[0];
+            Address address = Address.Parse(this.uiServerAddressTextBox.Text, Constants.Server.DefaultPort);
 
-                int port;
-
-                if (!int.TryParse(addressSplit[1], out port) || port <= 0 || port >= 65536)
-                {
-                    MessageBox.Show("Invalid address!");
-                    return false;
-                }
-
-                config.ServerPort = port;
-            }
-            else
+            if (address.Equals(Address.Invalid))
             {
                 MessageBox.Show("Invalid address!");
                 return false;
             }
+
+            config.ServerAddress = address.Host;
+            config.ServerPort = address.Port;
             
             config.UserId = this.uiUserIdTextBox.Text;
             config.Password = this.uiPasswordTextBox.Text;
@@ -277,6 +262,19 @@ namespace domi1819.UpClient.Forms
             }
 
             return true;
+        }
+
+        private void ChangePasswordButtonClick(object sender, EventArgs e)
+        {
+            using (ChangePasswordForm changePasswordForm = new ChangePasswordForm(this.uiServerAddressTextBox.Text, this.uiUserIdTextBox.Text, this.uiPasswordTextBox.Text, this.upClient.RsaCache))
+            {
+                changePasswordForm.ShowDialog(this);
+
+                if (changePasswordForm.NewPassword != null)
+                {
+                    this.uiPasswordTextBox.Text = changePasswordForm.NewPassword;
+                }
+            }
         }
     }
 }

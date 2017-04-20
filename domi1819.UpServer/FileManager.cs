@@ -75,6 +75,7 @@ namespace domi1819.UpServer
 
             return success;
         }
+
         internal bool IsOwner(string key, string user)
         {
             return this.dbFile.ContainsKey(key) && this.dbFile.GetLine(key)[Index.Owner].Equals(user);

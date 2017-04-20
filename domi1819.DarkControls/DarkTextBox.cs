@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -6,16 +7,12 @@ namespace domi1819.DarkControls
 {
     public partial class DarkTextBox : UserControl, IGlowComponent
     {
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        [Browsable(true)]
         public new string Text
         {
             get { return this.textBox.Text; }
             set { this.textBox.Text = value; }
-        }
-
-        public string TextValue
-        {
-            get { return this.Text; }
-            set { this.Text = value; }
         }
 
         public bool UseSystemPasswordChar

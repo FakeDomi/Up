@@ -32,6 +32,7 @@ namespace domi1819.UpServer.Server
             this.messages.Add(NetworkMethods.UploadPacket, new FileUploadData());
             this.messages.Add(NetworkMethods.FinishUpload, new FinishUpload(upServer.Files, upServer.Users, upServer.Config));
             this.messages.Add(NetworkMethods.InitiateUpload, new InitiateUpload(upServer.Files, upServer.Users));
+            this.messages.Add(NetworkMethods.ListFiles, new ListFiles(upServer.Files, upServer.Users));
         }
 
         internal void Start(int port, RsaKey rsaKey)
@@ -58,7 +59,7 @@ namespace domi1819.UpServer.Server
                 }
                 else
                 {
-                    Thread.Sleep(250);
+                    Thread.Sleep(100);
                 }
             }
 
@@ -73,22 +74,19 @@ namespace domi1819.UpServer.Server
 
             try
             {
-                Console.WriteLine("Client {0} connected.", client.Client.RemoteEndPoint); //TODO
+                Console.WriteLine($"Client {client.Client.RemoteEndPoint} connected."); //TODO
 
-                NetworkStream stream = client.GetStream();
-
-                connection.BaseStream = stream;
-
-                //stream.ReadTimeout = Constants.Network.Timeout;
-
-                stream.Write(this.rsaFingerprint, 0, this.rsaFingerprint.Length);
+                NetworkStream baseStream = client.GetStream();
+                connection.BaseStream = baseStream;
                 
-                int mode = stream.ReadByte();
+                baseStream.Write(this.rsaFingerprint, 0, this.rsaFingerprint.Length);
+
+                int mode = baseStream.ReadByte();
 
                 if (mode == 0x01) // Send full key
                 {
-                    stream.Write(this.rsaModulus, 0, this.rsaModulus.Length);
-                    stream.Write(this.rsaExponent, 0, this.rsaExponent.Length);
+                    baseStream.Write(this.rsaModulus, 0, this.rsaModulus.Length);
+                    baseStream.Write(this.rsaExponent, 0, this.rsaExponent.Length);
                 }
                 else if (mode == 0x00) // Normal connection
                 {
@@ -97,7 +95,7 @@ namespace domi1819.UpServer.Server
 
                     while (position < buffer.Length)
                     {
-                        int bytesRead = stream.Read(buffer, position, buffer.Length - position);
+                        int bytesRead = baseStream.Read(buffer, position, buffer.Length - position);
                         position += bytesRead;
 
                         if (bytesRead == 0)
@@ -105,41 +103,11 @@ namespace domi1819.UpServer.Server
                             throw new Exception($"Connection to client {client.Client.RemoteEndPoint} lost.");
                         }
                     }
-
-                    byte[] secret = this.rsaCsp.Decrypt(buffer, true);
-
-                    byte[] key = new byte[16];
-                    byte[] ivEncrypt = new byte[16];
-                    byte[] ivDecrypt = new byte[16];
-
-                    Array.Copy(secret, 0, key, 0, 16);
-                    Array.Copy(secret, 16, ivDecrypt, 0, 16);
-                    Array.Copy(secret, 32, ivEncrypt, 0, 16);
-
-                    ICryptoTransform encryptor, decryptor;
-
-                    using (RijndaelManaged rijndaelEncrypt = new RijndaelManaged { Key = key, IV = ivEncrypt, Mode = CipherMode.CBC, Padding = PaddingMode.None })
-                    {
-                        encryptor = rijndaelEncrypt.CreateEncryptor();
-                    }
-
-                    using (RijndaelManaged rijndaelDecrypt = new RijndaelManaged { Key = key, IV = ivDecrypt, Mode = CipherMode.CBC, Padding = PaddingMode.None })
-                    {
-                        decryptor = rijndaelDecrypt.CreateDecryptor();
-                    }
-
-                    CryptoStream outStream = new CryptoStream(stream, encryptor, CryptoStreamMode.Write);
-                    CryptoStream inStream = new CryptoStream(stream, decryptor, CryptoStreamMode.Read);
                     
-                    connection.Encryptor = encryptor;
-                    connection.Decryptor = decryptor;
-                    connection.OutStream = outStream;
-                    connection.InStream = inStream;
-                    connection.WriterBuffer = this.messageBufferPool.Get();
-                    connection.ReaderBuffer = this.messageBufferPool.Get();
-                    
-                    MessageSerializer serializer = new MessageSerializer { Bytes = connection.WriterBuffer, Stream = outStream };
-                    MessageDeserializer deserializer = new MessageDeserializer { Bytes = connection.ReaderBuffer, Stream = inStream };
+                    connection.InitializeSymmetricEncryption(this.rsaCsp.Decrypt(buffer, true), baseStream, this.messageBufferPool);
+
+                    MessageSerializer serializer = new MessageSerializer { Bytes = connection.WriterBuffer, Stream = connection.OutStream };
+                    MessageDeserializer deserializer = new MessageDeserializer { Bytes = connection.ReaderBuffer, Stream = connection.InStream };
 
                     deserializer.ReadMessage(NetworkMethods.GetServerVersion);
 
@@ -148,9 +116,7 @@ namespace domi1819.UpServer.Server
                     serializer.WriteNextInt(Constants.Server.MinClientBuild);
                     serializer.Flush();
 
-                    stream.ReadTimeout = Timeout.Infinite;
-
-                    //this.RunMessageLoop(serializer, deserializer, connection);
+                    baseStream.ReadTimeout = Timeout.Infinite;
 
                     this.RunMessageLoop(new MessageContext(deserializer, serializer), connection);
 
@@ -169,31 +135,7 @@ namespace domi1819.UpServer.Server
             }
             finally
             {
-                Util.SafeDispose(connection.OutStream, connection.InStream, connection.BaseStream, connection.Encryptor, connection.Decryptor);
-
-                if (connection.WriterBuffer != null)
-                {
-                    this.messageBufferPool.Return(connection.WriterBuffer);
-                }
-
-                if (connection.ReaderBuffer != null)
-                {
-                    this.messageBufferPool.Return(connection.ReaderBuffer);
-                }
-
-                if (connection.UploadUnit != null)
-                {
-                    try
-                    {
-                        connection.UploadUnit.FileStream.Dispose();
-                        // TODO: delete tempfile
-                    }
-                    catch
-                    {
-                        // No action needed
-                    }
-                }
-
+                connection.Cleanup(this.messageBufferPool);
                 client.Close();
             }
         }
@@ -202,17 +144,17 @@ namespace domi1819.UpServer.Server
         {
             while (true)
             {
-                IMessage message;
                 int messageId = context.FetchMessage();
 
                 //TODO: Proper error handling
-                if (!this.messages.TryGetValue(messageId, out message))
+                if (!this.messages.TryGetValue(messageId, out IMessage message))
                 {
                     return;
                 }
 
                 context.ShouldPush = true;
                 context.MessageWriter.Start(messageId);
+
                 message.OnMessage(context, connection);
 
                 if (context.Disconnect)

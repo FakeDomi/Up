@@ -25,8 +25,8 @@ namespace domi1819.UpServer.Server.Messages
                 unit.FileStream.Dispose();
 
                 string fileId = this.files.GetNewFileId();
-
                 this.files.AddFile(fileId, unit.FileName, connection.UserId, unit.Size);
+
                 File.Move(unit.TempFile, Path.Combine(this.config.FileStorageFolder, fileId));
                 this.users.RemoveTransferStorage(connection.UserId, unit.Size);
                 this.files.SetDownloadable(fileId, true);
