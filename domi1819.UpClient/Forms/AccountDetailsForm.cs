@@ -21,19 +21,20 @@ namespace domi1819.UpClient.Forms
             this.InitializeComponent();
         }
 
-        internal void ShowDetails(Config config, RsaCache rsaCache, Form parentForm, bool fetchKey)
+        internal void ShowDetails(Config config, RsaCache rsaCache, Form parentForm, bool fetchKey, EventHandler<ColorChangedEventArgs> themeColorChanged)
         {
             this.config = config;
             this.rsaCache = rsaCache;
             this.parent = parentForm;
             this.fetchKey = fetchKey;
             this.uiBackgroundWorker.RunWorkerAsync();
+
+            this.uiProgressBar.BarColor = DarkColors.StrongColor;
+            themeColorChanged += (sender, args) => { this.uiProgressBar.BarColor = args.NewColor; };
         }
 
         private void BackgroundWorkerDoWork(object sender, DoWorkEventArgs e)
         {
-            //UpClient upClient = (UpClient)e.Argument;
-
             NetClient client = new NetClient(this.config.ServerAddress, this.config.ServerPort, this.rsaCache);
 
             try

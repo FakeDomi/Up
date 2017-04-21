@@ -32,6 +32,7 @@ namespace domi1819.DarkControls
             set
             {
                 this.Brush = new SolidBrush(value);
+                this.label.ForeColor = DarkColors.GetForegroundColor(value);
                 this.Invalidate();
             }
         }
@@ -51,7 +52,7 @@ namespace domi1819.DarkControls
             this.BarColor = DarkColors.StrongColor;
 
             this.label.BackColor = Color.Transparent;
-            this.label.ForeColor = DarkColors.Foreground;
+            this.label.ForeColor = DarkColors.GetForegroundColor(this.BarColor);
 
             this.label.MouseEnter += this.LabelMouseEnter;
             this.label.MouseLeave += this.LabelMouseLeave;

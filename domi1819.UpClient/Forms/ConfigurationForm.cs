@@ -51,6 +51,7 @@ namespace domi1819.UpClient.Forms
             {
                 e.Cancel = true;
                 this.Hide();
+                this.ResetFields();
             }
         }
         
@@ -218,7 +219,7 @@ namespace domi1819.UpClient.Forms
 
             this.FillConfig(testConfig);
 
-            new AccountDetailsForm().ShowDetails(testConfig, this.upClient.RsaCache, this, sender == null);
+            new AccountDetailsForm().ShowDetails(testConfig, this.upClient.RsaCache, this, sender == null, this.ThemeColorChanged);
         }
 
         private void darkButton2_Click(object sender, EventArgs e)

@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Windows.Forms;
 using domi1819.UpClient.Forms;
 using domi1819.UpClient.Uploads;
 using domi1819.UpCore.Config;
@@ -43,8 +44,7 @@ namespace domi1819.UpClient
                 return this.storageExplorerForm;
             }
         }
-
-
+        
         internal void LaunchApplication(string[] cmdArgs)
         {
             if (cmdArgs.Length > 0)

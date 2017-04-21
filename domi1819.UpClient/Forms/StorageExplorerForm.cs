@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -35,6 +34,7 @@ namespace domi1819.UpClient.Forms
             this.upClient = upClient;
             
             this.uiDataGridView.DefaultCellStyle.SelectionBackColor = DarkColors.StrongColor;
+            this.uiDataGridView.DefaultCellStyle.SelectionForeColor = DarkColors.GetForegroundColor(DarkColors.StrongColor);
 
             this.upClient.ConfigurationForm.ThemeColorChanged += this.ConfigurationFormOnThemeColorChanged;
 
@@ -94,14 +94,7 @@ namespace domi1819.UpClient.Forms
             int otherColumns = this.uiDataGridView.Columns[0].Width + this.uiDataGridView.Columns[2].Width + this.uiDataGridView.Columns[3].Width + this.uiDataGridView.Columns[4].Width;
             VScrollBar bar = this.uiDataGridView.Controls.OfType<VScrollBar>().First();
 
-            if (bar.Visible)
-            {
-                this.uiDataGridView.Columns[1].Width = this.uiDataGridView.Width - otherColumns - bar.Width;
-            }
-            else
-            {
-                this.uiDataGridView.Columns[1].Width = this.uiDataGridView.Width - otherColumns;
-            }
+            this.uiDataGridView.Columns[1].Width = bar.Visible ? this.uiDataGridView.Width - otherColumns - bar.Width : this.uiDataGridView.Width - otherColumns;
         }
 
         private void uiDataGridView_MouseClick(object sender, MouseEventArgs e)
@@ -145,7 +138,7 @@ namespace domi1819.UpClient.Forms
             foreach (DataGridViewColumn column in this.uiDataGridView.Columns)
             {
                 column.DefaultCellStyle.SelectionBackColor = DarkColors.StrongColor;
-                column.DefaultCellStyle.SelectionForeColor = DarkColors.StrongColor.GetBrightness() > 0.50 ? Color.Black : DarkColors.Foreground; //TODO: replace with better algorithm (yellow with brightness slightly lower than 0.5 is unreadable)
+                column.DefaultCellStyle.SelectionForeColor = DarkColors.GetForegroundColor(DarkColors.StrongColor);
             }
 
             this.uiDataGridView.Refresh();
@@ -205,7 +198,7 @@ namespace domi1819.UpClient.Forms
 
         private void uiBackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-
+            Console.WriteLine("complete");
         }
 
         private void ItemCopyOnClick(object sender, EventArgs e)

@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 
 namespace domi1819.DarkControls
 {
@@ -6,11 +7,11 @@ namespace domi1819.DarkControls
     {
         private static Color strongColor;
 
-        public static Color Control { get; set; }
-        public static Color Control2 { get; set; }
-        public static Color Workspace { get; set; }
-        public static Color Border { get; set; }
-        public static Color Foreground { get; set; }
+        public static Color Control { get; }
+        public static Color Control2 { get; }
+        public static Color Workspace { get; }
+        public static Color Border { get; }
+        public static Color Foreground { get; }
 
         public static Color StrongColor
         {
@@ -25,7 +26,7 @@ namespace domi1819.DarkControls
             }
         }
         
-        public static Color PaleColor { get; set; }
+        public static Color PaleColor { get; private set; }
 
         static DarkColors()
         {
@@ -36,6 +37,11 @@ namespace domi1819.DarkControls
             Foreground = Color.FromArgb(241, 241, 241);
 
             StrongColor = Color.FromArgb(16, 48, 128);
+        }
+
+        public static Color GetForegroundColor(Color background)
+        {
+            return (int)Math.Sqrt(background.R * background.R * 0.299 + background.G * background.G * 0.587 + background.B * background.B * 0.114) > 127 ? Color.Black : Foreground;
         }
     }
 }

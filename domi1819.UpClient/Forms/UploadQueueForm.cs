@@ -41,6 +41,8 @@ namespace domi1819.UpClient.Forms
             this.Location = new Point(screen.WorkingArea.Right - this.Width, screen.WorkingArea.Bottom - this.Height);
             
             upClient.ConfigurationForm.ThemeColorChanged += this.ConfigurationFormOnThemeColorChanged;
+
+            this.uiProgressBar.BarColor = DarkColors.StrongColor;
         }
 
         internal new void Show()
