@@ -87,5 +87,10 @@ namespace domi1819.UpClient.Forms
 
             client.Disconnect();
         }
+
+        private void HidePasswordCheckBoxCheckedChanged(object sender, EventArgs e)
+        {
+            this.newPasswordTextBox.UseSystemPasswordChar = this.hidePasswordCheckBox.Checked;
+        }
     }
 }

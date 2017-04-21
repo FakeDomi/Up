@@ -6,33 +6,43 @@ namespace domi1819.DarkControls
 {
     public partial class DarkProgressBar : UserControl, IGlowComponent
     {
+        private const int BarPadding = 2;
+
+        private static readonly Brush ForegroundBrush = new SolidBrush(DarkColors.Foreground);
+        private static readonly StringFormat StringFormat = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
+        private static readonly Font TextFont = new Font(FontFamily.GenericSansSerif, 8.25F);
+
+        private SolidBrush textOverlayBrush = new SolidBrush(DarkColors.GetForegroundColor(DarkColors.StrongColor));
+
+        private string valueText;
         private float value;
 
         public float Value
         {
-            get { return this.value; }
+            get => this.value;
             set
             {
                 this.value = value < 0 ? 0 : value > 1 ? 1 : value;
-                this.label.Text = (int)(value * 100) + " %";
+                this.valueText = $"{this.ValueInt} %";
+                this.Invalidate();
             }
         }
 
         public int ValueInt
         {
-            get { return (int)(this.Value * 100); }
-            set { this.Value = value / 100F; }
+            get => (int)(this.Value * 100);
+            set => this.Value = value / 100F;
         }
 
         public SolidBrush Brush { get; set; }
 
         public Color BarColor
         {
-            get { return this.Brush.Color; }
+            get => this.Brush.Color;
             set
             {
                 this.Brush = new SolidBrush(value);
-                this.label.ForeColor = DarkColors.GetForegroundColor(value);
+                this.textOverlayBrush = new SolidBrush(DarkColors.GetForegroundColor(DarkColors.StrongColor));
                 this.Invalidate();
             }
         }
@@ -44,18 +54,15 @@ namespace domi1819.DarkControls
         public int GlowW => this.DisplayRectangle.Width;
 
         public int GlowH => this.DisplayRectangle.Height;
-
+        
         public DarkProgressBar()
         {
             this.InitializeComponent();
             this.BackColor = DarkColors.Control;
             this.BarColor = DarkColors.StrongColor;
-
-            this.label.BackColor = Color.Transparent;
-            this.label.ForeColor = DarkColors.GetForegroundColor(this.BarColor);
-
-            this.label.MouseEnter += this.LabelMouseEnter;
-            this.label.MouseLeave += this.LabelMouseLeave;
+            
+            this.MouseEnter += this.LabelMouseEnter;
+            this.MouseLeave += this.LabelMouseLeave;
 
             this.DoubleBuffered = true;
         }
@@ -64,19 +71,25 @@ namespace domi1819.DarkControls
         {
             base.OnPaint(e);
 
-            ControlPaint.DrawBorder(e.Graphics, this.DisplayRectangle, DarkColors.Border, ButtonBorderStyle.Solid);
+            Graphics g = e.Graphics;
 
-            if (this.value > 0)
+            ControlPaint.DrawBorder(g, this.DisplayRectangle, DarkColors.Border, ButtonBorderStyle.Solid);
+
+            if (this.value >= 0)
             {
-                e.Graphics.FillRectangle(this.Brush, 2, 2, (this.Width - 4) * this.value, this.Height - 4);
+                RectangleF fullArea = new RectangleF(0, 0, this.Width, this.Height);
+                Rectangle barArea = new Rectangle(BarPadding, BarPadding, (int)((this.Width - 2 * BarPadding) * this.value), this.Height - 2 * BarPadding);
+
+                g.DrawString(this.valueText, TextFont, ForegroundBrush, fullArea, StringFormat);
+                g.FillRectangle(this.Brush, barArea);
+                g.Clip = new Region(barArea);
+                g.DrawString(this.valueText, TextFont, this.textOverlayBrush, fullArea, StringFormat);
             }
         }
 
         private void LabelMouseEnter(object sender, EventArgs e)
         {
-            DarkForm parent = this.Parent as DarkForm;
-
-            if (parent != null)
+            if (this.Parent is DarkForm parent)
             {
                 parent.GlowComponent = this;
                 parent.Invalidate();
@@ -85,9 +98,7 @@ namespace domi1819.DarkControls
 
         private void LabelMouseLeave(object sender, EventArgs e)
         {
-            DarkForm parent = this.Parent as DarkForm;
-
-            if (parent != null)
+            if (this.Parent is DarkForm parent)
             {
                 parent.GlowComponent = null;
                 parent.Invalidate();

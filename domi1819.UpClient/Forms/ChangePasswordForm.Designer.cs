@@ -39,6 +39,7 @@
             this.newPasswordLabel = new System.Windows.Forms.Label();
             this.separator = new domi1819.DarkControls.ColoredBox();
             this.saveButton = new domi1819.DarkControls.DarkButton();
+            this.hidePasswordCheckBox = new domi1819.DarkControls.DarkCheckBox();
             this.SuspendLayout();
             // 
             // currentPasswordTextBox
@@ -49,7 +50,7 @@
             this.currentPasswordTextBox.Name = "currentPasswordTextBox";
             this.currentPasswordTextBox.ReadOnly = false;
             this.currentPasswordTextBox.Size = new System.Drawing.Size(154, 20);
-            this.currentPasswordTextBox.TabIndex = 4;
+            this.currentPasswordTextBox.TabIndex = 5;
             this.currentPasswordTextBox.UseSystemPasswordChar = true;
             // 
             // currentPasswordLabel
@@ -69,7 +70,7 @@
             this.userIdTextBox.Name = "userIdTextBox";
             this.userIdTextBox.ReadOnly = true;
             this.userIdTextBox.Size = new System.Drawing.Size(154, 20);
-            this.userIdTextBox.TabIndex = 3;
+            this.userIdTextBox.TabIndex = 4;
             this.userIdTextBox.UseSystemPasswordChar = false;
             // 
             // userIdLabel
@@ -89,7 +90,7 @@
             this.serverAddressTextBox.Name = "serverAddressTextBox";
             this.serverAddressTextBox.ReadOnly = true;
             this.serverAddressTextBox.Size = new System.Drawing.Size(154, 20);
-            this.serverAddressTextBox.TabIndex = 2;
+            this.serverAddressTextBox.TabIndex = 3;
             this.serverAddressTextBox.UseSystemPasswordChar = false;
             // 
             // serverAddressLabel
@@ -139,18 +140,35 @@
             this.saveButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(42)))), ((int)(((byte)(44)))));
             this.saveButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.saveButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
-            this.saveButton.Location = new System.Drawing.Point(15, 142);
+            this.saveButton.Location = new System.Drawing.Point(12, 154);
             this.saveButton.Name = "saveButton";
-            this.saveButton.Size = new System.Drawing.Size(246, 23);
-            this.saveButton.TabIndex = 1;
+            this.saveButton.Size = new System.Drawing.Size(249, 23);
+            this.saveButton.TabIndex = 2;
             this.saveButton.Text = "Change password";
             this.saveButton.UseVisualStyleBackColor = false;
             this.saveButton.Click += new System.EventHandler(this.SaveButtonClick);
             // 
+            // hidePasswordCheckBox
+            // 
+            this.hidePasswordCheckBox.AutoSize = true;
+            this.hidePasswordCheckBox.BackColor = System.Drawing.Color.Transparent;
+            this.hidePasswordCheckBox.Checked = true;
+            this.hidePasswordCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.hidePasswordCheckBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.hidePasswordCheckBox.Location = new System.Drawing.Point(107, 121);
+            this.hidePasswordCheckBox.Name = "hidePasswordCheckBox";
+            this.hidePasswordCheckBox.RadioStyle = false;
+            this.hidePasswordCheckBox.Size = new System.Drawing.Size(93, 17);
+            this.hidePasswordCheckBox.TabIndex = 1;
+            this.hidePasswordCheckBox.Text = "Hide password";
+            this.hidePasswordCheckBox.UseVisualStyleBackColor = false;
+            this.hidePasswordCheckBox.CheckedChanged += new System.EventHandler(this.HidePasswordCheckBoxCheckedChanged);
+            // 
             // ChangePasswordForm
             // 
             this.AcceptButton = this.saveButton;
-            this.ClientSize = new System.Drawing.Size(273, 177);
+            this.ClientSize = new System.Drawing.Size(273, 189);
+            this.Controls.Add(this.hidePasswordCheckBox);
             this.Controls.Add(this.saveButton);
             this.Controls.Add(this.separator);
             this.Controls.Add(this.newPasswordTextBox);
@@ -184,5 +202,6 @@
         private System.Windows.Forms.Label newPasswordLabel;
         private DarkControls.ColoredBox separator;
         private DarkControls.DarkButton saveButton;
+        private DarkControls.DarkCheckBox hidePasswordCheckBox;
     }
 }

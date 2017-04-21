@@ -17,7 +17,7 @@ namespace domi1819.UpClient.StorageExplorer
 
         public string Size { get; }
 
-        public int Downloads { get; }
+        public string Downloads { get; }
 
         public string Timestamp { get; }
 
@@ -27,16 +27,7 @@ namespace domi1819.UpClient.StorageExplorer
             this.Icon = icon;
             this.Name = name;
             this.Size = size;
-            this.Downloads = downloads;
-            this.Timestamp = timestamp;
-        }
-
-        internal FileItem(string id, Icon icon, string name, string size, string timestamp)
-        {
-            this.Identifier = id;
-            this.Icon = icon;
-            this.Name = name;
-            this.Size = size;
+            this.Downloads = $"{downloads}x";
             this.Timestamp = timestamp;
         }
 

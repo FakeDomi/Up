@@ -36,7 +36,7 @@
                 }
             }
 
-            return Address.Invalid;
+            return Invalid;
         }
     }
 }
