@@ -16,7 +16,7 @@ namespace domi1819.UpServer
         
         internal FileManager(UpServer upServer)
         {
-            Console.WriteLine("Initializing file manager...");
+            upServer.Console.WriteLine("Initializing file manager...");
 
             this.dbFile = new NanoDBFile(Path.Combine(upServer.Config.DataFolder, Constants.Database.FileDbName));
 
@@ -30,7 +30,7 @@ namespace domi1819.UpServer
             
             if (initResult != InitializeResult.Success)
             {
-                Console.WriteLine("File database does not exist or could not be read. Creating a new one...");
+                upServer.Console.WriteLine("File database does not exist or could not be read. Creating a new one...");
 
                 // FileId - Filename - Downloads - Owner - Filesize - UploadDate - Downloadable
                 this.dbFile.CreateNew(new NanoDBLayout(NanoDBElement.String8, NanoDBElement.String128, NanoDBElement.Int, NanoDBElement.String32, NanoDBElement.Long, NanoDBElement.DateTime, NanoDBElement.Bool), Index.FileId, Index.Owner);

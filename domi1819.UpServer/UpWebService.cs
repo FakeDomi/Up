@@ -14,6 +14,8 @@ namespace domi1819.UpServer
 
         private static byte[] iconData;
 
+        private Thread dispatcherThread;
+
         private readonly ServerConfig config;
         private readonly FileManager files;
 
@@ -42,8 +44,13 @@ namespace domi1819.UpServer
 
         internal void Start()
         {
-            Thread thread = new Thread(this.Run) { Name = "Up HTTP Server Dispatcher" };
-            thread.Start();
+            this.dispatcherThread = new Thread(this.Run) { Name = "Up HTTP Server Dispatcher" };
+            this.dispatcherThread.Start();
+        }
+
+        internal void Stop()
+        {
+            this.dispatcherThread.Abort();
         }
 
         private void Run()
@@ -56,7 +63,7 @@ namespace domi1819.UpServer
             {
                 listener.Start();
 
-                Console.WriteLine($"Listening for HTTP connections ({this.config.HostName}:{this.config.HttpServerPort})");
+                UpServer.Instance.Console.WriteLine($"Listening for HTTP connections ({this.config.HostName}:{this.config.HttpServerPort})");
 
                 while (true)
                 {
@@ -65,8 +72,8 @@ namespace domi1819.UpServer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("HTTP listener has been stopped:");
-                Console.WriteLine(ex.ToString());
+                UpServer.Instance.Console.WriteLine("HTTP listener has been stopped:");
+                UpServer.Instance.Console.WriteLine(ex.ToString());
             }
         }
 
@@ -106,7 +113,7 @@ namespace domi1819.UpServer
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                UpServer.Instance.Console.WriteLine(ex.ToString());
             }
         }
 

@@ -37,6 +37,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Console\CommandRegistry.cs" />
+    <Compile Include="Console\Commands\Stop.cs" />
+    <Compile Include="Console\ICommand.cs" />
+    <Compile Include="Console\UpConsole.cs" />
     <Compile Include="FileManager.cs" />
     <Compile Include="Server\Messages\ListFiles.cs" />
     <Compile Include="Server\NetServer.cs" />

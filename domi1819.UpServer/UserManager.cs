@@ -19,7 +19,7 @@ namespace domi1819.UpServer
 
         internal UserManager(UpServer upServer)
         {
-            Console.WriteLine("Initializing user register...");
+            upServer.Console.WriteLine("Initializing user register...");
 
             this.dbFile = new NanoDBFile(Path.Combine(upServer.Config.DataFolder, Constants.Database.UserDbName));
 
@@ -36,7 +36,7 @@ namespace domi1819.UpServer
             /*else*/
             if (initResult != InitializeResult.Success)
             {
-                Console.WriteLine("User database does not exist or could not be read. Creating a new one...");
+                upServer.Console.WriteLine("User database does not exist or could not be read. Creating a new one...");
 
                 // UserName - PasswordHash - Salt - MaxCapacity - CurCapacity - Admin
                 this.dbFile.CreateNew(new NanoDBLayout(NanoDBElement.String32, NanoDBElement.DataBlob32, NanoDBElement.String8, NanoDBElement.Long, NanoDBElement.Long, NanoDBElement.Bool), Index.UserName);
@@ -56,7 +56,7 @@ namespace domi1819.UpServer
 
             if (newDb)
             {
-                Console.WriteLine("Creating admin account...\n Username:  admin\n Password:  password\nDon't forget to change the password!!");
+                upServer.Console.WriteLine("Creating admin account...\n Username:  admin\n Password:  password\nDon't forget to change the password!!");
                 this.CreateUser("admin", "password", 10737418240 /*314572800*/, true);
             }
         }
@@ -174,7 +174,12 @@ namespace domi1819.UpServer
         {
             return this.HasUser(user) && (bool)this.dbFile.GetLine(user)[Index.Admin];
         }
-        
+
+        internal void Shutdown()
+        {
+            this.dbFile.Unbind();
+        }
+
         private static class Index
         {
             internal const int UserName = 0;

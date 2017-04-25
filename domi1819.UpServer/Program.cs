@@ -12,7 +12,7 @@ namespace domi1819.UpServer
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        internal static void Main(string[] args)
+        internal static void Main()
         {
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
 
@@ -24,7 +24,7 @@ namespace domi1819.UpServer
                 return File.Exists(path) ? Assembly.LoadFrom(path) : null;
             };
 
-            new UpServer().RunServer(args);
+            new UpServer().RunServer();
         }
     }
 }

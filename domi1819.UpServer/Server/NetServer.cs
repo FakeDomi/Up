@@ -6,16 +6,18 @@ using System.Security.Cryptography;
 using System.Threading;
 using domi1819.UpCore.Network;
 using domi1819.UpCore.Utilities;
+using domi1819.UpServer.Console;
 using domi1819.UpServer.Server.Messages;
 
 namespace domi1819.UpServer.Server
 {
     internal class NetServer
     {
-        private TcpListener listener;
-        
         private readonly ArrayPool<byte> messageBufferPool = new ArrayPool<byte>(Constants.Network.MessageBufferSize);
 
+        private Thread dispatcherThread;
+        private TcpListener listener;
+        
         private RSACryptoServiceProvider rsaCsp;
         private byte[] rsaModulus;
         private byte[] rsaExponent;
@@ -43,8 +45,14 @@ namespace domi1819.UpServer.Server
             this.rsaModulus = rsaKey.Modulus;
             this.rsaExponent = rsaKey.Exponent;
             this.rsaFingerprint = rsaKey.Fingerprint;
-            
-            new Thread(this.Run) { Name = "NetServer Dispatcher" }.Start();
+
+            this.dispatcherThread = new Thread(this.Run) { Name = "NetServer Dispatcher" };
+            this.dispatcherThread.Start();
+        }
+
+        internal void Stop()
+        {
+            this.dispatcherThread.Abort();
         }
 
         private void Run()
@@ -69,12 +77,14 @@ namespace domi1819.UpServer.Server
 
         private void ProcessClient(object clientObject)
         {
+            UpConsole console = UpServer.Instance.Console;
+
             TcpClient client = (TcpClient)clientObject;
             Connection connection = new Connection();
 
             try
             {
-                Console.WriteLine($"Client {client.Client.RemoteEndPoint} connected."); //TODO
+                console.WriteLine($"Client {client.Client.RemoteEndPoint} connected."); //TODO
 
                 NetworkStream baseStream = client.GetStream();
                 connection.BaseStream = baseStream;
@@ -120,18 +130,18 @@ namespace domi1819.UpServer.Server
 
                     this.RunMessageLoop(new MessageContext(deserializer, serializer), connection);
 
-                    Console.WriteLine($"Client {client.Client.RemoteEndPoint} disconnected.");
+                    console.WriteLine($"Client {client.Client.RemoteEndPoint} disconnected.");
                 }
                 else
                 {
-                    Console.WriteLine($"Client {client.Client.RemoteEndPoint} tried to connect with unknown request mode {mode}. Disconnected.");
+                    console.WriteLine($"Client {client.Client.RemoteEndPoint} tried to connect with unknown request mode {mode}. Disconnected.");
                 }
             }
             catch (Exception ex)
             {
                 // TODO change, currently crashes when socket is not connected
-                Console.WriteLine($"Client {client.Client.RemoteEndPoint} did something stupid, I guess...");
-                Console.WriteLine(ex.Message);
+                console.WriteLine($"Client {client.Client.RemoteEndPoint} did something stupid, I guess...");
+                console.WriteLine(ex.Message);
             }
             finally
             {
