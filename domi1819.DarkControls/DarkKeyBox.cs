@@ -6,7 +6,7 @@ namespace domi1819.DarkControls
     {
         public Keys Modifiers { get; set; }
         public Keys Key { get; set; }
-        
+
         public DarkKeyBox()
         {
             this.InitializeComponent();

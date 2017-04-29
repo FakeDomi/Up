@@ -16,7 +16,7 @@ namespace domi1819.DarkControls
 
         public Color Color
         {
-            get { return this.color; }
+            get => this.color;
             set
             {
                 this.color = value;
@@ -31,7 +31,7 @@ namespace domi1819.DarkControls
 
         public string CustomText
         {
-            get { return this.text; }
+            get => this.text;
             set
             {
                 this.text = value;
@@ -57,7 +57,7 @@ namespace domi1819.DarkControls
 
             this.ForeColor = DarkColors.Foreground;
             this.BackColor = DarkColors.Control;
-            
+
             this.uiColorLabel.ForeColor = DarkColors.Foreground;
             this.uiColorLabel.BackColor = DarkColors.Control;
 
@@ -75,41 +75,23 @@ namespace domi1819.DarkControls
             base.OnPaint(e);
 
             ControlPaint.DrawBorder(e.Graphics, this.DisplayRectangle, DarkColors.Border, ButtonBorderStyle.Solid);
-            
+
             e.Graphics.FillRectangle(this.brush, this.colorRectangle);
             ControlPaint.DrawBorder(e.Graphics, this.colorRectangle, DarkColors.Border, ButtonBorderStyle.Solid);
         }
 
         protected override void OnMouseEnter(EventArgs e)
         {
-            if (e != null)
-            {
-                base.OnMouseEnter(e);
-            }
+            base.OnMouseEnter(e);
 
-            DarkForm parent = this.Parent as DarkForm;
-
-            if (parent != null)
-            {
-                parent.GlowComponent = this;
-                parent.Invalidate();
-            }
+            DarkForm.UpdateGlowComponent(this, true);
         }
 
         protected override void OnMouseLeave(EventArgs e)
         {
-            if (e != null)
-            {
-                base.OnMouseLeave(e);
-            }
+            base.OnMouseLeave(e);
 
-            DarkForm parent = this.Parent as DarkForm;
-
-            if (parent != null)
-            {
-                parent.GlowComponent = null;
-                parent.Invalidate();
-            }
+            DarkForm.UpdateGlowComponent(this, false);
         }
 
         protected override void OnClick(EventArgs e)

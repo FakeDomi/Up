@@ -1,6 +1,6 @@
 ﻿namespace domi1819.UpServer.Console.Commands
 {
-    internal class Stop : ICommand
+    internal class CommandStop : ICommand
     {
         public bool Process(string command)
         {

@@ -27,7 +27,7 @@ namespace domi1819.DarkControls
         protected override void OnPaint(PaintEventArgs pevent)
         {
             base.OnPaint(pevent);
-            
+
             ControlPaint.DrawBorder(pevent.Graphics, this.DisplayRectangle, DarkColors.Border, ButtonBorderStyle.Solid);
         }
 
@@ -35,26 +35,14 @@ namespace domi1819.DarkControls
         {
             base.OnMouseEnter(e);
 
-            DarkForm parent = this.Parent as DarkForm;
-
-            if (parent != null)
-            {
-                parent.GlowComponent = this;
-                parent.Invalidate();
-            }
+            DarkForm.UpdateGlowComponent(this, true);
         }
 
         protected override void OnMouseLeave(EventArgs e)
         {
             base.OnMouseLeave(e);
 
-            DarkForm parent = this.Parent as DarkForm;
-
-            if (parent != null)
-            {
-                parent.GlowComponent = null;
-                parent.Invalidate();
-            }
+            DarkForm.UpdateGlowComponent(this, false);
         }
     }
 }

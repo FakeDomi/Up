@@ -54,13 +54,13 @@ namespace domi1819.DarkControls
         public int GlowW => this.DisplayRectangle.Width;
 
         public int GlowH => this.DisplayRectangle.Height;
-        
+
         public DarkProgressBar()
         {
             this.InitializeComponent();
             this.BackColor = DarkColors.Control;
             this.BarColor = DarkColors.StrongColor;
-            
+
             this.MouseEnter += this.LabelMouseEnter;
             this.MouseLeave += this.LabelMouseLeave;
 
@@ -89,20 +89,12 @@ namespace domi1819.DarkControls
 
         private void LabelMouseEnter(object sender, EventArgs e)
         {
-            if (this.Parent is DarkForm parent)
-            {
-                parent.GlowComponent = this;
-                parent.Invalidate();
-            }
+            DarkForm.UpdateGlowComponent(this, true);
         }
 
         private void LabelMouseLeave(object sender, EventArgs e)
         {
-            if (this.Parent is DarkForm parent)
-            {
-                parent.GlowComponent = null;
-                parent.Invalidate();
-            }
+            DarkForm.UpdateGlowComponent(this, false);
         }
     }
 }

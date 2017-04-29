@@ -47,7 +47,7 @@ namespace domi1819.UpServer
 
             if (!File.Exists(privateKeyPath))
             {
-                this.Console.Write($"Generating a RSA-{Constants.Encryption.RsaKeySize} key. This might take a few seconds... ");
+                this.Console.WriteLine($"Generating a RSA-{Constants.Encryption.RsaKeySize} key. This might take a few seconds... ");
 
                 Rsa.GenerateKeyPair(privateKeyPath, publicKeyPath, Constants.Encryption.RsaKeySize);
 

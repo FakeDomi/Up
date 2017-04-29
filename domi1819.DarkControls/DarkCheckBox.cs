@@ -29,10 +29,10 @@ namespace domi1819.DarkControls
         {
             base.OnPaint(e);
 
-            int size = 12;
+            const int size = 12;
 
             int x = this.Padding.Left;
-            int y = this.Height/2 - size/2;
+            int y = this.Height / 2 - size / 2;
 
             e.Graphics.FillRectangle(new SolidBrush(this.mouseDown ? DarkColors.Workspace : this.hover ? DarkColors.Control2 : DarkColors.Control), x, y, size, size);
             e.Graphics.DrawRectangle(new Pen(DarkColors.Border), x, y, size, size);
@@ -55,13 +55,8 @@ namespace domi1819.DarkControls
             base.OnMouseEnter(e);
 
             this.hover = true;
-            DarkForm parent = this.Parent as DarkForm;
 
-            if (parent != null)
-            {
-                parent.GlowComponent = this;
-                parent.Invalidate();
-            }
+            DarkForm.UpdateGlowComponent(this, true);
         }
 
         protected override void OnMouseLeave(EventArgs e)
@@ -69,15 +64,10 @@ namespace domi1819.DarkControls
             base.OnMouseLeave(e);
 
             this.hover = false;
-            DarkForm parent = this.Parent as DarkForm;
-            
-            if (parent != null)
-            {
-                parent.GlowComponent = null;
-                parent.Invalidate();
-            }
+
+            DarkForm.UpdateGlowComponent(this, false);
         }
-        
+
         protected override void OnMouseDown(MouseEventArgs mevent)
         {
             base.OnMouseDown(mevent);

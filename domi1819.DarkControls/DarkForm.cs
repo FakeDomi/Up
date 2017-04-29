@@ -31,5 +31,14 @@ namespace domi1819.DarkControls
                 ControlPaint.DrawBorder(e.Graphics, new Rectangle(this.GlowComponent.GlowX, this.GlowComponent.GlowY - 2, this.GlowComponent.GlowW, this.GlowComponent.GlowH + 4), DarkColors.PaleColor, ButtonBorderStyle.Solid);
             }
         }
+
+        internal static void UpdateGlowComponent(Control control, bool hover)
+        {
+            if (control.Parent is DarkForm parent)
+            {
+                parent.GlowComponent = (IGlowComponent)(hover ? control : null);
+                parent.Invalidate();
+            }
+        }
     }
 }

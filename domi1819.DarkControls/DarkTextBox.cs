@@ -11,20 +11,20 @@ namespace domi1819.DarkControls
         [Browsable(true)]
         public new string Text
         {
-            get { return this.textBox.Text; }
-            set { this.textBox.Text = value; }
+            get => this.textBox.Text;
+            set => this.textBox.Text = value;
         }
 
         public bool UseSystemPasswordChar
         {
-            get { return this.textBox.UseSystemPasswordChar; }
-            set { this.textBox.UseSystemPasswordChar = value; }
+            get => this.textBox.UseSystemPasswordChar;
+            set => this.textBox.UseSystemPasswordChar = value;
         }
 
         public bool ReadOnly
         {
-            get { return this.textBox.ReadOnly; }
-            set { this.textBox.ReadOnly = value; }
+            get => this.textBox.ReadOnly;
+            set => this.textBox.ReadOnly = value;
         }
 
         public int GlowX => this.Location.X + this.DisplayRectangle.X;
@@ -40,11 +40,11 @@ namespace domi1819.DarkControls
             this.InitializeComponent();
 
             this.DoubleBuffered = true;
-            
+
             this.BackColor = DarkColors.Control;
             this.textBox.BackColor = DarkColors.Control;
             this.textBox.ForeColor = DarkColors.Foreground;
-            
+
             this.MinimumSize = new Size(20, 20);
 
             this.textBox.MouseEnter += (sender, args) => { this.OnMouseEnter(args); };
@@ -54,10 +54,10 @@ namespace domi1819.DarkControls
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-            
+
             ControlPaint.DrawBorder(e.Graphics, this.DisplayRectangle, DarkColors.Border, ButtonBorderStyle.Solid);
         }
-        
+
         protected override void OnEnter(EventArgs e)
         {
             this.BeginInvoke((Action)delegate
@@ -77,26 +77,14 @@ namespace domi1819.DarkControls
         {
             base.OnMouseEnter(e);
 
-            DarkForm parent = this.Parent as DarkForm;
-
-            if (parent != null)
-            {
-                parent.GlowComponent = this;
-                parent.Invalidate();
-            }
+            DarkForm.UpdateGlowComponent(this, true);
         }
 
         protected override void OnMouseLeave(EventArgs e)
         {
             base.OnMouseLeave(e);
 
-            DarkForm parent = this.Parent as DarkForm;
-
-            if (parent != null)
-            {
-                parent.GlowComponent = null;
-                parent.Invalidate();
-            }
+            DarkForm.UpdateGlowComponent(this, false);
         }
     }
 }

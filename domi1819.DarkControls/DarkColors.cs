@@ -15,17 +15,14 @@ namespace domi1819.DarkControls
 
         public static Color StrongColor
         {
-            get
-            {
-                return strongColor;
-            }
+            get => strongColor;
             set
             {
                 strongColor = value;
                 PaleColor = Color.FromArgb(92, value);
             }
         }
-        
+
         public static Color PaleColor { get; private set; }
 
         static DarkColors()
