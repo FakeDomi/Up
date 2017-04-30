@@ -99,7 +99,7 @@ namespace domi1819.UpCore.Utilities
 
             return new string(chars);
         }
-        
+
         public static string FormatString(this DateTime dateTime)
         {
             return $"{dateTime.Year}-{dateTime.Month.Pad(2)}-{dateTime.Day.Pad(2)} {dateTime.Hour.Pad(2)}:{dateTime.Minute.Pad(2)}:{dateTime.Second.Pad(2)}";

@@ -54,14 +54,14 @@ namespace domi1819.UpCore.Network
             RsaKey key = new RsaKey { Csp = new RSACryptoServiceProvider() };
 
             key.Csp.ImportParameters(new RSAParameters { Modulus = modulus, Exponent = exponent });
-            
+
             key.Fingerprint = GetFingerprint(modulus, exponent);
             key.Modulus = modulus;
             key.Exponent = exponent;
 
             return key;
         }
-        
+
         private static byte[] GetFingerprint(byte[] modulus, byte[] exponent)
         {
             byte[] keyBytes = new byte[modulus.Length + exponent.Length];

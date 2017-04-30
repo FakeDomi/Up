@@ -32,7 +32,7 @@ namespace domi1819.UpClient.Forms
             this.uiDataGridView.GetType().InvokeMember("DoubleBuffered", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty, null, this.uiDataGridView, new object[] { true });
 
             this.upClient = upClient;
-            
+
             this.uiDataGridView.DefaultCellStyle.SelectionBackColor = DarkColors.StrongColor;
             this.uiDataGridView.DefaultCellStyle.SelectionForeColor = DarkColors.GetForegroundColor(DarkColors.StrongColor);
 
@@ -50,7 +50,7 @@ namespace domi1819.UpClient.Forms
 
             this.uiBackgroundWorker.RunWorkerAsync(upClient.NetClient);
         }
-        
+
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
@@ -64,14 +64,14 @@ namespace domi1819.UpClient.Forms
         protected override void OnClosing(CancelEventArgs e)
         {
             base.OnClosing(e);
-            
+
             this.upClient.ConfigurationForm.ThemeColorChanged -= this.ConfigurationFormOnThemeColorChanged;
         }
 
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
-            
+
             GC.Collect(); // TODO
         }
 
@@ -157,14 +157,14 @@ namespace domi1819.UpClient.Forms
 
             //try
             //{
-                client.ClaimConnectHandle();
+            client.ClaimConnectHandle();
 
             Console.WriteLine(watch.Elapsed);
 
             this.linkFormat = client.GetLinkFormat();
 
             Console.WriteLine(watch.Elapsed);
-            
+
             client.Login(this.upClient.Config);
 
             Console.WriteLine(watch.Elapsed);
@@ -180,7 +180,7 @@ namespace domi1819.UpClient.Forms
             //{
             //    InfoForm.Show("Storage explorer", "Error while fetching file list.", 2500);
             //}
-            
+
             client.ReleaseConnectHandle();
         }
 
@@ -190,7 +190,7 @@ namespace domi1819.UpClient.Forms
 
             return true;
         }
-        
+
         private void uiBackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             this.Rebind();

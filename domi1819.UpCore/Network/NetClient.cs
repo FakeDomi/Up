@@ -15,9 +15,9 @@ namespace domi1819.UpCore.Network
 
         private MessageSerializer serializer;
         private MessageDeserializer deserializer;
-        
+
         private readonly RsaCache rsaCache;
-        
+
         private readonly object messageLock = new object();
         private readonly object connectLock = new object();
 
@@ -114,7 +114,7 @@ namespace domi1819.UpCore.Network
                 rngCsp.GetBytes(secret);
 
                 byte[] encryptedSecret = rsaCsp.Encrypt(secret, true);
-                
+
                 netStream.Write(encryptedSecret, 0, encryptedSecret.Length);
 
                 byte[] key = new byte[16];
@@ -166,10 +166,10 @@ namespace domi1819.UpCore.Network
 
                 NetworkStream netStream = tempClient.GetStream();
                 byte[] keyFingerprint = new byte[Constants.Encryption.FingerprintSize];
-                
+
                 netStream.Read(keyFingerprint, 0, keyFingerprint.Length);
                 netStream.WriteByte(0x01);
-                
+
                 byte[] rsaModulus = new byte[Constants.Encryption.RsaModulusBytes];
                 byte[] rsaExponent = new byte[Constants.Encryption.RsaExponentBytes];
 
@@ -185,7 +185,7 @@ namespace domi1819.UpCore.Network
             this.client?.Close();
             this.Connected = false;
         }
-        
+
         public bool Login(string userId, string password)
         {
             this.CheckConnected();
@@ -253,7 +253,7 @@ namespace domi1819.UpCore.Network
                 this.deserializer.ReadMessage(NetworkMethods.InitiateUpload);
 
                 bool shouldUpload = this.deserializer.ReadNextBool();
-                
+
                 return shouldUpload ? "12345678" : null; //TODO: Server doesn't need transfer keys anymore
             }
         }
@@ -271,7 +271,7 @@ namespace domi1819.UpCore.Network
                 Array.Copy(bytes, start, this.serializer.Bytes, this.serializer.Index, count - start);
 
                 this.serializer.Index += count - start;
-                
+
                 this.serializer.Flush();
 
                 //this.deserializer.ReadMessage(NetworkMethods.UploadPacket);

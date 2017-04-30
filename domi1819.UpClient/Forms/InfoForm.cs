@@ -50,15 +50,15 @@ namespace domi1819.UpClient.Forms
             switch (m.Msg)
             {
                 case 0x0084: // WM_NCHITTEST
-                {
-                    m.Result = new IntPtr(0x01); // HTCLIENT
-                    return;
-                }
+                    {
+                        m.Result = new IntPtr(0x01); // HTCLIENT
+                        return;
+                    }
                 case 0x0086: // WM_NCACTIVATE
-                {
-                    m.WParam = new IntPtr(0x01); // TRUE
-                    break;
-                }
+                    {
+                        m.WParam = new IntPtr(0x01); // TRUE
+                        break;
+                    }
             }
 
             base.WndProc(ref m);

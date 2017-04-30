@@ -28,7 +28,7 @@ namespace domi1819.UpClient.Uploads
             this.netClient = upClient.NetClient;
 
             this.queueForm = new UploadQueueForm(upClient);
-            
+
             this.queueForm.BackgroundWorker.DoWork += this.StartUpload;
             this.queueForm.BackgroundWorker.RunWorkerCompleted += this.UploadCompleted;
 
@@ -66,14 +66,14 @@ namespace domi1819.UpClient.Uploads
                 this.queueForm.KeepVisible = true;
                 this.queueForm.BackgroundWorker.RunWorkerAsync();
             }
-            
+
             this.queueForm.Show();
         }
 
         private void StartUpload(object sender, DoWorkEventArgs args)
         {
             BackgroundWorker worker = (BackgroundWorker)sender;
-            
+
             try
             {
                 if (!this.netClient.ClaimConnectHandle())
@@ -125,7 +125,7 @@ namespace domi1819.UpClient.Uploads
                 lock (this.uploadItems)
                 {
                     item = this.uploadItems[0];
-                } 
+                }
 
                 string file = Path.Combine(item.FolderPath, $"{item.FileName}{item.FileExtension}");
 

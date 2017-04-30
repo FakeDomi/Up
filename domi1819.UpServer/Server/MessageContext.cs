@@ -8,7 +8,7 @@ namespace domi1819.UpServer.Server
         internal bool Disconnect { get; set; }
 
         internal bool ShouldPush { get; set; }
-        
+
         public MessageDeserializer MessageReader { get; }
 
         public MessageSerializer MessageWriter { get; }
@@ -29,7 +29,7 @@ namespace domi1819.UpServer.Server
         {
             this.MessageWriter.Flush();
         }
-        
+
         public bool ReadNextBool()
         {
             return this.MessageReader.ReadNextBool();

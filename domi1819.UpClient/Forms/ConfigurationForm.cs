@@ -54,7 +54,7 @@ namespace domi1819.UpClient.Forms
                 this.ResetFields();
             }
         }
-        
+
         internal void Restore()
         {
             if (!this.Visible)
@@ -101,20 +101,20 @@ namespace domi1819.UpClient.Forms
             switch (settings.UpdateBehavior)
             {
                 case UpdateBehavior.Indicate:
-                {
-                    this.uiIndicateUpdatesCheckBox.Checked = true;
-                    break;
-                }
+                    {
+                        this.uiIndicateUpdatesCheckBox.Checked = true;
+                        break;
+                    }
                 case UpdateBehavior.NeverCheck:
-                {
-                    this.uiNeverCheckForUpdatesCheckBox.Checked = true;
-                    break;
-                }
+                    {
+                        this.uiNeverCheckForUpdatesCheckBox.Checked = true;
+                        break;
+                    }
                 default:
-                {
-                    this.uiAutoInstallUpdatesCheckBox.Checked = true;
-                    break;
-                }
+                    {
+                        this.uiAutoInstallUpdatesCheckBox.Checked = true;
+                        break;
+                    }
             }
 
             DarkColors.StrongColor = this.upClient.Config.ThemeColor.GetColor();
@@ -203,7 +203,7 @@ namespace domi1819.UpClient.Forms
 
             this.suppressUpdateStyleCheckedChanged = false;
         }
-        
+
         private void VerifyKeyButtonClicked(object sender, EventArgs e)
         {
             Config testConfig = new Config();
@@ -228,7 +228,7 @@ namespace domi1819.UpClient.Forms
             this.hotkeyForm.ShowDialog(this);
             this.hotkeyManager.ActivateHotkeys(this.upClient.Config);
         }
-        
+
         private void DarkColorViewColorSelected(object sender, EventArgs e)
         {
             DarkColors.StrongColor = this.uiDarkColorView.Color;
@@ -247,7 +247,7 @@ namespace domi1819.UpClient.Forms
 
             config.ServerAddress = address.Host;
             config.ServerPort = address.Port;
-            
+
             config.UserId = this.uiUserIdTextBox.Text;
             config.Password = this.uiPasswordTextBox.Text;
 

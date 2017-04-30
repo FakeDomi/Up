@@ -47,7 +47,7 @@ namespace domi1819.UpClient
         internal void ActivateHotkeys(Config config)
         {
             Hotkeys hotkeySettings = config.Hotkeys;
-            
+
             this.uploadFileKeyCode = this.RegisterHotkey(hotkeySettings.UploadFile);
             this.uploadScreenshotKeyCode = this.RegisterHotkey(hotkeySettings.UploadScreenshot);
             this.uploadScreenAreaKeyCode = this.RegisterHotkey(hotkeySettings.UploadScreenArea);
@@ -128,7 +128,7 @@ namespace domi1819.UpClient
             {
                 returnValue += 4;
             }
-            
+
             return returnValue;
         }
     }

@@ -17,7 +17,7 @@ namespace domi1819.UpClient.Forms
             this.uiUploadFileKeyBox.Key = hotkeys.UploadFile.Key;
             this.uiUploadFileKeyBox.Modifiers = hotkeys.UploadFile.Modifier;
             this.uiUploadFileKeyBox.RefreshText();
-            
+
             this.uiUploadScreenshotKeyBox.Key = hotkeys.UploadScreenshot.Key;
             this.uiUploadScreenshotKeyBox.Modifiers = hotkeys.UploadScreenshot.Modifier;
             this.uiUploadScreenshotKeyBox.RefreshText();

@@ -28,7 +28,7 @@ namespace domi1819.UpServer
             {
                 iconData = File.ReadAllBytes(Path.Combine(this.config.DataFolder, "favicon.ico"));
             }
-            
+
             MimeDict.Add(".jpg", "image/jpeg");
             MimeDict.Add(".jpeg", "image/jpeg");
             MimeDict.Add(".png", "image/png");
@@ -56,7 +56,7 @@ namespace domi1819.UpServer
         private void Run()
         {
             HttpListener listener = new HttpListener();
-            
+
             listener.Prefixes.Add($"http://{this.config.HttpServerListenerName}:{this.config.HttpServerPort}/");
 
             try
@@ -121,7 +121,7 @@ namespace domi1819.UpServer
         {
             // Link format: /d/12345678
             string fileId = reqUrl.Substring(3, Constants.Server.FileIdLength);
-            
+
             if (this.files.FileExists(fileId) && this.files.GetDownloadableFlag(fileId))
             {
                 string fileName = this.files.GetFileName(fileId);
@@ -131,7 +131,7 @@ namespace domi1819.UpServer
                     res.ContentLength64 = fileStream.Length;
 
                     string fileExt = Path.GetExtension(fileName) ?? string.Empty;
-                    
+
                     if (MimeDict.ContainsKey(fileExt) && !reqUrl.EndsWith("!"))
                     {
                         res.AddHeader("Content-disposition", "inline; filename=\"" + fileName + "\"");
@@ -150,7 +150,7 @@ namespace domi1819.UpServer
                     while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) > 0)
                     {
                         outStream.Write(buffer, 0, bytesRead);
-                        
+
                         //if (!this.files.GetDownloadableFlag(fileId))
                         //{
                         //    throw new Exception("abort download");
@@ -179,7 +179,7 @@ namespace domi1819.UpServer
         {
             // Link format: /i/12345678
             string fileId = reqUrl.Substring(3, Constants.Server.FileIdLength);
-            
+
             if (this.files.FileExists(fileId))
             {
                 string fileName = this.files.GetFileName(fileId);

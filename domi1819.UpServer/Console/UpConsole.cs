@@ -8,7 +8,7 @@ namespace domi1819.UpServer.Console
     {
         private CommandRegistry commandRegistry;
         private List<char> command;
-        
+
         internal void WriteLine(object obj)
         {
             if (this.command != null)

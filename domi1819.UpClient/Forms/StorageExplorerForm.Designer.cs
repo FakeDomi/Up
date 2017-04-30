@@ -44,8 +44,8 @@ namespace domi1819.UpClient.Forms
             this.uiDataGridView.AllowUserToDeleteRows = false;
             this.uiDataGridView.AllowUserToResizeColumns = false;
             this.uiDataGridView.AllowUserToResizeRows = false;
-            this.uiDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.uiDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.uiDataGridView.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
             this.uiDataGridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;

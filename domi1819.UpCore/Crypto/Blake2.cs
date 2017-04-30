@@ -60,7 +60,7 @@ namespace domi1819.UpCore.Crypto
             if (key != null && key.Length > 0)
             {
                 state[0] ^= (ulong)(key.Length << 8);
-                
+
                 Buffer.BlockCopy(key, 0, block, 0, key.Length);
 
                 bytesCompressedOffset = BlockLength;
@@ -86,12 +86,12 @@ namespace domi1819.UpCore.Crypto
             Compress(state, block, bytesCompressed + bytesCompressedOffset, true);
 
             byte[] hash = new byte[hashSize];
-            
+
             Buffer.BlockCopy(state, 0, hash, 0, hashSize);
 
             return hash;
         }
-        
+
         private static void Compress(ulong[] state, ulong[] block, int position, bool lastBlock)
         {
             ulong v0 = state[0];

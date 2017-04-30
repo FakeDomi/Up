@@ -62,7 +62,7 @@ namespace domi1819.UpClient.Forms
             {
                 return;
             }
-            
+
             this.Width = SystemInformation.VirtualScreen.Width;
             this.Height = SystemInformation.VirtualScreen.Height;
 
@@ -84,7 +84,7 @@ namespace domi1819.UpClient.Forms
             this.Show();
             this.Location = new Point(SystemInformation.VirtualScreen.Left, SystemInformation.VirtualScreen.Top);
             this.Activate();
-            
+
             this.localScreenshot = local;
 
             if (fullscreen)
@@ -180,7 +180,7 @@ namespace domi1819.UpClient.Forms
 
             int areaWidth = this.drawEndX - this.drawStartX;
             int areaHeight = this.drawEndY - this.drawStartY;
-            
+
             if (!cancel && areaWidth > 1 && areaHeight > 1)
             {
                 Config settings = this.upClient.Config;

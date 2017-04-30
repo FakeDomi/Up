@@ -18,7 +18,7 @@ namespace domi1819.UpServer
         internal UserManager Users { get; private set; }
 
         internal FileManager Files { get; private set; }
-        
+
         internal UpConsole Console { get; } = new UpConsole();
 
         private NetServer messageServer;
@@ -37,7 +37,7 @@ namespace domi1819.UpServer
 
             this.Config = ServerConfig.Load(Constants.Server.ConfigFileName);
             this.Config.Save(Constants.Server.ConfigFileName);
-            
+
             Directory.CreateDirectory(this.Config.DataFolder);
             Directory.CreateDirectory(this.Config.FileStorageFolder);
             Directory.CreateDirectory(this.Config.FileTransferFolder);
@@ -55,9 +55,9 @@ namespace domi1819.UpServer
             }
 
             this.Console.WriteLine("Starting UpServer...");
-            
+
             RsaKey rsaKey = RsaKey.FromFile(privateKeyPath);
-            
+
             if (rsaKey.Csp.KeySize != Constants.Encryption.RsaKeySize)
             {
                 this.Console.WriteLine($"Unsupported key size {rsaKey.Csp.KeySize}. Expected: {Constants.Encryption.RsaKeySize}");
@@ -73,10 +73,10 @@ namespace domi1819.UpServer
             this.Console.WriteLine($"Message server listening on port {this.Config.UpServerPort}.");
 
             this.Console.WriteLine("UpServer started.");
-            
+
             UpWebService webService = new UpWebService(this);
             webService.Start();
-            
+
             this.Console.ProcessConsoleInput();
 
             this.Console.WriteLine("Stopping UpServer...");

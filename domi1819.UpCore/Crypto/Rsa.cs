@@ -16,10 +16,10 @@ namespace domi1819.UpCore.Crypto
 
             RSAParameters rsaParams = rsaCryptoProvider.ExportParameters(true);
             byte[][] keyParams = { rsaParams.Modulus, rsaParams.Exponent, rsaParams.P, rsaParams.Q, rsaParams.DP, rsaParams.DQ, rsaParams.InverseQ, rsaParams.D };
-            
+
             WriteKey(keyParams, publicKeyFile, false);
             WriteKey(keyParams, privateKeyFile, true);
-            
+
             return rsaCryptoProvider;
         }
 
@@ -74,9 +74,9 @@ namespace domi1819.UpCore.Crypto
             {
                 int index = 0;
                 byte[] sizes = new byte[RsaParamLengthSize];
-                
+
                 Split(keyParams[0].Length * 8, sizes);
-                
+
                 WriteFormatted((byte)(privateKey ? 0x01 : 0x00), ref index, fileStream);
                 WriteFormatted(sizes, ref index, fileStream);
 

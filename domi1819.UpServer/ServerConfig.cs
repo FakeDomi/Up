@@ -23,9 +23,9 @@ namespace domi1819.UpServer
         public string FileTransferFolder { get; set; }
 
         public string DataFolder { get; set; }
-        
+
         private static readonly XmlSerializer Serializer = new XmlSerializer(typeof(ServerConfig));
-        
+
         public ServerConfig()
         {
             this.HostName = "localhost";

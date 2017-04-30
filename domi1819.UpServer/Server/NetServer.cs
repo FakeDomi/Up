@@ -17,7 +17,7 @@ namespace domi1819.UpServer.Server
 
         private Thread dispatcherThread;
         private TcpListener listener;
-        
+
         private RSACryptoServiceProvider rsaCsp;
         private byte[] rsaModulus;
         private byte[] rsaExponent;
@@ -88,7 +88,7 @@ namespace domi1819.UpServer.Server
 
                 NetworkStream baseStream = client.GetStream();
                 connection.BaseStream = baseStream;
-                
+
                 baseStream.Write(this.rsaFingerprint, 0, this.rsaFingerprint.Length);
 
                 int mode = baseStream.ReadByte();
@@ -113,7 +113,7 @@ namespace domi1819.UpServer.Server
                             throw new Exception($"Connection to client {client.Client.RemoteEndPoint} lost.");
                         }
                     }
-                    
+
                     connection.InitializeSymmetricEncryption(this.rsaCsp.Decrypt(buffer, true), baseStream, this.messageBufferPool);
 
                     MessageSerializer serializer = new MessageSerializer { Bytes = connection.WriterBuffer, Stream = connection.OutStream };

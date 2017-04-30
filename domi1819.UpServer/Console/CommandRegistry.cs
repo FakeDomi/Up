@@ -6,7 +6,7 @@ namespace domi1819.UpServer.Console
     internal class CommandRegistry
     {
         private readonly Dictionary<string, ICommand> commands = new Dictionary<string, ICommand>();
-        
+
         internal void Register(ICommand command, string name)
         {
             this.commands.Add(name, command);

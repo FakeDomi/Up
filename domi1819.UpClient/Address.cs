@@ -18,7 +18,7 @@
         {
             return this.Host == other.Host && this.Port == other.Port;
         }
-        
+
         internal static Address Parse(string address, int defaultPort)
         {
             string[] addressSplit = address.Split(':');

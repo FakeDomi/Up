@@ -13,7 +13,7 @@ namespace domi1819.UpServer
     {
         private readonly NanoDBFile dbFile;
         private readonly List<NanoDBLine> emptyFilterList = new List<NanoDBLine>(0);
-        
+
         internal FileManager(UpServer upServer)
         {
             upServer.Console.WriteLine("Initializing file manager...");
@@ -27,7 +27,7 @@ namespace domi1819.UpServer
                 //logger.Log("File database could not be read because it was saved in an unsupported format. Please fix or delete the file database.");
                 throw new Exception("Database version not supported.");
             }
-            
+
             if (initResult != InitializeResult.Success)
             {
                 upServer.Console.WriteLine("File database does not exist or could not be read. Creating a new one...");
@@ -110,7 +110,7 @@ namespace domi1819.UpServer
         {
             return this.dbFile.GetSortedList(user) ?? this.emptyFilterList;
         }
-        
+
         internal void SetDownloadable(string key, bool downloadable)
         {
             this.dbFile.GetLine(key)[Index.DirectDownloadFlag] = downloadable;
@@ -204,7 +204,7 @@ namespace domi1819.UpServer
 
             return $"http://{config.HostName}{port}/d/{{0}}";
         }
-        
+
         private static class Index
         {
             internal const int FileId = 0;

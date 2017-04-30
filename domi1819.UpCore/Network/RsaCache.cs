@@ -51,7 +51,7 @@ namespace domi1819.UpCore.Network
 
             return this.Key != null;
         }
-        
+
         public void SaveKey()
         {
             Rsa.WriteKey(new[] { this.Key.Modulus, this.Key.Exponent }, this.GetKeyPath(this.ServerAddress), false);

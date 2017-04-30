@@ -15,7 +15,7 @@ namespace domi1819.UpCore.Network
         {
             int blockSize = Constants.Encryption.AesBlockSize;
             int headerSize = Constants.Network.MessageHeaderSize;
-            
+
             if (!this.ReadBytes(headerSize, 0))
             {
                 return NetworkMethods.ConnectionClosed;

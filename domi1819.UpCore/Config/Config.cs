@@ -8,27 +8,27 @@ namespace domi1819.UpCore.Config
     public class Config
     {
         public string ServerAddress { get; set; }
-        
+
         public int ServerPort { get; set; }
-        
+
         public string UserId { get; set; }
-        
+
         public string Password { get; set; }
-        
+
         public bool LocalScreenshotCopy { get; set; }
 
         public DropArea DropArea { get; set; }
 
         public UpdateBehavior UpdateBehavior { get; set; }
-        
+
         public bool PngScreenshots { get; set; }
-        
+
         public bool PendingUpdate { get; set; }
 
         public Hotkeys Hotkeys { get; set; }
 
         public WrappedColor ThemeColor { get; set; }
-        
+
         public string TrustFolder { get; set; }
 
         private static readonly XmlSerializer Serializer = new XmlSerializer(typeof(Config));

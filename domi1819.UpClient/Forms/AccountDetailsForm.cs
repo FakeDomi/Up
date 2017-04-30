@@ -56,7 +56,7 @@ namespace domi1819.UpClient.Forms
                 }
                 else
                 {
-                   e.Result = new InfoForm("Connection failed!", "Server key not trusted.", 3000);
+                    e.Result = new InfoForm("Connection failed!", "Server key not trusted.", 3000);
                 }
             }
             catch (Exception ex)

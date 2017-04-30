@@ -14,13 +14,13 @@ namespace domi1819.UpClient.Forms
         private Point mouseOffset;
 
         private readonly ToolStripMenuItem menuItemLock;
-        
+
         internal FileDropForm(UpClient upClient)
         {
             this.InitializeComponent();
 
             this.upClient = upClient;
-            
+
             this.ContextMenuStrip.Items.Add(this.menuItemLock = new ToolStripMenuItem(upClient.Config.DropArea.Lock ? "Unlock" : "Lock", null, this.LockOnClick));
             this.ContextMenuStrip.Items.Add(new ToolStripMenuItem("Hide", null, this.HideOnClick));
         }
@@ -45,7 +45,7 @@ namespace domi1819.UpClient.Forms
                 this.Hide();
             }
         }
-        
+
         internal void Resnap(Point? p = null)
         {
             if (p == null)
@@ -84,15 +84,15 @@ namespace domi1819.UpClient.Forms
             switch (m.Msg)
             {
                 case 0x0084: // WM_NCHITTEST
-                {
-                    m.Result = new IntPtr(0x01); // HTCLIENT
-                    return;
-                }
+                    {
+                        m.Result = new IntPtr(0x01); // HTCLIENT
+                        return;
+                    }
                 case 0x0086: // WM_NCACTIVATE
-                {
-                    m.WParam = new IntPtr(0x01); // TRUE
-                    break;
-                }
+                    {
+                        m.WParam = new IntPtr(0x01); // TRUE
+                        break;
+                    }
             }
 
             base.WndProc(ref m);
@@ -142,7 +142,7 @@ namespace domi1819.UpClient.Forms
             base.OnDragEnter(drgevent);
 
             string[] files = drgevent.Data.GetData(DataFormats.FileDrop) as string[];
-            
+
             if (files == null || files.Any(file => File.GetAttributes(file).HasFlag(FileAttributes.Directory)))
             {
                 drgevent.Effect = DragDropEffects.None;
@@ -155,7 +155,7 @@ namespace domi1819.UpClient.Forms
         protected override void OnDragDrop(DragEventArgs drgevent)
         {
             base.OnDragDrop(drgevent);
-            
+
             this.upClient.UploadManager.AddItems((string[])drgevent.Data.GetData(DataFormats.FileDrop));
         }
 

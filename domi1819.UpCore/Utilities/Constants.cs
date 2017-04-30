@@ -22,7 +22,7 @@ namespace domi1819.UpCore.Utilities
         {
             public static readonly int MaxUsernameLength = 32;
             public static readonly int PasswordMaxLength = 256;
-            
+
             public static readonly string FileDbName = "files.nano";
             public static readonly string UserDbName = "users.nano";
         }
@@ -63,7 +63,7 @@ namespace domi1819.UpCore.Utilities
         public static class Client
         {
             public static readonly string LocalItemsFolder = "local";
-            
+
             public static readonly string ConfigFileName = "up.xml";
 
             public static readonly int UploadQueueMaxItemCount = 7;

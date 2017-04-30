@@ -44,7 +44,7 @@ namespace domi1819.UpClient
                 return this.storageExplorerForm;
             }
         }
-        
+
         internal void LaunchApplication(string[] cmdArgs)
         {
             if (cmdArgs.Length > 0)
@@ -60,7 +60,7 @@ namespace domi1819.UpClient
             this.ActionManager = new ActionManager(this);
             this.ConfigurationForm = new ConfigurationForm(this);
             this.UploadManager = new UploadManager(this);
-            
+
             Application.Run();
         }
     }

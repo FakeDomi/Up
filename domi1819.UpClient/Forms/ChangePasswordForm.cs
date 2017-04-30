@@ -22,7 +22,7 @@ namespace domi1819.UpClient.Forms
 
             this.rsaCache = rsaCache;
         }
-        
+
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if (keyData == Keys.Escape)
@@ -46,7 +46,7 @@ namespace domi1819.UpClient.Forms
 
             NetClient client = new NetClient(address.Host, address.Port, this.rsaCache);
             InfoForm result;
-            
+
             try
             {
                 if (client.Connect())

@@ -21,7 +21,7 @@ namespace domi1819.UpClient.Forms
         internal BackgroundWorker BackgroundWorker => this.uiBackgroundWorker;
 
         protected override bool ShowWithoutActivation => true;
-        
+
         protected override CreateParams CreateParams
         {
             get
@@ -32,14 +32,14 @@ namespace domi1819.UpClient.Forms
                 return createParams;
             }
         }
-        
+
         public UploadQueueForm(UpClient upClient)
         {
             this.InitializeComponent();
-            
+
             Screen screen = Screen.FromPoint(this.Location);
             this.Location = new Point(screen.WorkingArea.Right - this.Width, screen.WorkingArea.Bottom - this.Height);
-            
+
             upClient.ConfigurationForm.ThemeColorChanged += this.ConfigurationFormOnThemeColorChanged;
 
             this.uiProgressBar.BarColor = DarkColors.StrongColor;
@@ -122,30 +122,30 @@ namespace domi1819.UpClient.Forms
             this.Height = 139 + itemCount * 13;
             this.Location = new Point(Screen.PrimaryScreen.WorkingArea.Right - this.Width, Screen.PrimaryScreen.WorkingArea.Bottom - this.Height);
         }
-        
+
         protected override void WndProc(ref Message m)
         {
             switch (m.Msg)
             {
                 case 0x0084: // WM_NCHITTEST
-                {
-                    m.Result = new IntPtr(0x01); // HTCLIENT
-                    return;
-                }
-                case 0x0086: // WM_NCACTIVATE
-                {
-                    m.WParam = new IntPtr(0x01); // TRUE
-                    break;
-                }
-                case 0x0112: // WM_SYSCOMMAND
-                {
-                    if ((m.WParam.ToInt32() & 0xfff0) == 0xF010) // SC_MOVE
                     {
+                        m.Result = new IntPtr(0x01); // HTCLIENT
                         return;
                     }
+                case 0x0086: // WM_NCACTIVATE
+                    {
+                        m.WParam = new IntPtr(0x01); // TRUE
+                        break;
+                    }
+                case 0x0112: // WM_SYSCOMMAND
+                    {
+                        if ((m.WParam.ToInt32() & 0xfff0) == 0xF010) // SC_MOVE
+                        {
+                            return;
+                        }
 
-                    break;
-                }
+                        break;
+                    }
             }
 
             base.WndProc(ref m);
@@ -167,7 +167,7 @@ namespace domi1819.UpClient.Forms
             this.uiProgressBar.ValueInt = e.ProgressPercentage;
             this.uiSpeedLabel.Text = $"{Util.GetByteSizeText((long)e.UserState)}/s";
         }
-        
+
         private void ListBoxDrawItem(object sender, DrawItemEventArgs e)
         {
             int maxItemCount = Constants.Client.UploadQueueMaxItemCount;

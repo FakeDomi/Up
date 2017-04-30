@@ -9,14 +9,14 @@ namespace domi1819.UpInstaller
 {
     public partial class MainForm : DarkForm
     {
-        private WebClient webClient = new WebClient { CachePolicy = new HttpRequestCachePolicy(HttpRequestCacheLevel.NoCacheNoStore)};
+        private WebClient webClient = new WebClient { CachePolicy = new HttpRequestCachePolicy(HttpRequestCacheLevel.NoCacheNoStore) };
         private string downloadPath;
 
         public MainForm()
         {
             this.InitializeComponent();
 
-            
+
         }
 
         private void label1_Click(object sender, System.EventArgs e)
@@ -30,7 +30,7 @@ namespace domi1819.UpInstaller
             {
                 if (File.Exists("%appdata%\\up\\version"))
                 {
-                    
+
                 }
 
                 string[] versionInfo = this.webClient.DownloadString("https://up.domi1819.xyz/version").Split(';');

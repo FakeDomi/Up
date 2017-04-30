@@ -11,7 +11,7 @@
         public Hotkey SaveLocalScreenshot { get; set; }
         public Hotkey SaveLocalScreenArea { get; set; }
         public Hotkey SaveLocalClipboard { get; set; }
-        
+
         public Hotkeys()
         {
             this.UploadFile = new Hotkey();

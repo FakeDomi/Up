@@ -29,7 +29,7 @@ namespace domi1819.UpClient
 
             this.upClient = upClient;
         }
-        
+
         internal void Rebuild(Menu.MenuItemCollection menuItems)
         {
             menuItems.Clear();
@@ -56,7 +56,7 @@ namespace domi1819.UpClient
             menuItems.Add(this.menuItemStorageExplorer);
             menuItems.Add("-");
             menuItems.Add(this.menuItemConfiguration);
-            
+
             menuItems.Add(this.menuItemAbout);
             menuItems.Add("-");
             menuItems.Add(this.menuItemExit);
@@ -116,7 +116,7 @@ namespace domi1819.UpClient
         {
             this.upClient.ActionManager.ShowConfiguration();
         }
-        
+
         private void ShowInfo(object o, EventArgs e)
         {
             this.upClient.ActionManager.ShowInfo();
