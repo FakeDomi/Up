@@ -61,10 +61,8 @@
             // uiUploadFileKeyBox
             // 
             this.uiUploadFileKeyBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
-            this.uiUploadFileKeyBox.Key = System.Windows.Forms.Keys.None;
             this.uiUploadFileKeyBox.Location = new System.Drawing.Point(12, 29);
             this.uiUploadFileKeyBox.MinimumSize = new System.Drawing.Size(20, 20);
-            this.uiUploadFileKeyBox.Modifiers = System.Windows.Forms.Keys.None;
             this.uiUploadFileKeyBox.Name = "uiUploadFileKeyBox";
             this.uiUploadFileKeyBox.Size = new System.Drawing.Size(210, 20);
             this.uiUploadFileKeyBox.TabIndex = 1;
@@ -82,10 +80,8 @@
             // uiUploadScreenshotKeyBox
             // 
             this.uiUploadScreenshotKeyBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
-            this.uiUploadScreenshotKeyBox.Key = System.Windows.Forms.Keys.None;
             this.uiUploadScreenshotKeyBox.Location = new System.Drawing.Point(12, 71);
             this.uiUploadScreenshotKeyBox.MinimumSize = new System.Drawing.Size(20, 20);
-            this.uiUploadScreenshotKeyBox.Modifiers = System.Windows.Forms.Keys.None;
             this.uiUploadScreenshotKeyBox.Name = "uiUploadScreenshotKeyBox";
             this.uiUploadScreenshotKeyBox.Size = new System.Drawing.Size(210, 20);
             this.uiUploadScreenshotKeyBox.TabIndex = 2;
@@ -103,10 +99,8 @@
             // uiUploadScreenAreaKeyBox
             // 
             this.uiUploadScreenAreaKeyBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
-            this.uiUploadScreenAreaKeyBox.Key = System.Windows.Forms.Keys.None;
             this.uiUploadScreenAreaKeyBox.Location = new System.Drawing.Point(12, 113);
             this.uiUploadScreenAreaKeyBox.MinimumSize = new System.Drawing.Size(20, 20);
-            this.uiUploadScreenAreaKeyBox.Modifiers = System.Windows.Forms.Keys.None;
             this.uiUploadScreenAreaKeyBox.Name = "uiUploadScreenAreaKeyBox";
             this.uiUploadScreenAreaKeyBox.Size = new System.Drawing.Size(210, 20);
             this.uiUploadScreenAreaKeyBox.TabIndex = 3;
@@ -124,10 +118,8 @@
             // uiUploadClipboardKeyBox
             // 
             this.uiUploadClipboardKeyBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
-            this.uiUploadClipboardKeyBox.Key = System.Windows.Forms.Keys.None;
             this.uiUploadClipboardKeyBox.Location = new System.Drawing.Point(12, 155);
             this.uiUploadClipboardKeyBox.MinimumSize = new System.Drawing.Size(20, 20);
-            this.uiUploadClipboardKeyBox.Modifiers = System.Windows.Forms.Keys.None;
             this.uiUploadClipboardKeyBox.Name = "uiUploadClipboardKeyBox";
             this.uiUploadClipboardKeyBox.Size = new System.Drawing.Size(210, 20);
             this.uiUploadClipboardKeyBox.TabIndex = 4;
@@ -145,10 +137,8 @@
             // uiShowFileDropAreaKeyBox
             // 
             this.uiShowFileDropAreaKeyBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
-            this.uiShowFileDropAreaKeyBox.Key = System.Windows.Forms.Keys.None;
             this.uiShowFileDropAreaKeyBox.Location = new System.Drawing.Point(12, 197);
             this.uiShowFileDropAreaKeyBox.MinimumSize = new System.Drawing.Size(20, 20);
-            this.uiShowFileDropAreaKeyBox.Modifiers = System.Windows.Forms.Keys.None;
             this.uiShowFileDropAreaKeyBox.Name = "uiShowFileDropAreaKeyBox";
             this.uiShowFileDropAreaKeyBox.Size = new System.Drawing.Size(210, 20);
             this.uiShowFileDropAreaKeyBox.TabIndex = 5;
@@ -193,10 +183,8 @@
             // uiOpenStorageExplorerKeyBox
             // 
             this.uiOpenStorageExplorerKeyBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
-            this.uiOpenStorageExplorerKeyBox.Key = System.Windows.Forms.Keys.None;
             this.uiOpenStorageExplorerKeyBox.Location = new System.Drawing.Point(12, 239);
             this.uiOpenStorageExplorerKeyBox.MinimumSize = new System.Drawing.Size(20, 20);
-            this.uiOpenStorageExplorerKeyBox.Modifiers = System.Windows.Forms.Keys.None;
             this.uiOpenStorageExplorerKeyBox.Name = "uiOpenStorageExplorerKeyBox";
             this.uiOpenStorageExplorerKeyBox.Size = new System.Drawing.Size(210, 20);
             this.uiOpenStorageExplorerKeyBox.TabIndex = 6;
@@ -205,10 +193,8 @@
             // uiSaveLocalScreenshotKeyBox
             // 
             this.uiSaveLocalScreenshotKeyBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
-            this.uiSaveLocalScreenshotKeyBox.Key = System.Windows.Forms.Keys.None;
             this.uiSaveLocalScreenshotKeyBox.Location = new System.Drawing.Point(12, 281);
             this.uiSaveLocalScreenshotKeyBox.MinimumSize = new System.Drawing.Size(20, 20);
-            this.uiSaveLocalScreenshotKeyBox.Modifiers = System.Windows.Forms.Keys.None;
             this.uiSaveLocalScreenshotKeyBox.Name = "uiSaveLocalScreenshotKeyBox";
             this.uiSaveLocalScreenshotKeyBox.Size = new System.Drawing.Size(210, 20);
             this.uiSaveLocalScreenshotKeyBox.TabIndex = 7;
@@ -217,10 +203,8 @@
             // uiSaveLocalScreenAreaKeyBox
             // 
             this.uiSaveLocalScreenAreaKeyBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
-            this.uiSaveLocalScreenAreaKeyBox.Key = System.Windows.Forms.Keys.None;
             this.uiSaveLocalScreenAreaKeyBox.Location = new System.Drawing.Point(12, 323);
             this.uiSaveLocalScreenAreaKeyBox.MinimumSize = new System.Drawing.Size(20, 20);
-            this.uiSaveLocalScreenAreaKeyBox.Modifiers = System.Windows.Forms.Keys.None;
             this.uiSaveLocalScreenAreaKeyBox.Name = "uiSaveLocalScreenAreaKeyBox";
             this.uiSaveLocalScreenAreaKeyBox.Size = new System.Drawing.Size(210, 20);
             this.uiSaveLocalScreenAreaKeyBox.TabIndex = 8;
@@ -229,10 +213,8 @@
             // uiSaveLocalClipboardKeyBox
             // 
             this.uiSaveLocalClipboardKeyBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
-            this.uiSaveLocalClipboardKeyBox.Key = System.Windows.Forms.Keys.None;
             this.uiSaveLocalClipboardKeyBox.Location = new System.Drawing.Point(12, 365);
             this.uiSaveLocalClipboardKeyBox.MinimumSize = new System.Drawing.Size(20, 20);
-            this.uiSaveLocalClipboardKeyBox.Modifiers = System.Windows.Forms.Keys.None;
             this.uiSaveLocalClipboardKeyBox.Name = "uiSaveLocalClipboardKeyBox";
             this.uiSaveLocalClipboardKeyBox.Size = new System.Drawing.Size(210, 20);
             this.uiSaveLocalClipboardKeyBox.TabIndex = 9;

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 using domi1819.UpClient.Forms;
 using domi1819.UpClient.Uploads;
 using domi1819.UpCore.Config;

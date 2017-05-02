@@ -4,8 +4,9 @@ namespace domi1819.DarkControls
 {
     public partial class DarkKeyBox : DarkTextBox
     {
-        public Keys Modifiers { get; set; }
-        public Keys Key { get; set; }
+        public Keys Modifiers { get; private set; }
+
+        public Keys Key { get; private set; }
 
         public DarkKeyBox()
         {
@@ -15,16 +16,12 @@ namespace domi1819.DarkControls
             this.textBox.PreviewKeyDown += this.TextBoxOnPreviewKeyDown;
         }
 
-        public void RefreshText()
+        public void Set(Keys modifiers, Keys key)
         {
-            if (this.Modifiers > 0 && this.Key > 0)
-            {
-                this.textBox.Text = $"{this.Modifiers} + {this.Key}";
-            }
-            else
-            {
-                this.textBox.Text = "";
-            }
+            this.Modifiers = modifiers;
+            this.Key = key;
+
+            this.RefreshText();
         }
 
         private void TextBoxOnPreviewKeyDown(object o, PreviewKeyDownEventArgs e)
@@ -36,6 +33,7 @@ namespace domi1819.DarkControls
                     this.Modifiers = 0;
                     this.Key = 0;
 
+                    this.RefreshText();
                     this.Parent.SelectNextControl(this, true, true, true, true);
                 }
             }
@@ -44,10 +42,23 @@ namespace domi1819.DarkControls
                 this.Modifiers = e.Modifiers;
                 this.Key = e.KeyCode;
 
+                this.RefreshText();
                 this.Parent.SelectNextControl(this, true, true, true, true);
             }
+        }
 
-            this.RefreshText();
+        private void RefreshText()
+        {
+            if (this.Modifiers > 0 && this.Key > 0)
+            {
+                this.textBox.Text = $"{this.Modifiers} + {this.Key}";
+                this.textBox.ForeColor = DarkColors.Foreground;
+            }
+            else
+            {
+                this.textBox.Text = "No Hotkey";
+                this.textBox.ForeColor = DarkColors.ForegroundInactive;
+            }
         }
     }
 }

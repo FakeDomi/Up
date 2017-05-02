@@ -24,7 +24,11 @@ namespace domi1819.DarkControls
         public bool ReadOnly
         {
             get => this.textBox.ReadOnly;
-            set => this.textBox.ReadOnly = value;
+            set
+            {
+                this.textBox.ForeColor = value ? DarkColors.ForegroundInactive : DarkColors.Foreground;
+                this.textBox.ReadOnly = value;
+            }
         }
 
         public int GlowX => this.Location.X + this.DisplayRectangle.X;

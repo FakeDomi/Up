@@ -12,6 +12,7 @@ namespace domi1819.DarkControls
         public static Color Workspace { get; }
         public static Color Border { get; }
         public static Color Foreground { get; }
+        public static Color ForegroundInactive { get; }
 
         public static Color StrongColor
         {
@@ -32,6 +33,7 @@ namespace domi1819.DarkControls
             Workspace = Color.FromArgb(45, 45, 48);
             Border = Color.FromArgb(67, 67, 70);
             Foreground = Color.FromArgb(241, 241, 241);
+            ForegroundInactive = Color.FromArgb(96, 96, 96);
 
             StrongColor = Color.FromArgb(16, 48, 128);
         }
