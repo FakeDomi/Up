@@ -117,7 +117,7 @@ namespace domi1819.UpClient.Forms
                     }
             }
 
-            DarkColors.StrongColor = this.upClient.Config.ThemeColor.GetColor();
+            DarkPainting.StrongColor = this.upClient.Config.ThemeColor.GetColor();
 
             this.uiDarkColorView.Color = this.upClient.Config.ThemeColor.GetColor();
             this.DarkColorViewColorSelected(null, null);
@@ -231,7 +231,7 @@ namespace domi1819.UpClient.Forms
 
         private void DarkColorViewColorSelected(object sender, EventArgs e)
         {
-            DarkColors.StrongColor = this.uiDarkColorView.Color;
+            DarkPainting.StrongColor = this.uiDarkColorView.Color;
             this.ThemeColorChanged?.Invoke(this, new ColorChangedEventArgs(this.uiDarkColorView.Color));
         }
 

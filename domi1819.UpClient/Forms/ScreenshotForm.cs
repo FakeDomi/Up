@@ -125,8 +125,8 @@ namespace domi1819.UpClient.Forms
                 e.Graphics.FillRectangle(this.brush, 0, this.drawStartY, this.drawStartX, this.drawEndY - this.drawStartY);
                 e.Graphics.FillRectangle(this.brush, this.drawEndX, this.drawStartY, this.Width - this.drawEndX, this.drawEndY - this.drawStartY);
 
-                ControlPaint.DrawBorder(e.Graphics, new Rectangle(this.drawStartX - 1, this.drawStartY - 1, this.drawEndX - this.drawStartX + 2, this.drawEndY - this.drawStartY + 2), DarkColors.PaleColor, ButtonBorderStyle.Solid);
-                ControlPaint.DrawBorder(e.Graphics, new Rectangle(this.drawStartX, this.drawStartY, this.drawEndX - this.drawStartX, this.drawEndY - this.drawStartY), DarkColors.StrongColor, ButtonBorderStyle.Solid);
+                ControlPaint.DrawBorder(e.Graphics, new Rectangle(this.drawStartX - 1, this.drawStartY - 1, this.drawEndX - this.drawStartX + 2, this.drawEndY - this.drawStartY + 2), DarkPainting.PaleColor, ButtonBorderStyle.Solid);
+                ControlPaint.DrawBorder(e.Graphics, new Rectangle(this.drawStartX, this.drawStartY, this.drawEndX - this.drawStartX, this.drawEndY - this.drawStartY), DarkPainting.StrongColor, ButtonBorderStyle.Solid);
             }
             else if (this.drawBackground)
             {

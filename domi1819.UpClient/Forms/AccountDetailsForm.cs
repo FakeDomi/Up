@@ -29,7 +29,7 @@ namespace domi1819.UpClient.Forms
             this.fetchKey = fetchKey;
             this.uiBackgroundWorker.RunWorkerAsync();
 
-            this.uiProgressBar.BarColor = DarkColors.StrongColor;
+            this.uiProgressBar.BarColor = DarkPainting.StrongColor;
             themeColorChanged += (sender, args) => { this.uiProgressBar.BarColor = args.NewColor; };
         }
 

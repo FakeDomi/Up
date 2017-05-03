@@ -42,7 +42,7 @@ namespace domi1819.UpClient.Forms
 
             upClient.ConfigurationForm.ThemeColorChanged += this.ConfigurationFormOnThemeColorChanged;
 
-            this.uiProgressBar.BarColor = DarkColors.StrongColor;
+            this.uiProgressBar.BarColor = DarkPainting.StrongColor;
         }
 
         internal new void Show()

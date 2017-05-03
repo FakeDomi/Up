@@ -1,18 +1,20 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
-using domi1819.UpCore.Utilities;
 
 namespace domi1819.DarkControls
 {
     public sealed partial class DarkColorView : UserControl, IGlowComponent
     {
+        private static readonly Rectangle PreviewRectangle = new Rectangle(4, 4, 15, 15);
+        private readonly ColorDialog colorDialog = new ColorDialog();
+
+        private bool hover;
+
         private Color color;
         private Brush brush;
-        private string text;
 
-        private readonly ColorDialog colorDialog = new ColorDialog();
-        private readonly Rectangle colorRectangle = new Rectangle(4, 4, 15, 15);
+        private string customText, drawText;
 
         public Color Color
         {
@@ -22,22 +24,62 @@ namespace domi1819.DarkControls
                 this.color = value;
                 this.brush = new SolidBrush(value);
                 this.colorDialog.Color = value;
-                this.RefreshLabelText();
-                this.Invalidate();
+
+                this.UpdateText();
             }
         }
-
-        public bool AllowEdit { get; set; }
-
+        
         public string CustomText
         {
-            get => this.text;
+            get => this.customText;
             set
             {
-                this.text = value;
-                this.RefreshLabelText();
+                this.customText = value;
+                this.UpdateText();
             }
         }
+        
+        public event EventHandler ColorSelected;
+        
+        public DarkColorView()
+        {
+            this.InitializeComponent();
+
+            this.DoubleBuffered = true;
+            this.Color = DarkPainting.StrongColor;
+
+            this.colorDialog.CustomColors = new[] {ColorTranslator.ToOle(DarkPainting.StrongColor)};
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
+
+            e.Graphics.FillRectangle(DarkPainting.BackgroundBrush(this.hover), this.DisplayRectangle);
+            DarkPainting.DrawText(e.Graphics, this.drawText, this.DisplayRectangle);
+            DarkPainting.DrawBorder(e.Graphics, this.DisplayRectangle);
+            
+            e.Graphics.FillRectangle(this.brush, PreviewRectangle);
+            DarkPainting.DrawBorder(e.Graphics, PreviewRectangle);
+        }
+        
+        protected override void OnClick(EventArgs e)
+        {
+            if (this.colorDialog.ShowDialog(this) == DialogResult.OK)
+            {
+                this.Color = this.colorDialog.Color;
+                this.ColorSelected?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        private void UpdateText()
+        {
+            this.drawText = $"{this.customText ?? ""}{this.color.ToHexString()}";
+            this.Invalidate();
+        }
+        
+        #region GlowComponent
+
         public int GlowX => this.Location.X + this.DisplayRectangle.X;
 
         public int GlowY => this.Location.Y + this.DisplayRectangle.Y;
@@ -46,72 +88,38 @@ namespace domi1819.DarkControls
 
         public int GlowH => this.DisplayRectangle.Height;
 
-
-        public event EventHandler ColorSelected;
-
-        public DarkColorView()
+        protected override void OnGotFocus(EventArgs e)
         {
-            this.InitializeComponent();
+            base.OnGotFocus(e);
 
-            this.DoubleBuffered = true;
-
-            this.ForeColor = DarkColors.Foreground;
-            this.BackColor = DarkColors.Control;
-
-            this.uiColorLabel.ForeColor = DarkColors.Foreground;
-            this.uiColorLabel.BackColor = DarkColors.Control;
-
-            this.uiColorLabel.Click += delegate { this.OnClick(null); };
-            this.uiColorLabel.MouseEnter += delegate { this.OnMouseEnter(null); };
-            this.uiColorLabel.MouseLeave += delegate { this.OnMouseLeave(null); };
-
-            this.Color = DarkColors.StrongColor;
-
-            this.colorDialog.CustomColors[1] = 0x1818C0;
+            DarkForm.UpdateGlow(true, this, true);
         }
 
-        protected override void OnPaint(PaintEventArgs e)
+        protected override void OnLostFocus(EventArgs e)
         {
-            base.OnPaint(e);
+            base.OnLostFocus(e);
 
-            ControlPaint.DrawBorder(e.Graphics, this.DisplayRectangle, DarkColors.Border, ButtonBorderStyle.Solid);
-
-            e.Graphics.FillRectangle(this.brush, this.colorRectangle);
-            ControlPaint.DrawBorder(e.Graphics, this.colorRectangle, DarkColors.Border, ButtonBorderStyle.Solid);
+            DarkForm.UpdateGlow(true, this, false);
         }
 
         protected override void OnMouseEnter(EventArgs e)
         {
             base.OnMouseEnter(e);
 
-            DarkForm.UpdateGlowComponent(this, true);
+            this.hover = true;
+            DarkForm.UpdateGlow(false, this, true);
+            this.Invalidate();
         }
 
         protected override void OnMouseLeave(EventArgs e)
         {
             base.OnMouseLeave(e);
 
-            DarkForm.UpdateGlowComponent(this, false);
+            this.hover = false;
+            DarkForm.UpdateGlow(false, this, false);
+            this.Invalidate();
         }
 
-        protected override void OnClick(EventArgs e)
-        {
-            if (e != null)
-            {
-                base.OnClick(e);
-            }
-
-            if (this.AllowEdit && this.colorDialog.ShowDialog(this) == DialogResult.OK)
-            {
-                this.Color = this.colorDialog.Color;
-
-                this.ColorSelected?.Invoke(this, new EventArgs());
-            }
-        }
-
-        private void RefreshLabelText()
-        {
-            this.uiColorLabel.Text = (this.CustomText ?? "") + this.color.ToHexString();
-        }
+        #endregion
     }
 }

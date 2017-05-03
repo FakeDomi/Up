@@ -3,8 +3,30 @@ using System.Windows.Forms;
 
 namespace domi1819.DarkControls
 {
-    public class DarkButton : Button, IGlowComponent
+    public sealed class DarkButton : Button, IGlowComponent
     {
+        protected override bool ShowFocusCues => false;
+
+        public DarkButton()
+        {
+            this.ForeColor = DarkPainting.Foreground;
+            this.BackColor = DarkPainting.Control;
+            this.FlatStyle = FlatStyle.Flat;
+
+            this.FlatAppearance.BorderSize = 0;
+            this.FlatAppearance.MouseOverBackColor = DarkPainting.ControlHighlight;
+            this.FlatAppearance.MouseDownBackColor = DarkPainting.ControlHighlight;
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
+
+            DarkPainting.DrawBorder(e.Graphics, this.DisplayRectangle);
+        }
+
+        #region GlowComponent
+
         public int GlowX => this.Location.X + this.DisplayRectangle.X;
 
         public int GlowY => this.Location.Y + this.DisplayRectangle.Y;
@@ -13,36 +35,34 @@ namespace domi1819.DarkControls
 
         public int GlowH => this.DisplayRectangle.Height;
 
-        public DarkButton()
-        {
-            this.ForeColor = DarkColors.Foreground;
-            this.BackColor = DarkColors.Control;
-            this.FlatStyle = FlatStyle.Flat;
-
-            this.FlatAppearance.BorderSize = 0;
-            this.FlatAppearance.MouseOverBackColor = DarkColors.Control2;
-            this.FlatAppearance.MouseDownBackColor = DarkColors.Workspace;
-        }
-
-        protected override void OnPaint(PaintEventArgs pevent)
-        {
-            base.OnPaint(pevent);
-
-            ControlPaint.DrawBorder(pevent.Graphics, this.DisplayRectangle, DarkColors.Border, ButtonBorderStyle.Solid);
-        }
-
         protected override void OnMouseEnter(EventArgs e)
         {
             base.OnMouseEnter(e);
 
-            DarkForm.UpdateGlowComponent(this, true);
+            DarkForm.UpdateGlow(false, this, true);
         }
 
         protected override void OnMouseLeave(EventArgs e)
         {
             base.OnMouseLeave(e);
 
-            DarkForm.UpdateGlowComponent(this, false);
+            DarkForm.UpdateGlow(false, this, false);
         }
+
+        protected override void OnGotFocus(EventArgs e)
+        {
+            base.OnGotFocus(e);
+
+            DarkForm.UpdateGlow(true, this, true);
+        }
+
+        protected override void OnLostFocus(EventArgs e)
+        {
+            base.OnLostFocus(e);
+
+            DarkForm.UpdateGlow(true, this, false);
+        }
+
+        #endregion
     }
 }

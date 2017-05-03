@@ -43,7 +43,7 @@
     <Compile Include="DarkCheckBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="DarkColors.cs" />
+    <Compile Include="DarkPainting.cs" />
     <Compile Include="DarkColorView.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -52,12 +52,6 @@
     </Compile>
     <Compile Include="DarkForm.cs">
       <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="DarkKeyBox.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="DarkKeyBox.Designer.cs">
-      <DependentUpon>DarkKeyBox.cs</DependentUpon>
     </Compile>
     <Compile Include="DarkProgressBar.cs">
       <SubType>UserControl</SubType>
@@ -71,6 +65,7 @@
     <Compile Include="DarkTextBox.designer.cs">
       <DependentUpon>DarkTextBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="HexConversion.cs" />
     <Compile Include="IGlowComponent.cs" />
     <Compile Include="ColoredBox.cs">
       <SubType>UserControl</SubType>
@@ -78,14 +73,17 @@
     <Compile Include="ColoredBox.Designer.cs">
       <DependentUpon>ColoredBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="DarkKeyBox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DarkKeyBox.Designer.cs">
+      <DependentUpon>DarkKeyBox.cs</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="DarkColorView.resx">
       <DependentUpon>DarkColorView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DarkKeyBox.resx">
-      <DependentUpon>DarkKeyBox.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DarkProgressBar.resx">
       <DependentUpon>DarkProgressBar.cs</DependentUpon>
@@ -93,12 +91,9 @@
     <EmbeddedResource Include="DarkTextBox.resx">
       <DependentUpon>DarkTextBox.cs</DependentUpon>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\domi1819.UpCore\domi1819.UpCore.csproj">
-      <Project>{f08ac443-d347-48ec-b853-5ee0e1290adb}</Project>
-      <Name>domi1819.UpCore</Name>
-    </ProjectReference>
+    <EmbeddedResource Include="DarkKeyBox.resx">
+      <DependentUpon>DarkKeyBox.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

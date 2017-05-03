@@ -33,8 +33,8 @@ namespace domi1819.UpClient.Forms
 
             this.upClient = upClient;
 
-            this.uiDataGridView.DefaultCellStyle.SelectionBackColor = DarkColors.StrongColor;
-            this.uiDataGridView.DefaultCellStyle.SelectionForeColor = DarkColors.GetForegroundColor(DarkColors.StrongColor);
+            this.uiDataGridView.DefaultCellStyle.SelectionBackColor = DarkPainting.StrongColor;
+            this.uiDataGridView.DefaultCellStyle.SelectionForeColor = DarkPainting.GetForegroundColor(DarkPainting.StrongColor);
 
             this.upClient.ConfigurationForm.ThemeColorChanged += this.ConfigurationFormOnThemeColorChanged;
 
@@ -137,8 +137,8 @@ namespace domi1819.UpClient.Forms
         {
             foreach (DataGridViewColumn column in this.uiDataGridView.Columns)
             {
-                column.DefaultCellStyle.SelectionBackColor = DarkColors.StrongColor;
-                column.DefaultCellStyle.SelectionForeColor = DarkColors.GetForegroundColor(DarkColors.StrongColor);
+                column.DefaultCellStyle.SelectionBackColor = DarkPainting.StrongColor;
+                column.DefaultCellStyle.SelectionForeColor = DarkPainting.GetForegroundColor(DarkPainting.StrongColor);
             }
 
             this.uiDataGridView.Refresh();

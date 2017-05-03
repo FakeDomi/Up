@@ -1,6 +1,6 @@
 ﻿namespace domi1819.DarkControls
 {
-    partial class DarkProgressBar
+    sealed partial class DarkProgressBar
     {
         /// <summary> 
         /// Required designer variable.

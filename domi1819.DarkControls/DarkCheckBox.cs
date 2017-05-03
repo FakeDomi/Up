@@ -18,6 +18,8 @@ namespace domi1819.DarkControls
         public int GlowW => 13;
 
         public int GlowH => 13;
+        
+        protected override bool ShowFocusCues => false;
 
         public DarkCheckBox()
         {
@@ -34,14 +36,14 @@ namespace domi1819.DarkControls
             int x = this.Padding.Left;
             int y = this.Height / 2 - size / 2;
 
-            e.Graphics.FillRectangle(new SolidBrush(this.mouseDown ? DarkColors.Workspace : this.hover ? DarkColors.Control2 : DarkColors.Control), x, y, size, size);
-            e.Graphics.DrawRectangle(new Pen(DarkColors.Border), x, y, size, size);
+            e.Graphics.FillRectangle(new SolidBrush(this.mouseDown ? DarkPainting.Workspace : this.hover ? DarkPainting.ControlHighlight : DarkPainting.Control), x, y, size, size);
+            e.Graphics.DrawRectangle(new Pen(DarkPainting.Border), x, y, size, size);
 
             if (this.Checked)
             {
                 if (this.RadioStyle)
                 {
-                    e.Graphics.FillRectangle(new SolidBrush(DarkColors.Foreground), x + 4, y + 4, 5, 5);
+                    e.Graphics.FillRectangle(new SolidBrush(DarkPainting.Foreground), x + 4, y + 4, 5, 5);
                 }
                 else
                 {
@@ -56,7 +58,7 @@ namespace domi1819.DarkControls
 
             this.hover = true;
 
-            DarkForm.UpdateGlowComponent(this, true);
+            DarkForm.UpdateGlow(false, this, true);
         }
 
         protected override void OnMouseLeave(EventArgs e)
@@ -65,7 +67,7 @@ namespace domi1819.DarkControls
 
             this.hover = false;
 
-            DarkForm.UpdateGlowComponent(this, false);
+            DarkForm.UpdateGlow(false, this, false);
         }
 
         protected override void OnMouseDown(MouseEventArgs mevent)
@@ -83,6 +85,20 @@ namespace domi1819.DarkControls
             this.mouseDown = false;
             this.Invalidate();
         }
+        
+        protected override void OnGotFocus(EventArgs e)
+        {
+            base.OnGotFocus(e);
+
+            DarkForm.UpdateGlow(true, this, true);
+        }
+        
+        protected override void OnLostFocus(EventArgs e)
+        {
+            base.OnLostFocus(e);
+
+            DarkForm.UpdateGlow(true, this, false);
+        }
 
         private static readonly Bitmap Check;
 
@@ -99,16 +115,16 @@ namespace domi1819.DarkControls
                 {
                     if ((image & checkBit) > 0)
                     {
-                        Check.SetPixel(x, y, DarkColors.Foreground);
+                        Check.SetPixel(x, y, DarkPainting.Foreground);
                     }
 
                     checkBit = checkBit << 1;
                 }
             }
 
-            Check.SetPixel(8, 0, DarkColors.Foreground);
-            Check.SetPixel(8, 1, DarkColors.Foreground);
-            Check.SetPixel(8, 2, DarkColors.Foreground);
+            Check.SetPixel(8, 0, DarkPainting.Foreground);
+            Check.SetPixel(8, 1, DarkPainting.Foreground);
+            Check.SetPixel(8, 2, DarkPainting.Foreground);
         }
     }
 }

@@ -220,9 +220,6 @@ namespace domi1819.UpClient.Forms
             // uiCancelButton
             // 
             this.uiCancelButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
-            this.uiCancelButton.FlatAppearance.BorderSize = 0;
-            this.uiCancelButton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
-            this.uiCancelButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(42)))), ((int)(((byte)(44)))));
             this.uiCancelButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.uiCancelButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
             this.uiCancelButton.Location = new System.Drawing.Point(12, 439);
@@ -236,9 +233,6 @@ namespace domi1819.UpClient.Forms
             // uiSaveButton
             // 
             this.uiSaveButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
-            this.uiSaveButton.FlatAppearance.BorderSize = 0;
-            this.uiSaveButton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
-            this.uiSaveButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(42)))), ((int)(((byte)(44)))));
             this.uiSaveButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.uiSaveButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.uiSaveButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
@@ -262,9 +256,6 @@ namespace domi1819.UpClient.Forms
             // darkButton1
             // 
             this.darkButton1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
-            this.darkButton1.FlatAppearance.BorderSize = 0;
-            this.darkButton1.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
-            this.darkButton1.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(42)))), ((int)(((byte)(44)))));
             this.darkButton1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.darkButton1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
             this.darkButton1.Location = new System.Drawing.Point(12, 112);
@@ -316,9 +307,6 @@ namespace domi1819.UpClient.Forms
             // darkButton2
             // 
             this.darkButton2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
-            this.darkButton2.FlatAppearance.BorderSize = 0;
-            this.darkButton2.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
-            this.darkButton2.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(42)))), ((int)(((byte)(44)))));
             this.darkButton2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.darkButton2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
             this.darkButton2.Location = new System.Drawing.Point(12, 229);
@@ -331,10 +319,9 @@ namespace domi1819.UpClient.Forms
             // 
             // uiDarkColorView
             // 
-            this.uiDarkColorView.AllowEdit = true;
             this.uiDarkColorView.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
             this.uiDarkColorView.Color = System.Drawing.Color.FromArgb(((int)(((byte)(24)))), ((int)(((byte)(24)))), ((int)(((byte)(192)))));
-            this.uiDarkColorView.CustomText = "Theme color: ";
+            this.uiDarkColorView.CustomText = "Theme Color: ";
             this.uiDarkColorView.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
             this.uiDarkColorView.Location = new System.Drawing.Point(12, 256);
             this.uiDarkColorView.MaximumSize = new System.Drawing.Size(2000000000, 23);
@@ -347,9 +334,6 @@ namespace domi1819.UpClient.Forms
             // darkButton3
             // 
             this.darkButton3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
-            this.darkButton3.FlatAppearance.BorderSize = 0;
-            this.darkButton3.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
-            this.darkButton3.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(42)))), ((int)(((byte)(44)))));
             this.darkButton3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.darkButton3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
             this.darkButton3.Location = new System.Drawing.Point(120, 112);
@@ -363,9 +347,6 @@ namespace domi1819.UpClient.Forms
             // changePasswordButton
             // 
             this.changePasswordButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
-            this.changePasswordButton.FlatAppearance.BorderSize = 0;
-            this.changePasswordButton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
-            this.changePasswordButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(42)))), ((int)(((byte)(44)))));
             this.changePasswordButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.changePasswordButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
             this.changePasswordButton.Location = new System.Drawing.Point(120, 141);

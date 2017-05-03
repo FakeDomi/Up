@@ -1,6 +1,6 @@
 ﻿namespace domi1819.DarkControls
 {
-    partial class DarkKeyBox
+    sealed partial class DarkKeyBox
     {
         /// <summary> 
         /// Required designer variable.
@@ -35,9 +35,8 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Name = "DarkKeyBox";
-            this.Size = new System.Drawing.Size(70, 20);
+            this.Size = new System.Drawing.Size(150, 20);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 

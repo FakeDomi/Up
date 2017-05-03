@@ -4,18 +4,16 @@ using System.Windows.Forms;
 
 namespace domi1819.DarkControls
 {
-    public partial class DarkProgressBar : UserControl, IGlowComponent
+    public sealed partial class DarkProgressBar : UserControl, IGlowComponent
     {
         private const int BarPadding = 2;
 
-        private static readonly Brush ForegroundBrush = new SolidBrush(DarkColors.Foreground);
-        private static readonly StringFormat StringFormat = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
-        private static readonly Font TextFont = new Font(FontFamily.GenericSansSerif, 8.25F);
+        private bool hover;
 
-        private SolidBrush textOverlayBrush = new SolidBrush(DarkColors.GetForegroundColor(DarkColors.StrongColor));
-
-        private string valueText;
         private float value;
+        private string text;
+        private SolidBrush barBrush;
+        private Color textOverlayColor;
 
         public float Value
         {
@@ -23,29 +21,57 @@ namespace domi1819.DarkControls
             set
             {
                 this.value = value < 0 ? 0 : value > 1 ? 1 : value;
-                this.valueText = $"{this.ValueInt} %";
+                this.text = $"{this.ValueInt} %";
                 this.Invalidate();
             }
         }
 
         public int ValueInt
         {
-            get => (int)(this.Value * 100);
+            get => (int)(this.Value * 100 + 0.5);
             set => this.Value = value / 100F;
         }
 
-        public SolidBrush Brush { get; set; }
-
         public Color BarColor
         {
-            get => this.Brush.Color;
+            get => this.barBrush.Color;
             set
             {
-                this.Brush = new SolidBrush(value);
-                this.textOverlayBrush = new SolidBrush(DarkColors.GetForegroundColor(DarkColors.StrongColor));
+                this.barBrush = new SolidBrush(value);
+                this.textOverlayColor = DarkPainting.GetForegroundColor(value);
                 this.Invalidate();
             }
         }
+
+        public DarkProgressBar()
+        {
+            this.InitializeComponent();
+
+            this.DoubleBuffered = true;
+            this.BarColor = DarkPainting.StrongColor;
+
+            this.Value = 0;
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
+
+            e.Graphics.FillRectangle(DarkPainting.BackgroundBrush(this.hover), this.DisplayRectangle);
+            DarkPainting.DrawBorder(e.Graphics, this.DisplayRectangle);
+
+            if (this.value >= 0)
+            {
+                Rectangle barArea = new Rectangle(BarPadding, BarPadding, (int)((this.Width - 2 * BarPadding) * this.value), this.Height - 2 * BarPadding);
+
+                DarkPainting.DrawText(e.Graphics, this.text, this.DisplayRectangle);
+                e.Graphics.FillRectangle(this.barBrush, barArea);
+                e.Graphics.Clip = new Region(barArea);
+                DarkPainting.DrawText(e.Graphics, this.text, this.DisplayRectangle, this.textOverlayColor, TextFormatFlags.PreserveGraphicsClipping | TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
+            }
+        }
+
+        #region GlowComponent
 
         public int GlowX => this.Location.X + this.DisplayRectangle.X;
 
@@ -55,46 +81,38 @@ namespace domi1819.DarkControls
 
         public int GlowH => this.DisplayRectangle.Height;
 
-        public DarkProgressBar()
+        protected override void OnGotFocus(EventArgs e)
         {
-            this.InitializeComponent();
-            this.BackColor = DarkColors.Control;
-            this.BarColor = DarkColors.StrongColor;
+            base.OnGotFocus(e);
 
-            this.MouseEnter += this.LabelMouseEnter;
-            this.MouseLeave += this.LabelMouseLeave;
-
-            this.DoubleBuffered = true;
+            DarkForm.UpdateGlow(true, this, true);
         }
 
-        protected override void OnPaint(PaintEventArgs e)
+        protected override void OnLostFocus(EventArgs e)
         {
-            base.OnPaint(e);
+            base.OnLostFocus(e);
 
-            Graphics g = e.Graphics;
-
-            ControlPaint.DrawBorder(g, this.DisplayRectangle, DarkColors.Border, ButtonBorderStyle.Solid);
-
-            if (this.value >= 0)
-            {
-                RectangleF fullArea = new RectangleF(0, 0, this.Width, this.Height);
-                Rectangle barArea = new Rectangle(BarPadding, BarPadding, (int)((this.Width - 2 * BarPadding) * this.value), this.Height - 2 * BarPadding);
-
-                g.DrawString(this.valueText, TextFont, ForegroundBrush, fullArea, StringFormat);
-                g.FillRectangle(this.Brush, barArea);
-                g.Clip = new Region(barArea);
-                g.DrawString(this.valueText, TextFont, this.textOverlayBrush, fullArea, StringFormat);
-            }
+            DarkForm.UpdateGlow(true, this, false);
         }
 
-        private void LabelMouseEnter(object sender, EventArgs e)
+        protected override void OnMouseEnter(EventArgs e)
         {
-            DarkForm.UpdateGlowComponent(this, true);
+            base.OnMouseEnter(e);
+
+            this.hover = true;
+            DarkForm.UpdateGlow(false, this, true);
+            this.Invalidate();
         }
 
-        private void LabelMouseLeave(object sender, EventArgs e)
+        protected override void OnMouseLeave(EventArgs e)
         {
-            DarkForm.UpdateGlowComponent(this, false);
+            base.OnMouseLeave(e);
+
+            this.hover = false;
+            DarkForm.UpdateGlow(false, this, false);
+            this.Invalidate();
         }
+
+        #endregion
     }
 }

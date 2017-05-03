@@ -5,38 +5,57 @@ namespace domi1819.DarkControls
 {
     public class DarkForm : Form
     {
+        private IGlowComponent focus, hover;
+
         public bool DisableGlow { get; set; }
-
-        internal IGlowComponent GlowComponent { get; set; }
-
+        
         public DarkForm()
         {
-            this.BackColor = DarkColors.Workspace;
-            this.ForeColor = DarkColors.Foreground;
+            this.BackColor = DarkPainting.Workspace;
+            this.ForeColor = DarkPainting.Foreground;
 
             this.DoubleBuffered = true;
         }
-
+        
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
 
-            if (!this.DisableGlow && this.GlowComponent != null)
+            if (this.DisableGlow)
             {
-                ControlPaint.DrawBorder(e.Graphics, new Rectangle(this.GlowComponent.GlowX - 1, this.GlowComponent.GlowY - 1, this.GlowComponent.GlowW + 2, this.GlowComponent.GlowH + 2), DarkColors.StrongColor, ButtonBorderStyle.Solid);
+                return;
+            }
 
-                //e.Graphics.DrawRectangle(new Pen(new SolidBrush(DarkColors.PaleColor), 2.5F), GlowComponent.GlowX - 1, GlowComponent.GlowY - 1, GlowComponent.GlowW + 2, GlowComponent.GlowH + 2);
+            if (this.focus != null)
+            {
+                ControlPaint.DrawBorder(e.Graphics, new Rectangle(this.focus.GlowX - 1, this.focus.GlowY - 1, this.focus.GlowW + 2, this.focus.GlowH + 2), DarkPainting.StrongColor, ButtonBorderStyle.Solid);
+                ControlPaint.DrawBorder(e.Graphics, new Rectangle(this.focus.GlowX - 2, this.focus.GlowY, this.focus.GlowW + 4, this.focus.GlowH), DarkPainting.PaleColor, ButtonBorderStyle.Solid);
+                ControlPaint.DrawBorder(e.Graphics, new Rectangle(this.focus.GlowX, this.focus.GlowY - 2, this.focus.GlowW, this.focus.GlowH + 4), DarkPainting.PaleColor, ButtonBorderStyle.Solid);
+            }
 
-                ControlPaint.DrawBorder(e.Graphics, new Rectangle(this.GlowComponent.GlowX - 2, this.GlowComponent.GlowY, this.GlowComponent.GlowW + 4, this.GlowComponent.GlowH), DarkColors.PaleColor, ButtonBorderStyle.Solid);
-                ControlPaint.DrawBorder(e.Graphics, new Rectangle(this.GlowComponent.GlowX, this.GlowComponent.GlowY - 2, this.GlowComponent.GlowW, this.GlowComponent.GlowH + 4), DarkColors.PaleColor, ButtonBorderStyle.Solid);
+            if (this.hover != null)
+            {
+                ControlPaint.DrawBorder(e.Graphics, new Rectangle(this.hover.GlowX - 1, this.hover.GlowY - 1, this.hover.GlowW + 2, this.hover.GlowH + 2), DarkPainting.StrongColor, ButtonBorderStyle.Solid);
+                ControlPaint.DrawBorder(e.Graphics, new Rectangle(this.hover.GlowX - 2, this.hover.GlowY, this.hover.GlowW + 4, this.hover.GlowH), DarkPainting.PaleColor, ButtonBorderStyle.Solid);
+                ControlPaint.DrawBorder(e.Graphics, new Rectangle(this.hover.GlowX, this.hover.GlowY - 2, this.hover.GlowW, this.hover.GlowH + 4), DarkPainting.PaleColor, ButtonBorderStyle.Solid);
             }
         }
 
-        internal static void UpdateGlowComponent(Control control, bool hover)
+        internal static void UpdateGlow(bool focus, Control control, bool active)
         {
             if (control.Parent is DarkForm parent)
             {
-                parent.GlowComponent = (IGlowComponent)(hover ? control : null);
+                IGlowComponent glowComponent = (IGlowComponent)(active ? control : null);
+
+                if (focus)
+                {
+                    parent.focus = glowComponent;
+                }
+                else
+                {
+                    parent.hover = glowComponent;
+                }
+
                 parent.Invalidate();
             }
         }

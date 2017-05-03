@@ -66,7 +66,6 @@
             this.uiUploadFileKeyBox.Name = "uiUploadFileKeyBox";
             this.uiUploadFileKeyBox.Size = new System.Drawing.Size(210, 20);
             this.uiUploadFileKeyBox.TabIndex = 1;
-            this.uiUploadFileKeyBox.UseSystemPasswordChar = false;
             // 
             // uiUploadScreenshotLabel
             // 
@@ -85,7 +84,6 @@
             this.uiUploadScreenshotKeyBox.Name = "uiUploadScreenshotKeyBox";
             this.uiUploadScreenshotKeyBox.Size = new System.Drawing.Size(210, 20);
             this.uiUploadScreenshotKeyBox.TabIndex = 2;
-            this.uiUploadScreenshotKeyBox.UseSystemPasswordChar = false;
             // 
             // uiUploadScreenAreaLabel
             // 
@@ -104,7 +102,6 @@
             this.uiUploadScreenAreaKeyBox.Name = "uiUploadScreenAreaKeyBox";
             this.uiUploadScreenAreaKeyBox.Size = new System.Drawing.Size(210, 20);
             this.uiUploadScreenAreaKeyBox.TabIndex = 3;
-            this.uiUploadScreenAreaKeyBox.UseSystemPasswordChar = false;
             // 
             // uiUploadClipbardLabel
             // 
@@ -123,7 +120,6 @@
             this.uiUploadClipboardKeyBox.Name = "uiUploadClipboardKeyBox";
             this.uiUploadClipboardKeyBox.Size = new System.Drawing.Size(210, 20);
             this.uiUploadClipboardKeyBox.TabIndex = 4;
-            this.uiUploadClipboardKeyBox.UseSystemPasswordChar = false;
             // 
             // uiShowFileDropAreaLabel
             // 
@@ -142,7 +138,6 @@
             this.uiShowFileDropAreaKeyBox.Name = "uiShowFileDropAreaKeyBox";
             this.uiShowFileDropAreaKeyBox.Size = new System.Drawing.Size(210, 20);
             this.uiShowFileDropAreaKeyBox.TabIndex = 5;
-            this.uiShowFileDropAreaKeyBox.UseSystemPasswordChar = false;
             // 
             // uiOpenStorageExplorer
             // 
@@ -188,7 +183,6 @@
             this.uiOpenStorageExplorerKeyBox.Name = "uiOpenStorageExplorerKeyBox";
             this.uiOpenStorageExplorerKeyBox.Size = new System.Drawing.Size(210, 20);
             this.uiOpenStorageExplorerKeyBox.TabIndex = 6;
-            this.uiOpenStorageExplorerKeyBox.UseSystemPasswordChar = false;
             // 
             // uiSaveLocalScreenshotKeyBox
             // 
@@ -198,7 +192,6 @@
             this.uiSaveLocalScreenshotKeyBox.Name = "uiSaveLocalScreenshotKeyBox";
             this.uiSaveLocalScreenshotKeyBox.Size = new System.Drawing.Size(210, 20);
             this.uiSaveLocalScreenshotKeyBox.TabIndex = 7;
-            this.uiSaveLocalScreenshotKeyBox.UseSystemPasswordChar = false;
             // 
             // uiSaveLocalScreenAreaKeyBox
             // 
@@ -208,7 +201,6 @@
             this.uiSaveLocalScreenAreaKeyBox.Name = "uiSaveLocalScreenAreaKeyBox";
             this.uiSaveLocalScreenAreaKeyBox.Size = new System.Drawing.Size(210, 20);
             this.uiSaveLocalScreenAreaKeyBox.TabIndex = 8;
-            this.uiSaveLocalScreenAreaKeyBox.UseSystemPasswordChar = false;
             // 
             // uiSaveLocalClipboardKeyBox
             // 
@@ -218,7 +210,6 @@
             this.uiSaveLocalClipboardKeyBox.Name = "uiSaveLocalClipboardKeyBox";
             this.uiSaveLocalClipboardKeyBox.Size = new System.Drawing.Size(210, 20);
             this.uiSaveLocalClipboardKeyBox.TabIndex = 9;
-            this.uiSaveLocalClipboardKeyBox.UseSystemPasswordChar = false;
             // 
             // HotkeyForm
             // 
