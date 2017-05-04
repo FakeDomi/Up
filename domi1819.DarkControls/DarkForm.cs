@@ -8,7 +8,7 @@ namespace domi1819.DarkControls
         private IGlowComponent focus, hover;
 
         public bool DisableGlow { get; set; }
-        
+
         public DarkForm()
         {
             this.BackColor = DarkPainting.Workspace;
@@ -16,7 +16,7 @@ namespace domi1819.DarkControls
 
             this.DoubleBuffered = true;
         }
-        
+
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);

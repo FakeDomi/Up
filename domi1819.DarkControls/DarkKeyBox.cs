@@ -27,7 +27,7 @@ namespace domi1819.DarkControls
             this.Modifiers = modifiers;
             this.Key = key;
 
-            this.text = modifiers != Keys.None && key > Keys.None ? $"{modifiers} + {key}" : null;
+            this.text = modifiers != Keys.None && key != Keys.None ? $"{modifiers} + {key}" : null;
 
             this.Invalidate();
         }

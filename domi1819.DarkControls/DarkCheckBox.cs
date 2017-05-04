@@ -18,7 +18,7 @@ namespace domi1819.DarkControls
         public int GlowW => 13;
 
         public int GlowH => 13;
-        
+
         protected override bool ShowFocusCues => false;
 
         public DarkCheckBox()
@@ -85,14 +85,14 @@ namespace domi1819.DarkControls
             this.mouseDown = false;
             this.Invalidate();
         }
-        
+
         protected override void OnGotFocus(EventArgs e)
         {
             base.OnGotFocus(e);
 
             DarkForm.UpdateGlow(true, this, true);
         }
-        
+
         protected override void OnLostFocus(EventArgs e)
         {
             base.OnLostFocus(e);

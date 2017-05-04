@@ -1,10 +1,16 @@
-﻿namespace domi1819.UpServer.Console.Commands
+﻿using System.Collections.Generic;
+
+namespace domi1819.UpServer.Console.Commands
 {
-    internal class CommandStop : ICommand
+    internal class CommandStop : BaseCommand
     {
-        public bool Process(string command)
+        public CommandStop(BaseCommand parent) : base(parent)
         {
-            return true;
+        }
+
+        protected override Result Run(List<string> input)
+        {
+            return Result.Shutdown;
         }
     }
 }

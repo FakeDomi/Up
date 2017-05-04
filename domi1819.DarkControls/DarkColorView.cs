@@ -28,7 +28,7 @@ namespace domi1819.DarkControls
                 this.UpdateText();
             }
         }
-        
+
         public string CustomText
         {
             get => this.customText;
@@ -38,9 +38,9 @@ namespace domi1819.DarkControls
                 this.UpdateText();
             }
         }
-        
+
         public event EventHandler ColorSelected;
-        
+
         public DarkColorView()
         {
             this.InitializeComponent();
@@ -48,7 +48,7 @@ namespace domi1819.DarkControls
             this.DoubleBuffered = true;
             this.Color = DarkPainting.StrongColor;
 
-            this.colorDialog.CustomColors = new[] {ColorTranslator.ToOle(DarkPainting.StrongColor)};
+            this.colorDialog.CustomColors = new[] { ColorTranslator.ToOle(DarkPainting.StrongColor) };
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -58,11 +58,11 @@ namespace domi1819.DarkControls
             e.Graphics.FillRectangle(DarkPainting.BackgroundBrush(this.hover), this.DisplayRectangle);
             DarkPainting.DrawText(e.Graphics, this.drawText, this.DisplayRectangle);
             DarkPainting.DrawBorder(e.Graphics, this.DisplayRectangle);
-            
+
             e.Graphics.FillRectangle(this.brush, PreviewRectangle);
             DarkPainting.DrawBorder(e.Graphics, PreviewRectangle);
         }
-        
+
         protected override void OnClick(EventArgs e)
         {
             if (this.colorDialog.ShowDialog(this) == DialogResult.OK)
@@ -77,7 +77,7 @@ namespace domi1819.DarkControls
             this.drawText = $"{this.customText ?? ""}{this.color.ToHexString()}";
             this.Invalidate();
         }
-        
+
         #region GlowComponent
 
         public int GlowX => this.Location.X + this.DisplayRectangle.X;

@@ -15,14 +15,14 @@ namespace domi1819.UpClient.Forms
             Hotkeys hotkeys = settings.Hotkeys;
 
             this.uiUploadFileKeyBox.Set(hotkeys.UploadFile.Modifier, hotkeys.UploadFile.Key);
-            this.uiUploadScreenshotKeyBox.Set(hotkeys.UploadFile.Modifier, hotkeys.UploadFile.Key);
-            this.uiUploadScreenAreaKeyBox.Set(hotkeys.UploadFile.Modifier, hotkeys.UploadFile.Key);
-            this.uiUploadClipboardKeyBox.Set(hotkeys.UploadFile.Modifier, hotkeys.UploadFile.Key);
-            this.uiShowFileDropAreaKeyBox.Set(hotkeys.UploadFile.Modifier, hotkeys.UploadFile.Key);
-            this.uiOpenStorageExplorerKeyBox.Set(hotkeys.UploadFile.Modifier, hotkeys.UploadFile.Key);
-            this.uiSaveLocalScreenshotKeyBox.Set(hotkeys.UploadFile.Modifier, hotkeys.UploadFile.Key);
-            this.uiSaveLocalScreenAreaKeyBox.Set(hotkeys.UploadFile.Modifier, hotkeys.UploadFile.Key);
-            this.uiSaveLocalClipboardKeyBox.Set(hotkeys.UploadFile.Modifier, hotkeys.UploadFile.Key);
+            this.uiUploadScreenshotKeyBox.Set(hotkeys.UploadScreenshot.Modifier, hotkeys.UploadScreenshot.Key);
+            this.uiUploadScreenAreaKeyBox.Set(hotkeys.UploadScreenArea.Modifier, hotkeys.UploadScreenArea.Key);
+            this.uiUploadClipboardKeyBox.Set(hotkeys.UploadClipboard.Modifier, hotkeys.UploadClipboard.Key);
+            this.uiShowFileDropAreaKeyBox.Set(hotkeys.ShowFileDropArea.Modifier, hotkeys.ShowFileDropArea.Key);
+            this.uiOpenStorageExplorerKeyBox.Set(hotkeys.OpenStorageExplorer.Modifier, hotkeys.OpenStorageExplorer.Key);
+            this.uiSaveLocalScreenshotKeyBox.Set(hotkeys.SaveLocalScreenshot.Modifier, hotkeys.SaveLocalScreenshot.Key);
+            this.uiSaveLocalScreenAreaKeyBox.Set(hotkeys.SaveLocalScreenArea.Modifier, hotkeys.SaveLocalScreenArea.Key);
+            this.uiSaveLocalClipboardKeyBox.Set(hotkeys.SaveLocalClipboard.Modifier, hotkeys.SaveLocalClipboard.Key);
         }
 
         public void FillConfig(Config settings)

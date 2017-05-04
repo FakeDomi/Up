@@ -8,7 +8,7 @@ namespace domi1819.UpCore.Utilities
         {
             return value.ToString().PadLeft(length, '0');
         }
-        
+
         public static string ToHexString(this byte[] bytes, int groupedChars = 0, int limit = -1, char separator = '-')
         {
             char[] chars;

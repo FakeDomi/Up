@@ -30,11 +30,11 @@ namespace domi1819.DarkControls
         }
 
         public static Color PaleColor { get; private set; }
-        
+
         public static readonly Font TextFont = new Font(FontFamily.GenericSansSerif, 8.25F);
 
         public static Brush ForegroundBrush { get; }
-        
+
         static DarkPainting()
         {
             Control = Color.FromArgb(37, 37, 38);
@@ -68,7 +68,7 @@ namespace domi1819.DarkControls
         {
             TextRenderer.DrawText(graphics, text, TextFont, rectangle, Foreground);
         }
-        
+
         public static void DrawText(Graphics graphics, string text, Rectangle rectangle, Color color, TextFormatFlags flags)
         {
             TextRenderer.DrawText(graphics, text, TextFont, rectangle, color, flags);
