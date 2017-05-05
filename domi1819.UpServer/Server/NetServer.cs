@@ -77,14 +77,12 @@ namespace domi1819.UpServer.Server
 
         private void ProcessClient(object clientObject)
         {
-            UpConsole console = UpServer.Instance.Console;
-
             TcpClient client = (TcpClient)clientObject;
             Connection connection = new Connection();
 
             try
             {
-                console.WriteLine($"Client {client.Client.RemoteEndPoint} connected."); //TODO
+                UpConsole.WriteLine($"Client {client.Client.RemoteEndPoint} connected."); //TODO
 
                 NetworkStream baseStream = client.GetStream();
                 connection.BaseStream = baseStream;
@@ -130,18 +128,18 @@ namespace domi1819.UpServer.Server
 
                     this.RunMessageLoop(new MessageContext(deserializer, serializer), connection);
 
-                    console.WriteLine($"Client {client.Client.RemoteEndPoint} disconnected.");
+                    UpConsole.WriteLine($"Client {client.Client.RemoteEndPoint} disconnected.");
                 }
                 else
                 {
-                    console.WriteLine($"Client {client.Client.RemoteEndPoint} tried to connect with unknown request mode {mode}. Disconnected.");
+                    UpConsole.WriteLine($"Client {client.Client.RemoteEndPoint} tried to connect with unknown request mode {mode}. Disconnected.");
                 }
             }
             catch (Exception ex)
             {
                 // TODO change, currently crashes when socket is not connected
-                console.WriteLine($"Client {client.Client.RemoteEndPoint} did something stupid, I guess...");
-                console.WriteLine(ex.Message);
+                UpConsole.WriteLine($"Client {client.Client.RemoteEndPoint} did something stupid, I guess...");
+                UpConsole.WriteLine(ex.Message);
             }
             finally
             {

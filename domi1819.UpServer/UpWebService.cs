@@ -5,6 +5,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using domi1819.UpCore.Utilities;
+using domi1819.UpServer.Console;
 
 namespace domi1819.UpServer
 {
@@ -63,7 +64,7 @@ namespace domi1819.UpServer
             {
                 listener.Start();
 
-                UpServer.Instance.Console.WriteLine($"Listening for HTTP connections ({this.config.HostName}:{this.config.HttpServerPort})");
+                UpConsole.WriteLine($"Listening for HTTP connections ({this.config.HostName}:{this.config.HttpServerPort})");
 
                 while (true)
                 {
@@ -72,8 +73,8 @@ namespace domi1819.UpServer
             }
             catch (Exception ex)
             {
-                UpServer.Instance.Console.WriteLine("HTTP listener has been stopped:");
-                UpServer.Instance.Console.WriteLine(ex.ToString());
+                UpConsole.WriteLine("HTTP listener has been stopped:");
+                UpConsole.WriteLine(ex.ToString());
             }
         }
 
@@ -113,7 +114,7 @@ namespace domi1819.UpServer
             }
             catch (Exception ex)
             {
-                UpServer.Instance.Console.WriteLine(ex.ToString());
+                UpConsole.WriteLine(ex.ToString());
             }
         }
 

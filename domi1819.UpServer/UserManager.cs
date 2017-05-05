@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using domi1819.NanoDB;
 using domi1819.UpCore.Utilities;
+using domi1819.UpServer.Console;
 
 namespace domi1819.UpServer
 {
@@ -19,7 +21,7 @@ namespace domi1819.UpServer
 
         internal UserManager(UpServer upServer)
         {
-            upServer.Console.WriteLine("Initializing user register...");
+            UpConsole.WriteLine("Initializing user register...");
 
             this.dbFile = new NanoDBFile(Path.Combine(upServer.Config.DataFolder, Constants.Database.UserDbName));
 
@@ -36,7 +38,7 @@ namespace domi1819.UpServer
             /*else*/
             if (initResult != InitializeResult.Success)
             {
-                upServer.Console.WriteLine("User database does not exist or could not be read. Creating a new one...");
+                UpConsole.WriteLine("User database does not exist or could not be read. Creating a new one...");
 
                 // UserName - PasswordHash - Salt - MaxCapacity - CurCapacity - Admin
                 this.dbFile.CreateNew(new NanoDBLayout(NanoDBElement.String32, NanoDBElement.DataBlob32, NanoDBElement.String8, NanoDBElement.Long, NanoDBElement.Long, NanoDBElement.Bool), Index.UserName);
@@ -56,7 +58,7 @@ namespace domi1819.UpServer
 
             if (newDb)
             {
-                upServer.Console.WriteLine("Creating admin account...\n Username:  admin\n Password:  password\nDon't forget to change the password!!");
+                UpConsole.WriteLine("Creating admin account...\n Username:  admin\n Password:  password\nDon't forget to change the password!!");
                 this.CreateUser("admin", "password", 10737418240 /*314572800*/, true);
             }
         }
@@ -66,12 +68,14 @@ namespace domi1819.UpServer
             return this.dbFile.ContainsKey(name);
         }
 
-        internal void CreateUser(string name, string password, long capacity, bool admin)
+        internal bool CreateUser(string name, string password, long capacity, bool admin)
         {
             string salt = Util.GetRandomString(SaltLength);
             byte[] hash = Util.Hash(password, salt);
 
             this.dbFile.AddLine(name, hash, salt, capacity, 0L, admin);
+
+            return true;
         }
 
         internal bool Verify(string user, string password)
@@ -173,6 +177,16 @@ namespace domi1819.UpServer
         internal bool IsAdmin(string user)
         {
             return this.HasUser(user) && (bool)this.dbFile.GetLine(user)[Index.Admin];
+        }
+
+        internal bool IsValidName(string name)
+        {
+            return Encoding.UTF8.GetByteCount(name) <= Constants.Database.MaxUsernameLength;
+        }
+
+        internal bool IsValidPassword(string password)
+        {
+            return password.Length >= PasswordMinLength && password.Length <= Constants.Database.PasswordMaxLength;
         }
 
         internal void Shutdown()

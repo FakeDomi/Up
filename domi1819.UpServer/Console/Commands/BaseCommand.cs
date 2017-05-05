@@ -8,7 +8,7 @@ namespace domi1819.UpServer.Console.Commands
         protected readonly Dictionary<string, BaseCommand> SubCommands = new Dictionary<string, BaseCommand>();
         
         private readonly int level;
-        
+
         internal BaseCommand(BaseCommand parent)
         {
             this.level = parent?.level + 1 ?? 0;
@@ -16,23 +16,28 @@ namespace domi1819.UpServer.Console.Commands
 
         internal Result Process(List<string> input)
         {
-            if (this.level == 0 && input.Count > 1 && input[input.Count - 1] == "")
+            if (this.level == 0 && input[input.Count - 1] == "")
             {
                 input.RemoveAt(input.Count - 1);
             }
 
-            if (input.Count > this.level && this.SubCommands.Count > 0)
+            if (input.Count > this.level)
             {
-                BaseCommand command = this.Get(input[this.level]);
-
-                if (command != null)
+                if (this.SubCommands.Count > 0)
                 {
-                    return command.Process(input);
+                    BaseCommand subCommand = this.Get(input[this.level]);
+
+                    if (subCommand != null)
+                    {
+                        return subCommand.Process(input);
+                    }
+
+                    System.Console.WriteLine($"Unknown command \"{input[this.level]}\"");
+
+                    return Result.Default;
                 }
 
-                System.Console.WriteLine($"Unknown command \"{input[this.level]}\"");
-
-                return Result.Default;
+                return this.Run(input);
             }
 
             return this.Run(input);
@@ -41,11 +46,9 @@ namespace domi1819.UpServer.Console.Commands
 
         internal List<string> AutoComplete(List<string> input)
         {
-            string lastInput = input[input.Count - 1];
-
             if (input.Count == this.level + 1)
             {
-                return (from command in this.SubCommands where command.Key.StartsWith(lastInput) select command.Key).ToList();
+                return (from command in this.SubCommands where command.Key.StartsWith(input[input.Count - 1]) select command.Key).ToList();
             }
 
             if (input.Count > this.level + 1 && this.SubCommands.Count > 0)
@@ -61,14 +64,12 @@ namespace domi1819.UpServer.Console.Commands
             return new List<string>();
         }
 
-        protected Result ShowUsages(List<string> input)
+        protected virtual Result Run(List<string> input)
         {
             System.Console.WriteLine($"Usage: {string.Join(" ", input)} <{string.Join("/", this.SubCommands.Keys)}>");
             return Result.ReuseCommand;
         }
 
-        protected abstract Result Run(List<string> input);
-        
         private BaseCommand Get(string name)
         {
             return this.SubCommands.TryGetValue(name, out BaseCommand command) ? command : null;

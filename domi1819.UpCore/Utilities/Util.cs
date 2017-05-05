@@ -63,6 +63,38 @@ namespace domi1819.UpCore.Utilities
             return null;
         }
 
+        public static bool TryParseByteSize(string input, out long value)
+        {
+            long? result = GetRevSize(input);
+
+            value = result ?? 0;
+
+            return result != null;
+        }
+
+        public static bool TryParseYesNo(string input, out bool value)
+        {
+            value = false;
+
+            if (input.Length == 0)
+            {
+                return false;
+            }
+
+            char firstChar = char.ToLower(input[0]);
+
+            if (firstChar == 'y')
+            {
+                value = true;
+            }
+            else if (firstChar != 'n')
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         public static string GetRandomString(int length)
         {
             char[] chars = new char[length];

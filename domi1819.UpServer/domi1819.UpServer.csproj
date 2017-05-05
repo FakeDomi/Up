@@ -38,6 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Console\Commands\BaseCommand.cs" />
+    <Compile Include="Console\Commands\CommandFile.cs" />
     <Compile Include="Console\Commands\CommandStop.cs" />
     <Compile Include="Console\Commands\CommandUser.cs" />
     <Compile Include="Console\Commands\Result.cs" />
