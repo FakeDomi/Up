@@ -8,43 +8,43 @@ namespace domi1819.UpServer.Console
     {
         private static List<char> inputChars;
         private static RootCommand rootCommand;
-
-        private static int indentCharCount;
-        private static string indentString = "";
-
-        internal static int IndentCharCount
+        
+        internal static void WriteLineRestoreCommand(object obj)
         {
-            get => indentCharCount;
-            set
+            if (inputChars != null)
             {
-                indentCharCount = value;
-                indentString = new string(' ', value);
+                for (int i = 0; i < inputChars.Count + 2; i++)
+                {
+                    RemoveCharacter();
+                }
+            }
+            
+            System.Console.WriteLine(obj);
+            
+            if (inputChars != null)
+            {
+                System.Console.Write("> ");
+
+                foreach (char c in inputChars)
+                {
+                    System.Console.Write(c);
+                }
             }
         }
-        
-        internal static void Write(object obj)
+
+        internal static void RemoveCharacter()
         {
-            System.Console.Write(indentString);
-            System.Console.Write(obj);
+            System.Console.Write('\b');
+            System.Console.Write(' ');
+            System.Console.Write('\b');
         }
 
-        internal static void WriteLine()
-        {
-            System.Console.WriteLine();
-        }
-
-        internal static void WriteLine(object obj)
-        {
-            System.Console.Write(indentString);
-            System.Console.WriteLine(obj);
-        }
-        
         internal static void ProcessConsoleInput(UpServer server)
         {
             rootCommand = new RootCommand(server);
 
             inputChars = new List<char>();
-            Write("> ");
+            System.Console.Write("> ");
 
             while (true)
             {
@@ -67,14 +67,14 @@ namespace domi1819.UpServer.Console
                         if (inputChars.Count > 0)
                         {
                             inputChars.RemoveAt(inputChars.Count - 1);
-                            System.Console.Write("\b \b");
+                            RemoveCharacter();
                         }
                         break;
 
                     case ConsoleKey.Escape:
                         inputChars.Clear();
-                        WriteLine();
-                        Write("> ");
+                        System.Console.WriteLine();
+                        System.Console.Write("> ");
                         break;
 
                     default:
@@ -100,10 +100,11 @@ namespace domi1819.UpServer.Console
 
             if (text != null)
             {
-                WriteLine(text);
+                System.Console.Write("    ");
+                System.Console.WriteLine(text);
             }
 
-            Write("  > ");
+            System.Console.Write(mask ? "    * " : "    > ");
 
             while (true)
             {
@@ -112,11 +113,11 @@ namespace domi1819.UpServer.Console
                 switch (key.Key)
                 {
                     case ConsoleKey.Enter:
-                        WriteLine();
+                        System.Console.WriteLine();
                         return new string(chars.ToArray());
 
                     case ConsoleKey.Escape:
-                        WriteLine();
+                        System.Console.WriteLine();
                         return null;
 
                     case ConsoleKey.Backspace:
@@ -131,52 +132,22 @@ namespace domi1819.UpServer.Console
                         if (!char.IsControl(key.KeyChar))
                         {
                             chars.Add(key.KeyChar);
-                            System.Console.Write(key.KeyChar);
+
+                            if (!mask)
+                            {
+                                System.Console.Write(key.KeyChar);
+                            }
                         }
                         break;
                 }
             }
         }
-
-        /// <summary>
-        /// Asks the user to enter an input and runs a validation Func, until a valid input is entered or the user decided to cancel.
-        /// </summary>
-        /// <param name="text"></param>
-        /// <param name="validator"></param>
-        /// <param name="errorText"></param>
-        /// <param name="mask"></param>
-        /// <returns></returns>
-        internal static string GetInput(string text, Func<string, bool> validator, string errorText, bool mask = false)
-        {
-            string result;
-
-            WriteLine(text);
-
-            do
-            {
-                result = ReadInput(null, mask);
-
-                if (result == null)
-                {
-                    return null;
-                }
-
-                if (!validator.Invoke(result))
-                {
-                    WriteLine(errorText);
-                    result = null;
-                }
-
-            } while (result == null);
-
-            return result;
-        }
-
+        
         private static bool HandleEnterKey()
         {
             if (inputChars.Count >= 0)
             {
-                WriteLine();
+                System.Console.WriteLine();
 
                 List<string> inputs = GetInputStrings();
 
@@ -189,7 +160,7 @@ namespace domi1819.UpServer.Console
                         return true;
 
                     case Result.ReuseCommand:
-                        Write("> ");
+                        System.Console.Write("> ");
 
                         foreach (char c in inputChars)
                         {
@@ -200,7 +171,7 @@ namespace domi1819.UpServer.Console
 
                     default:
                         inputChars.Clear();
-                        Write("> ");
+                        System.Console.Write("> ");
                         break;
                 }
             }
@@ -221,15 +192,15 @@ namespace domi1819.UpServer.Console
                 for (int i = originalCount; i < suggestion.Length; i++)
                 {
                     inputChars.Add(suggestion[i]);
-                    Write(suggestion[i]);
+                    System.Console.Write(suggestion[i]);
                 }
 
                 inputChars.Add(' ');
-                Write(' ');
+                System.Console.Write(' ');
             }
             else if (suggestions.Count > 1)
             {
-                WriteLine(string.Join(", ", suggestions));
+                WriteLineRestoreCommand(string.Join(", ", suggestions));
             }
         }
 

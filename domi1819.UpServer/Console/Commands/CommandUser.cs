@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.ExceptionServices;
 using domi1819.UpCore.Utilities;
 
 namespace domi1819.UpServer.Console.Commands
@@ -23,16 +24,14 @@ namespace domi1819.UpServer.Console.Commands
 
             protected override Result Run(List<string> input)
             {
-                UpConsole.IndentCharCount += 2;
-
-                string userName = UpConsole.GetInput("User name?", x => x.Length > 0 && this.users.IsValidName(x), "Invalid name (too short or too long).");
+                string userName = Feedback.ReadString("User name?", x => x.Length > 0 && this.users.IsValidName(x), "Invalid name (too short or too long).");
 
                 if (userName == null)
                 {
                     goto Cancel;
                 }
 
-                string password = UpConsole.GetInput("Password?", x => this.users.IsValidPassword(x), "Invalid password (too short or too long).", true);
+                string password = Feedback.ReadString("Password?", x => this.users.IsValidPassword(x), "Invalid password (too short or too long).", true);
 
                 if (password == null)
                 {
@@ -40,7 +39,7 @@ namespace domi1819.UpServer.Console.Commands
                 }
 
                 long capacity = 0;
-                string capacityString = UpConsole.GetInput("Storage capacity? (\"1000000000\" or \"1 GB\")", x => Util.TryParseByteSize(x, out capacity), "Unable to understand your input!");
+                string capacityString = Feedback.ReadString("Storage capacity? (\"1000000000\" or \"1 GB\")", x => Util.TryParseByteSize(x, out capacity), "Unable to understand your input!");
 
                 if (capacityString == null)
                 {
@@ -54,29 +53,12 @@ namespace domi1819.UpServer.Console.Commands
                 {
                     goto Cancel;
                 }
-
-                bool accept = false;
-                string acceptString = UpConsole.GetInput($"Create new user \"{userName}\" with {capacity} bytes of storage with admin status \"{admin}\"?", x => Util.TryParseYesNo(x, out accept), "Please answer \"Y\" (Yes) or \"N\" (No)!");
-
-                if (acceptString == null)
-                {
-                    goto Cancel;
-                }
-
-                if (accept)
-                {
-                    System.Console.WriteLine(this.users.CreateUser(userName, password, capacity, admin) ? "User successfully created." : "User could not be added. Name might be taken already.");
-
-                    UpConsole.IndentCharCount -= 2;
-
-                    return Result.Default;
-                }
+                
+                Feedback.WriteLine(this.users.CreateUser(userName, password, capacity, admin) ? "User successfully created." : "User could not be added. Name might be taken already.");
+                return Result.Default;
 
                 Cancel:
-                System.Console.WriteLine("User creation cancelled.");
-
-                UpConsole.IndentCharCount -= 2;
-
+                Feedback.WriteLine("User creation cancelled.");
                 return Result.Default;
             }
         }

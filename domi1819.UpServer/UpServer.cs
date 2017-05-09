@@ -29,10 +29,10 @@ namespace domi1819.UpServer
 
         internal void RunServer()
         {
-            UpConsole.WriteLine("================================");
-            UpConsole.WriteLine($"UpServer {Assembly.GetExecutingAssembly().GetName().Version}");
-            UpConsole.WriteLine("https://up.domi1819.xyz");
-            UpConsole.WriteLine("================================\n");
+            UpConsole.WriteLineRestoreCommand("================================");
+            UpConsole.WriteLineRestoreCommand($"UpServer {Assembly.GetExecutingAssembly().GetName().Version}");
+            UpConsole.WriteLineRestoreCommand("https://up.domi1819.xyz");
+            UpConsole.WriteLineRestoreCommand("================================\n");
 
             this.Config = ServerConfig.Load(Constants.Server.ConfigFileName);
             this.Config.Save(Constants.Server.ConfigFileName);
@@ -46,20 +46,20 @@ namespace domi1819.UpServer
 
             if (!File.Exists(privateKeyPath))
             {
-                UpConsole.WriteLine($"Generating a RSA-{Constants.Encryption.RsaKeySize} key. This might take a few seconds... ");
+                UpConsole.WriteLineRestoreCommand($"Generating a RSA-{Constants.Encryption.RsaKeySize} key. This might take a few seconds... ");
 
                 Rsa.GenerateKeyPair(privateKeyPath, publicKeyPath, Constants.Encryption.RsaKeySize);
 
-                UpConsole.WriteLine("Done.");
+                UpConsole.WriteLineRestoreCommand("Done.");
             }
 
-            UpConsole.WriteLine("Starting UpServer...");
+            UpConsole.WriteLineRestoreCommand("Starting UpServer...");
 
             RsaKey rsaKey = RsaKey.FromFile(privateKeyPath);
 
             if (rsaKey.Csp.KeySize != Constants.Encryption.RsaKeySize)
             {
-                UpConsole.WriteLine($"Unsupported key size {rsaKey.Csp.KeySize}. Expected: {Constants.Encryption.RsaKeySize}");
+                UpConsole.WriteLineRestoreCommand($"Unsupported key size {rsaKey.Csp.KeySize}. Expected: {Constants.Encryption.RsaKeySize}");
                 return;
             }
 
@@ -69,9 +69,9 @@ namespace domi1819.UpServer
             this.messageServer = new NetServer(this);
             this.messageServer.Start(this.Config.UpServerPort, rsaKey);
 
-            UpConsole.WriteLine($"Message server listening on port {this.Config.UpServerPort}.");
+            UpConsole.WriteLineRestoreCommand($"Message server listening on port {this.Config.UpServerPort}.");
 
-            UpConsole.WriteLine("UpServer started.");
+            UpConsole.WriteLineRestoreCommand("UpServer started.");
 
             UpWebService webService = new UpWebService(this);
             webService.Start();
@@ -80,7 +80,7 @@ namespace domi1819.UpServer
 
             UpConsole.ProcessConsoleInput(this);
 
-            UpConsole.WriteLine("Stopping UpServer...");
+            UpConsole.WriteLineRestoreCommand("Stopping UpServer...");
 
             webService.Stop();
             this.messageServer.Stop();
