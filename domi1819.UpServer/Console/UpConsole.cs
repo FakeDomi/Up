@@ -15,7 +15,7 @@ namespace domi1819.UpServer.Console
             {
                 for (int i = 0; i < inputChars.Count + 2; i++)
                 {
-                    RemoveCharacter();
+                    System.Console.Write("\b \b");
                 }
             }
             
@@ -30,13 +30,6 @@ namespace domi1819.UpServer.Console
                     System.Console.Write(c);
                 }
             }
-        }
-
-        internal static void RemoveCharacter()
-        {
-            System.Console.Write('\b');
-            System.Console.Write(' ');
-            System.Console.Write('\b');
         }
 
         internal static void ProcessConsoleInput(UpServer server)
@@ -67,7 +60,7 @@ namespace domi1819.UpServer.Console
                         if (inputChars.Count > 0)
                         {
                             inputChars.RemoveAt(inputChars.Count - 1);
-                            RemoveCharacter();
+                            System.Console.Write("\b \b");
                         }
                         break;
 
@@ -124,7 +117,11 @@ namespace domi1819.UpServer.Console
                         if (chars.Count > 0)
                         {
                             chars.RemoveAt(chars.Count - 1);
-                            System.Console.Write("\b \b");
+
+                            if (!mask)
+                            {
+                                System.Console.Write("\b \b");
+                            }
                         }
                         break;
 

@@ -21,28 +21,22 @@ namespace domi1819.UpServer.Console.Commands
                 input.RemoveAt(input.Count - 1);
             }
 
-            if (input.Count > this.level)
+            if (input.Count > this.level && this.SubCommands.Count > 0)
             {
-                if (this.SubCommands.Count > 0)
+                BaseCommand subCommand = this.GetSubCommand(input[this.level]);
+
+                if (subCommand != null)
                 {
-                    BaseCommand subCommand = this.Get(input[this.level]);
-
-                    if (subCommand != null)
-                    {
-                        return subCommand.Process(input);
-                    }
-
-                    System.Console.WriteLine($"Unknown command \"{input[this.level]}\"");
-
-                    return Result.Default;
+                    return subCommand.Process(input);
                 }
 
-                return this.Run(input);
+                System.Console.WriteLine($"Unknown command \"{input[this.level]}\"");
+
+                return Result.Default;
             }
 
             return this.Run(input);
         }
-
 
         internal List<string> AutoComplete(List<string> input)
         {
@@ -53,7 +47,7 @@ namespace domi1819.UpServer.Console.Commands
 
             if (input.Count > this.level + 1 && this.SubCommands.Count > 0)
             {
-                BaseCommand subCommand = this.Get(input[this.level]);
+                BaseCommand subCommand = this.GetSubCommand(input[this.level]);
 
                 if (subCommand != null)
                 {
@@ -70,7 +64,7 @@ namespace domi1819.UpServer.Console.Commands
             return Result.ReuseCommand;
         }
 
-        private BaseCommand Get(string name)
+        private BaseCommand GetSubCommand(string name)
         {
             return this.SubCommands.TryGetValue(name, out BaseCommand command) ? command : null;
         }

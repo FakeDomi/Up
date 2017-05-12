@@ -181,7 +181,7 @@ namespace domi1819.UpServer
 
         internal bool IsValidName(string name)
         {
-            return Encoding.UTF8.GetByteCount(name) <= Constants.Database.MaxUsernameLength;
+            return name.Length > 0 && Encoding.UTF8.GetByteCount(name) <= Constants.Database.MaxUsernameLength;
         }
 
         internal bool IsValidPassword(string password)

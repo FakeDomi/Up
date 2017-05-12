@@ -38,9 +38,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Console\Commands\BaseCommand.cs" />
-    <Compile Include="Console\Commands\CommandFile.cs" />
     <Compile Include="Console\Commands\CommandStop.cs" />
     <Compile Include="Console\Commands\CommandUser.cs" />
+    <Compile Include="Console\Commands\CommandUserSet.cs" />
+    <Compile Include="Console\Commands\CommandUserSetPassword.cs" />
     <Compile Include="Console\Commands\Feedback.cs" />
     <Compile Include="Console\Commands\Result.cs" />
     <Compile Include="Console\Commands\RootCommand.cs" />
