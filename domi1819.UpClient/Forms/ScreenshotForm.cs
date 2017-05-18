@@ -209,7 +209,7 @@ namespace domi1819.UpClient.Forms
 
                 DateTime now = DateTime.Now;
 
-                string fileExtension = (settings.PngScreenshots ? ".png" : ".jpeg");
+                string fileExtension = settings.PngScreenshots ? ".png" : ".jpeg";
                 string fileName = $"ss_{now.Year}-{now.Month.Pad(2)}-{now.Day.Pad(2)}_{now.Hour.Pad(2)}-{now.Minute.Pad(2)}-{now.Second.Pad(2)}";
                 string fileFullPath = Path.Combine(tempFolderPath, $"{fileName}{fileExtension}");
 
@@ -224,7 +224,7 @@ namespace domi1819.UpClient.Forms
 
                 if (this.localScreenshot)
                 {
-                    UploadManager.CleanupTempFile(tempFolderPath, fileName, fileExtension, true);
+                    UploadManager.CleanupTempFile(tempFolderPath, fileName, fileExtension, true, true);
                 }
                 else
                 {

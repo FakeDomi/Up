@@ -5,11 +5,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using domi1819.UpClient.Forms;
 using domi1819.UpCore.Config;
 using domi1819.UpCore.Network;
 using domi1819.UpCore.Utilities;
+using domi1819.UpCore.Windows;
 
 namespace domi1819.UpClient.Uploads
 {
@@ -31,7 +33,6 @@ namespace domi1819.UpClient.Uploads
 
             this.queueForm.BackgroundWorker.DoWork += this.StartUpload;
             this.queueForm.BackgroundWorker.RunWorkerCompleted += this.UploadCompleted;
-
         }
 
         internal void AddItem(UploadItem item)
@@ -222,34 +223,55 @@ namespace domi1819.UpClient.Uploads
             }
         }
 
-        internal static void CleanupTempFile(string folderPath, string fileName, string fileExtension, bool copyLocal, bool showInExplorer = false)
+        internal static void CleanupTempFile(string sourceFolder, string fileName, string fileExtension, bool copyLocal, bool showInExplorer = false)
         {
             if (copyLocal || showInExplorer)
             {
-                if (!Directory.Exists(Constants.Client.LocalItemsFolder))
-                {
-                    Directory.CreateDirectory(Constants.Client.LocalItemsFolder);
-                }
+                string destinationFolder = Constants.Client.LocalItemsFolder;
+                
+                Directory.CreateDirectory(destinationFolder);
 
-                string sourcePath = Path.Combine(folderPath, $"{fileName}{fileExtension}");
-                string destinationPath = Path.Combine(Constants.Client.LocalItemsFolder, $"{fileName}{fileExtension}");
+                string sourcePath = Path.Combine(sourceFolder, $"{fileName}{fileExtension}");
+                string destinationPath = Path.Combine(destinationFolder, $"{fileName}{fileExtension}");
                 int tries = 0;
 
                 while (File.Exists(destinationPath))
                 {
                     tries++;
-                    destinationPath = Path.Combine(Constants.Client.LocalItemsFolder, $"{fileName}_{tries}{fileExtension}");
+                    destinationPath = Path.Combine(destinationFolder, $"{fileName}_{tries}{fileExtension}");
                 }
 
                 File.Move(sourcePath, destinationPath);
 
                 if (showInExplorer)
                 {
-                    Process.Start("explorer", $"/select, \"{destinationPath}\"");
+                    ShowFileInExplorer(destinationFolder, destinationPath);
                 }
             }
 
-            Directory.Delete(folderPath, true);
+            Directory.Delete(sourceFolder, true);
+        }
+
+        private static void ShowFileInExplorer(string folderPath, string filePath)
+        {
+            Shell32.SHParseDisplayName(Path.GetFullPath(folderPath), IntPtr.Zero, out IntPtr folder, 0, out uint psfgaoOut);
+
+            if (folder == IntPtr.Zero)
+            {
+                return;
+            }
+
+            Shell32.SHParseDisplayName(Path.GetFullPath(filePath), IntPtr.Zero, out IntPtr file, 0, out psfgaoOut);
+
+            if (file != IntPtr.Zero)
+            {
+                IntPtr[] files = { file };
+
+                Shell32.SHOpenFolderAndSelectItems(folder, (uint)files.Length, files, 0);
+                Marshal.FreeCoTaskMem(file);
+            }
+
+            Marshal.FreeCoTaskMem(folder);
         }
     }
 }

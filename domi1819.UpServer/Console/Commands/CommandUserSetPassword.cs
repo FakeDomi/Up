@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace domi1819.UpServer.Console.Commands
 {
-    internal class CommandUserSetPassword: BaseCommand
+    internal class CommandUserSetPassword : BaseCommand
     {
         private readonly UserManager users;
 
