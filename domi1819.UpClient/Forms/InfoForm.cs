@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
 using domi1819.DarkControls;
+using domi1819.UpCore.Windows;
 
 namespace domi1819.UpClient.Forms
 {
@@ -47,14 +48,14 @@ namespace domi1819.UpClient.Forms
 
         protected override void WndProc(ref Message m)
         {
-            switch (m.Msg)
+            switch ((uint)m.Msg)
             {
-                case 0x0084: // WM_NCHITTEST
+                case WinConsts.WM_NCHITTEST:
                     {
                         m.Result = new IntPtr(0x01); // HTCLIENT
                         return;
                     }
-                case 0x0086: // WM_NCACTIVATE
+                case WinConsts.WM_NCACTIVATE:
                     {
                         m.WParam = new IntPtr(0x01); // TRUE
                         break;

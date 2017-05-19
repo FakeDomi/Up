@@ -9,6 +9,7 @@ using domi1819.DarkControls;
 using domi1819.UpClient.Uploads;
 using domi1819.UpCore.Config;
 using domi1819.UpCore.Utilities;
+using domi1819.UpCore.Windows;
 
 namespace domi1819.UpClient.Forms
 {
@@ -99,18 +100,16 @@ namespace domi1819.UpClient.Forms
 
         protected override void WndProc(ref Message m)
         {
-            if (m.Msg == 0x0021) // WM_MOUSEACTIVATE
+            if (m.Msg == WinConsts.WM_MOUSEACTIVATE)
             {
-                m.Result = new IntPtr(0x03); // MA_NOACTIVATE
+                m.Result = new IntPtr(WinConsts.MA_NOACTIVATE);
                 return;
             }
 
-            if (m.Msg == 0x0006)
+            if (m.Msg != WinConsts.WM_ACTIVATE)
             {
-                return;
+                base.WndProc(ref m);
             }
-
-            base.WndProc(ref m);
         }
 
         protected override void OnPaint(PaintEventArgs e)
