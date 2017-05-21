@@ -4,6 +4,7 @@ using domi1819.DarkControls;
 using domi1819.UpCore.Config;
 using domi1819.UpCore.Network;
 using domi1819.UpCore.Utilities;
+using domi1819.UpCore.Windows;
 
 namespace domi1819.UpClient.Forms
 {
@@ -37,7 +38,7 @@ namespace domi1819.UpClient.Forms
 
         protected override void WndProc(ref Message m)
         {
-            if (m.Msg == 0x0312) // WM_HOTKEY
+            if (m.Msg == WinConsts.WM_HOTKEY)
             {
                 this.hotkeyManager.ProcessHotkey(m.LParam.ToInt32());
             }

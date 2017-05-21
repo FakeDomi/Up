@@ -24,7 +24,7 @@ namespace domi1819.UpClient.Forms
             get
             {
                 CreateParams createParams = base.CreateParams;
-                createParams.ExStyle |= 0x0008; // WS_EX_TOPMOST
+                createParams.ExStyle |= (int)WinConsts.WS_EX_TOPMOST;
 
                 return createParams;
             }
@@ -51,15 +51,12 @@ namespace domi1819.UpClient.Forms
             switch ((uint)m.Msg)
             {
                 case WinConsts.WM_NCHITTEST:
-                    {
-                        m.Result = new IntPtr(0x01); // HTCLIENT
-                        return;
-                    }
+                    m.Result = new IntPtr((int)WinConsts.HTCLIENT);
+                    return;
+
                 case WinConsts.WM_NCACTIVATE:
-                    {
-                        m.WParam = new IntPtr(0x01); // TRUE
-                        break;
-                    }
+                    m.WParam = new IntPtr((int)WinConsts.TRUE);
+                    break;
             }
 
             base.WndProc(ref m);
@@ -69,8 +66,8 @@ namespace domi1819.UpClient.Forms
         {
             if (!this.showing)
             {
-                Message m = new Message { HWnd = this.Handle, Msg = 0x0086 };
-
+                Message m = new Message { HWnd = this.Handle, Msg = (int)WinConsts.WM_NCACTIVATE };
+                
                 this.WndProc(ref m);
 
                 this.uiInfoTimer.Stop();
