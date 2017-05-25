@@ -8,7 +8,7 @@ namespace domi1819.UpServer.Console.Commands
         {
         }
 
-        protected override Result Run(List<string> input)
+        protected override Result Run(IEnumerable<string> input)
         {
             return Result.Shutdown;
         }

@@ -3,10 +3,17 @@ using System.Windows.Forms;
 
 namespace domi1819.DarkControls
 {
+    /// <summary>
+    /// A window that has some values set for a dark themed environment.
+    /// Also allows selected components to glow.
+    /// </summary>
     public class DarkForm : Form
     {
         private IGlowComponent focus, hover;
 
+        /// <summary>
+        /// Whether glow for focused/hovered components should be disabled.
+        /// </summary>
         public bool DisableGlow { get; set; }
 
         public DarkForm()
@@ -41,13 +48,20 @@ namespace domi1819.DarkControls
             }
         }
 
-        internal static void UpdateGlow(bool focus, Control control, bool active)
+        /// <summary>
+        /// Called when a child control changes hover/focus state.
+        /// Updates the form's glow information and then re-draws the window.
+        /// </summary>
+        /// <param name="focused">Whether the updating control is/was focused or hovered over.</param>
+        /// <param name="control">The control that's updating.</param>
+        /// <param name="active">The focus/hover state.</param>
+        internal static void UpdateGlow(bool focused, Control control, bool active)
         {
             if (control.Parent is DarkForm parent)
             {
                 IGlowComponent glowComponent = (IGlowComponent)(active ? control : null);
 
-                if (focus)
+                if (focused)
                 {
                     parent.focus = glowComponent;
                 }

@@ -40,10 +40,8 @@ namespace domi1819.UpClient
         {
             if (Clipboard.ContainsImage() || Clipboard.ContainsText())
             {
-                DateTime now = DateTime.Now;
-
                 string tempFolderPath = Util.CreateTempFolder();
-                string fileName = $"clip_{now.Year}-{now.Month.Pad(2)}-{now.Day.Pad(2)}_{now.Hour.Pad(2)}-{now.Minute.Pad(2)}-{now.Second.Pad(2)}";
+                string fileName = $"clip_{Util.GetTimestampString(DateTime.Now)}";
                 string fileExt = Clipboard.ContainsImage() ? ".png" : ".txt";
                 string fileFullPath = Path.Combine(tempFolderPath, $"{fileName}{fileExt}");
 

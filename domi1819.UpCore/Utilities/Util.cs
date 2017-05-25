@@ -154,5 +154,10 @@ namespace domi1819.UpCore.Utilities
 
             return (char)(loNibble + (loNibble < 10 ? '0' : 'A' - 10));
         }
+
+        public static string GetTimestampString(DateTime dateTime)
+        {
+            return $"{dateTime.Year}-{dateTime.Month.Pad(2)}-{dateTime.Day.Pad(2)}_{dateTime.Hour.Pad(2)}-{dateTime.Minute.Pad(2)}-{dateTime.Second.Pad(2)}";
+        }
     }
 }

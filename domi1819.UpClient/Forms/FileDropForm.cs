@@ -82,14 +82,14 @@ namespace domi1819.UpClient.Forms
 
         protected override void WndProc(ref Message m)
         {
-            switch ((uint)m.Msg)
+            switch (m.Msg)
             {
                 case WinConsts.WM_NCHITTEST:
-                    m.Result = new IntPtr((int)WinConsts.HTCLIENT);
+                    m.Result = new IntPtr(WinConsts.HTCLIENT);
                     return;
 
                 case WinConsts.WM_NCACTIVATE:
-                    m.WParam = new IntPtr((int)WinConsts.TRUE);
+                    m.WParam = new IntPtr(WinConsts.TRUE);
                     break;
             }
 

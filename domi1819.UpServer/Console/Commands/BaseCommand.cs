@@ -58,7 +58,7 @@ namespace domi1819.UpServer.Console.Commands
             return new List<string>();
         }
 
-        protected virtual Result Run(List<string> input)
+        protected virtual Result Run(IEnumerable<string> input)
         {
             System.Console.WriteLine($"Usage: {string.Join(" ", input)} <{string.Join("/", this.SubCommands.Keys)}>");
             return Result.ReuseCommand;

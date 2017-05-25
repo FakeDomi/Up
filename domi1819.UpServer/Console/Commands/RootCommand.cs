@@ -10,7 +10,7 @@ namespace domi1819.UpServer.Console.Commands
             this.SubCommands.Add("user", new CommandUser(this, server.Users));
         }
 
-        protected override Result Run(List<string> input)
+        protected override Result Run(IEnumerable<string> input)
         {
             System.Console.WriteLine("Unknown command \"\"");
 

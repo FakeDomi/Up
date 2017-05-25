@@ -15,7 +15,7 @@ namespace domi1819.UpClient.Forms
 {
     internal partial class ScreenshotForm : Form
     {
-        private readonly Brush brush = new SolidBrush(Color.FromArgb(80, 128, 128, 128));
+        private readonly Brush inactiveRegion = new SolidBrush(Color.FromArgb(80, 128, 128, 128));
 
         private readonly UpClient upClient;
 
@@ -118,18 +118,18 @@ namespace domi1819.UpClient.Forms
 
             if (this.drawSelection)
             {
-                e.Graphics.FillRectangle(this.brush, 0, 0, this.Width, this.drawStartY);
-                e.Graphics.FillRectangle(this.brush, 0, this.drawEndY, this.Width, this.Height - this.drawEndY);
+                e.Graphics.FillRectangle(this.inactiveRegion, 0, 0, this.Width, this.drawStartY);
+                e.Graphics.FillRectangle(this.inactiveRegion, 0, this.drawEndY, this.Width, this.Height - this.drawEndY);
 
-                e.Graphics.FillRectangle(this.brush, 0, this.drawStartY, this.drawStartX, this.drawEndY - this.drawStartY);
-                e.Graphics.FillRectangle(this.brush, this.drawEndX, this.drawStartY, this.Width - this.drawEndX, this.drawEndY - this.drawStartY);
+                e.Graphics.FillRectangle(this.inactiveRegion, 0, this.drawStartY, this.drawStartX, this.drawEndY - this.drawStartY);
+                e.Graphics.FillRectangle(this.inactiveRegion, this.drawEndX, this.drawStartY, this.Width - this.drawEndX, this.drawEndY - this.drawStartY);
 
                 ControlPaint.DrawBorder(e.Graphics, new Rectangle(this.drawStartX - 1, this.drawStartY - 1, this.drawEndX - this.drawStartX + 2, this.drawEndY - this.drawStartY + 2), DarkPainting.PaleColor, ButtonBorderStyle.Solid);
                 ControlPaint.DrawBorder(e.Graphics, new Rectangle(this.drawStartX, this.drawStartY, this.drawEndX - this.drawStartX, this.drawEndY - this.drawStartY), DarkPainting.StrongColor, ButtonBorderStyle.Solid);
             }
             else if (this.drawBackground)
             {
-                e.Graphics.FillRectangle(this.brush, 0, 0, this.Width, this.Height);
+                e.Graphics.FillRectangle(this.inactiveRegion, 0, 0, this.Width, this.Height);
             }
         }
 
@@ -205,11 +205,8 @@ namespace domi1819.UpClient.Forms
                 }
 
                 string tempFolderPath = Util.CreateTempFolder();
-
-                DateTime now = DateTime.Now;
-
                 string fileExtension = settings.PngScreenshots ? ".png" : ".jpeg";
-                string fileName = $"ss_{now.Year}-{now.Month.Pad(2)}-{now.Day.Pad(2)}_{now.Hour.Pad(2)}-{now.Minute.Pad(2)}-{now.Second.Pad(2)}";
+                string fileName = $"ss_{Util.GetTimestampString(DateTime.Now)}";
                 string fileFullPath = Path.Combine(tempFolderPath, $"{fileName}{fileExtension}");
 
                 if (settings.PngScreenshots)

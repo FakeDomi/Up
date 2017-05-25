@@ -11,7 +11,7 @@ namespace domi1819.UpServer.Console.Commands
             this.users = users;
         }
 
-        protected override Result Run(List<string> input)
+        protected override Result Run(IEnumerable<string> input)
         {
             if (Feedback.ReadString("User name?", x => this.users.HasUser(x), "User not found.", out string userName))
             {

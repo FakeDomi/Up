@@ -4,6 +4,8 @@ using System.Drawing;
 using System.IO;
 using domi1819.UpCore.Utilities;
 
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace domi1819.UpClient.StorageExplorer
 {
     internal class FileItem

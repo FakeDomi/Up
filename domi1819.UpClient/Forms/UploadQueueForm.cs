@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using domi1819.DarkControls;
 using domi1819.UpClient.Uploads;
 using domi1819.UpCore.Utilities;
+using domi1819.UpCore.Windows;
 
 namespace domi1819.UpClient.Forms
 {
@@ -127,25 +128,21 @@ namespace domi1819.UpClient.Forms
         {
             switch (m.Msg)
             {
-                case 0x0084: // WM_NCHITTEST
+                case WinConsts.WM_NCHITTEST:
+                    m.Result = new IntPtr(WinConsts.HTCLIENT);
+                    return;
+
+                case WinConsts.WM_NCACTIVATE:
+                    m.WParam = new IntPtr(WinConsts.TRUE);
+                    break;
+
+                case WinConsts.WM_SYSCOMMAND:
+                    if ((m.WParam.ToInt32() & WinConsts.SC_MASK) == WinConsts.SC_MOVE)
                     {
-                        m.Result = new IntPtr(0x01); // HTCLIENT
                         return;
                     }
-                case 0x0086: // WM_NCACTIVATE
-                    {
-                        m.WParam = new IntPtr(0x01); // TRUE
-                        break;
-                    }
-                case 0x0112: // WM_SYSCOMMAND
-                    {
-                        if ((m.WParam.ToInt32() & 0xfff0) == 0xF010) // SC_MOVE
-                        {
-                            return;
-                        }
 
-                        break;
-                    }
+                    break;
             }
 
             base.WndProc(ref m);
