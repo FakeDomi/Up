@@ -7,6 +7,10 @@ using domi1819.UpCore.Utilities;
 
 namespace domi1819.UpClient
 {
+    /// <summary>
+    /// This class handles scenarios like uploading files.
+    /// It's intended to be called from hotkey / context menu handlers.
+    /// </summary>
     internal class ActionManager
     {
         private readonly UpClient upClient;
@@ -17,10 +21,16 @@ namespace domi1819.UpClient
             this.upClient = upClient;
         }
 
+        /// <summary>
+        /// Update the client.
+        /// </summary>
         internal void Update()
         {
         }
 
+        /// <summary>
+        /// Upload a file by asking the user to select a file.
+        /// </summary>
         internal void UploadFile()
         {
             this.openFileDialog.FileName = "";
@@ -31,11 +41,21 @@ namespace domi1819.UpClient
             }
         }
 
+        /// <summary>
+        /// Upload a screen shot.
+        /// </summary>
+        /// <param name="fullscreen">Whether to grab everything from the screen or let the user select.</param>
+        /// <param name="local">Whether to just save the screenshot to a file instead of uploading.</param>
+        /// <param name="timeout">The time that needs to pass until the screenshot is made.</param>
         internal void UploadScreenshot(bool fullscreen, bool local, int timeout = 0)
         {
             this.upClient.ScreenshotForm.TakeScreenshot(fullscreen, local, timeout);
         }
 
+        /// <summary>
+        /// Upload the clipboard contents.
+        /// </summary>
+        /// <param name="local">Whether to just save the clipboard to a file instead of uploading.</param>
         internal void UploadClipboard(bool local = false)
         {
             if (Clipboard.ContainsImage() || Clipboard.ContainsText())
@@ -126,6 +146,9 @@ namespace domi1819.UpClient
         //    }
         //}
 
+        /// <summary>
+        /// Toggle the visibilty of the file drop area.
+        /// </summary>
         internal void ToggleFileDropArea()
         {
             this.upClient.Config.DropArea.Show = !this.upClient.Config.DropArea.Show;
@@ -135,36 +158,33 @@ namespace domi1819.UpClient
             this.upClient.ConfigurationForm.RebuildContextMenu();
         }
 
+        /// <summary>
+        /// Show the storage explorer.
+        /// </summary>
         internal void ShowFiles()
         {
             this.upClient.StorageExplorerForm.Show();
-
-            //if (m.fileExplorer == null)
-            //    m.fileExplorer = new Files();
-
-            //if (!m.fileExplorer.Visible)
-            //    m.fileExplorer.Show();
-            //else if (m.fileExplorer.WindowState == FormWindowState.Minimized)
-            //    m.fileExplorer.WindowState = FormWindowState.Normal;
-            //else
-            //    m.fileExplorer.BringToFront();
-
-            //m.fileExplorer.dataGridView1.Visible = false;
-            //m.fileExplorer.Refresh();
-
-            //m.fileExplorer.RefreshList(m.textBox1.Text, m.textBox2.Text, m.textBox3.Text, 0);
         }
 
+        /// <summary>
+        /// Show the configuration dialog.
+        /// </summary>
         internal void ShowConfiguration()
         {
             this.upClient.ConfigurationForm.Restore();
         }
 
+        /// <summary>
+        /// Show the about dialog.
+        /// </summary>
         internal void ShowInfo()
         {
             this.upClient.AboutForm.Restore();
         }
 
+        /// <summary>
+        /// Stop the program.
+        /// </summary>
         internal void Exit()
         {
             this.upClient.ConfigurationForm.HideTrayIcon();

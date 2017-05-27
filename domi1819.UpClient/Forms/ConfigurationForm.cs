@@ -13,7 +13,7 @@ namespace domi1819.UpClient.Forms
         private readonly UpClient upClient;
 
         private readonly HotkeyForm hotkeyForm = new HotkeyForm();
-        private readonly HotkeyManager hotkeyManager;
+        private readonly HotkeyHandler hotkeyHandler;
         private readonly ContextMenuHandler contextMenuHandler;
 
         private bool suppressUpdateStyleCheckedChanged;
@@ -26,7 +26,7 @@ namespace domi1819.UpClient.Forms
             this.InitializeComponent();
 
             this.upClient = upClient;
-            this.hotkeyManager = new HotkeyManager(this, upClient.ActionManager);
+            this.hotkeyHandler = new HotkeyHandler(this, upClient.ActionManager);
 
             this.ResetFields();
 
@@ -40,7 +40,7 @@ namespace domi1819.UpClient.Forms
         {
             if (m.Msg == WinConsts.WM_HOTKEY)
             {
-                this.hotkeyManager.ProcessHotkey(m.LParam.ToInt32());
+                this.hotkeyHandler.ProcessHotkey(m.LParam.ToInt32());
             }
 
             base.WndProc(ref m);
@@ -124,7 +124,7 @@ namespace domi1819.UpClient.Forms
             this.DarkColorViewColorSelected(null, null);
 
             this.hotkeyForm.ResetFields(settings);
-            this.hotkeyManager.ReloadHotkeys(settings);
+            this.hotkeyHandler.ReloadHotkeys(settings);
             this.upClient.FileDropForm.Reload();
         }
 
@@ -225,9 +225,9 @@ namespace domi1819.UpClient.Forms
 
         private void darkButton2_Click(object sender, EventArgs e)
         {
-            this.hotkeyManager.SuspendHotkeys();
+            this.hotkeyHandler.SuspendHotkeys();
             this.hotkeyForm.ShowDialog(this);
-            this.hotkeyManager.ActivateHotkeys(this.upClient.Config);
+            this.hotkeyHandler.ActivateHotkeys(this.upClient.Config);
         }
 
         private void DarkColorViewColorSelected(object sender, EventArgs e)

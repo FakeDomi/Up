@@ -96,7 +96,7 @@
     <Compile Include="Forms\StorageExplorerForm.Designer.cs">
       <DependentUpon>StorageExplorerForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="HotkeyManager.cs" />
+    <Compile Include="HotkeyHandler.cs" />
     <Compile Include="Forms\InfoForm.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -5,7 +5,11 @@ using domi1819.UpCore.Windows;
 
 namespace domi1819.UpClient
 {
-    internal class HotkeyManager
+    /// <summary>
+    /// This class registers and unregisters hotkeys.
+    /// It initiates running of actions caused by hotkeys.
+    /// </summary>
+    internal class HotkeyHandler
     {
         private readonly IntPtr hostHandle;
         private readonly ActionManager actionManager;
@@ -22,18 +26,30 @@ namespace domi1819.UpClient
         private int saveLocalScreenAreaKeyCode;
         private int saveLocalClipboardKeyCode;
 
-        internal HotkeyManager(IWin32Window host, ActionManager actionManager)
+        /// <summary>
+        /// Construct a new HotkeyHandler using a Win32 host window and an action manager.
+        /// </summary>
+        /// <param name="host">The host that hotkeys will be registered for.</param>
+        /// <param name="actionManager">The action manager that will be called to process hotkey presses.</param>
+        internal HotkeyHandler(IWin32Window host, ActionManager actionManager)
         {
             this.hostHandle = host.Handle;
             this.actionManager = actionManager;
         }
 
-        internal void ReloadHotkeys(Config settings)
+        /// <summary>
+        /// Unregister all hotkeys, then reload using a new config.
+        /// </summary>
+        /// <param name="config">The config to use.</param>
+        internal void ReloadHotkeys(Config config)
         {
             this.SuspendHotkeys();
-            this.ActivateHotkeys(settings);
+            this.ActivateHotkeys(config);
         }
 
+        /// <summary>
+        /// Unregister all hotkeys.
+        /// </summary>
         internal void SuspendHotkeys()
         {
             for (int id = 0; id < this.registeredHotkeys; id++)
@@ -44,6 +60,10 @@ namespace domi1819.UpClient
             this.registeredHotkeys = 0;
         }
 
+        /// <summary>
+        /// Register all known hotkeys.
+        /// </summary>
+        /// <param name="config">The configuration to use hotkey data from.</param>
         internal void ActivateHotkeys(Config config)
         {
             Hotkeys hotkeySettings = config.Hotkeys;
@@ -59,6 +79,10 @@ namespace domi1819.UpClient
             this.saveLocalClipboardKeyCode = this.RegisterHotkey(hotkeySettings.SaveLocalClipboard);
         }
 
+        /// <summary>
+        /// Process a hotkey event.
+        /// </summary>
+        /// <param name="keyCode">The Win32 key press of the hotkey event.</param>
         internal void ProcessHotkey(int keyCode)
         {
             if (keyCode == this.uploadFileKeyCode)
@@ -99,18 +123,29 @@ namespace domi1819.UpClient
             }
         }
 
+        /// <summary>
+        /// Register a hotkey using the host handle as callback object.
+        /// </summary>
+        /// <param name="hotkey">A hotkey config entity to register.</param>
+        /// <returns>An int that represents a Win32 key press with scancode and modifiers.</returns>
         private int RegisterHotkey(Hotkey hotkey)
         {
             if (hotkey.Key > 0 && hotkey.Modifier > 0)
             {
-                User32.RegisterHotKey(this.hostHandle, this.registeredHotkeys++, this.ConvertModifiers(hotkey.Modifier), (int)hotkey.Key);
-                return ((int)hotkey.Key << 16) | this.ConvertModifiers(hotkey.Modifier);
+                User32.RegisterHotKey(this.hostHandle, this.registeredHotkeys++, ConvertModifiers(hotkey.Modifier), (int)hotkey.Key);
+                return ((int)hotkey.Key << 16) | ConvertModifiers(hotkey.Modifier);
             }
 
             return 0;
         }
 
-        private int ConvertModifiers(Keys keys)
+        /// <summary>
+        /// Convert .NET key modifiers to Win32 modifiers.
+        /// Supports ALT, CONTROL and SHIFT.
+        /// </summary>
+        /// <param name="keys">The keys entity holding the needed modifiers.</param>
+        /// <returns>An int that represents the input modifiers as Win32 modifiers.</returns>
+        private static int ConvertModifiers(Keys keys)
         {
             int returnValue = 0;
 

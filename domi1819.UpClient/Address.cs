@@ -21,7 +21,7 @@
         internal int Port { get; }
 
         /// <summary>
-        /// Creates a new Address with the given parameters.
+        /// Create a new Address with the given parameters.
         /// </summary>
         /// <param name="host">The host part.</param>
         /// <param name="port">The port.</param>
@@ -32,7 +32,7 @@
         }
 
         /// <summary>
-        /// Checks two Addresses for equality in terms of host part and port.
+        /// Check two Addresses for equality in terms of host part and port.
         /// </summary>
         /// <param name="other">The other Address to use for comparing.</param>
         /// <returns>True if both Addresses are equal, false otherwise.</returns>
@@ -42,7 +42,7 @@
         }
 
         /// <summary>
-        /// Parses a full address string into an Address, with a default port if none is found in the address string.
+        /// Parse a full address string into an Address, with a default port if none is found in the address string.
         /// Examples: google.com; 172.16.0.1:8080
         /// </summary>
         /// <param name="fullAddress">The address input string.</param>
