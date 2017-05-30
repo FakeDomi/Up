@@ -41,6 +41,9 @@ namespace domi1819.UpServer
             MimeDict.Add(".conf", "text/plain; charset=UTF-8");
             MimeDict.Add(".log", "text/plain; charset=UTF-8");
             MimeDict.Add(".pdf", "application/pdf");
+            MimeDict.Add(".mp3", "audio/mpeg");
+            MimeDict.Add(".mp4", "video/mp4");
+            MimeDict.Add(".webm", "video/webm");
         }
 
         internal void Start()
