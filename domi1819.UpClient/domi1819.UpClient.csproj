@@ -179,8 +179,8 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\domi1819.DarkControls\domi1819.DarkControls.csproj">
-      <Project>{555C18DB-450D-4E40-88AD-EA51EF8B5E06}</Project>
+    <ProjectReference Include="..\..\DarkControls\domi1819.DarkControls\domi1819.DarkControls.csproj">
+      <Project>{555c18db-450d-4e40-88ad-ea51ef8b5e06}</Project>
       <Name>domi1819.DarkControls</Name>
     </ProjectReference>
     <ProjectReference Include="..\domi1819.UpCore.Windows\domi1819.UpCore.Windows.csproj">
