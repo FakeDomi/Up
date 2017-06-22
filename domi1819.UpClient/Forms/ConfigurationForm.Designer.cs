@@ -220,20 +220,17 @@ namespace domi1819.UpClient.Forms
             // uiCancelButton
             // 
             this.uiCancelButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
-            this.uiCancelButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.uiCancelButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
             this.uiCancelButton.Location = new System.Drawing.Point(12, 439);
             this.uiCancelButton.Name = "uiCancelButton";
             this.uiCancelButton.Size = new System.Drawing.Size(102, 23);
             this.uiCancelButton.TabIndex = 16;
             this.uiCancelButton.Text = "Close";
-            this.uiCancelButton.UseVisualStyleBackColor = false;
             this.uiCancelButton.Click += new System.EventHandler(this.CancelButtonOnClick);
             // 
             // uiSaveButton
             // 
             this.uiSaveButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
-            this.uiSaveButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.uiSaveButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.uiSaveButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
             this.uiSaveButton.Location = new System.Drawing.Point(120, 439);
@@ -241,7 +238,6 @@ namespace domi1819.UpClient.Forms
             this.uiSaveButton.Size = new System.Drawing.Size(102, 23);
             this.uiSaveButton.TabIndex = 0;
             this.uiSaveButton.Text = "Save";
-            this.uiSaveButton.UseVisualStyleBackColor = false;
             this.uiSaveButton.Click += new System.EventHandler(this.SaveButtonOnClick);
             // 
             // uiNotifyIcon
@@ -256,14 +252,12 @@ namespace domi1819.UpClient.Forms
             // darkButton1
             // 
             this.darkButton1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
-            this.darkButton1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.darkButton1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
             this.darkButton1.Location = new System.Drawing.Point(12, 112);
             this.darkButton1.Name = "darkButton1";
             this.darkButton1.Size = new System.Drawing.Size(102, 23);
             this.darkButton1.TabIndex = 6;
             this.darkButton1.Text = "Account details";
-            this.darkButton1.UseVisualStyleBackColor = false;
             this.darkButton1.Click += new System.EventHandler(this.AccountDetailsButtonClick);
             // 
             // uiPngFormatCheckBox
@@ -307,14 +301,12 @@ namespace domi1819.UpClient.Forms
             // darkButton2
             // 
             this.darkButton2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
-            this.darkButton2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.darkButton2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
             this.darkButton2.Location = new System.Drawing.Point(12, 229);
             this.darkButton2.Name = "darkButton2";
             this.darkButton2.Size = new System.Drawing.Size(210, 21);
             this.darkButton2.TabIndex = 9;
             this.darkButton2.Text = "Hotkeys...";
-            this.darkButton2.UseVisualStyleBackColor = false;
             this.darkButton2.Click += new System.EventHandler(this.darkButton2_Click);
             // 
             // uiDarkColorView
@@ -329,32 +321,28 @@ namespace domi1819.UpClient.Forms
             this.uiDarkColorView.Name = "uiDarkColorView";
             this.uiDarkColorView.Size = new System.Drawing.Size(210, 23);
             this.uiDarkColorView.TabIndex = 10;
-            this.uiDarkColorView.ColorSelected += new System.EventHandler(this.DarkColorViewColorSelected);
+            this.uiDarkColorView.ColorSelected += new System.EventHandler<ColorSelectedEventArgs>(this.DarkColorViewColorSelected);
             // 
             // darkButton3
             // 
             this.darkButton3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
-            this.darkButton3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.darkButton3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
             this.darkButton3.Location = new System.Drawing.Point(120, 112);
             this.darkButton3.Name = "darkButton3";
             this.darkButton3.Size = new System.Drawing.Size(102, 23);
             this.darkButton3.TabIndex = 6;
             this.darkButton3.Text = "Verify key";
-            this.darkButton3.UseVisualStyleBackColor = false;
             this.darkButton3.Click += new System.EventHandler(this.VerifyKeyButtonClicked);
             // 
             // changePasswordButton
             // 
             this.changePasswordButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
-            this.changePasswordButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.changePasswordButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
             this.changePasswordButton.Location = new System.Drawing.Point(120, 141);
             this.changePasswordButton.Name = "changePasswordButton";
             this.changePasswordButton.Size = new System.Drawing.Size(102, 23);
             this.changePasswordButton.TabIndex = 6;
             this.changePasswordButton.Text = "Change password";
-            this.changePasswordButton.UseVisualStyleBackColor = false;
             this.changePasswordButton.Click += new System.EventHandler(this.ChangePasswordButtonClick);
             // 
             // ConfigurationForm

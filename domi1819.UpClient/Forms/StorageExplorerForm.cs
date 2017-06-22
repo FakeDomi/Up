@@ -133,7 +133,7 @@ namespace domi1819.UpClient.Forms
             }
         }
 
-        private void ConfigurationFormOnThemeColorChanged(object sender, ColorChangedEventArgs colorChangedEventArgs)
+        private void ConfigurationFormOnThemeColorChanged(object sender, ColorSelectedEventArgs colorChangedEventArgs)
         {
             foreach (DataGridViewColumn column in this.uiDataGridView.Columns)
             {

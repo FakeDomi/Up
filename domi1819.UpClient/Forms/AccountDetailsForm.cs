@@ -21,7 +21,7 @@ namespace domi1819.UpClient.Forms
             this.InitializeComponent();
         }
 
-        internal void ShowDetails(Config config, RsaCache rsaCache, Form parentForm, bool fetchKey, EventHandler<ColorChangedEventArgs> themeColorChanged)
+        internal void ShowDetails(Config config, RsaCache rsaCache, Form parentForm, bool fetchKey, EventHandler<ColorSelectedEventArgs> themeColorChanged)
         {
             this.config = config;
             this.rsaCache = rsaCache;

@@ -19,7 +19,7 @@ namespace domi1819.UpClient.Forms
         private bool suppressUpdateStyleCheckedChanged;
         private bool suppressScreenshotFormatCheckedChanged;
 
-        public event EventHandler<ColorChangedEventArgs> ThemeColorChanged;
+        public event EventHandler<ColorSelectedEventArgs> ThemeColorChanged;
 
         public ConfigurationForm(UpClient upClient)
         {
@@ -233,7 +233,7 @@ namespace domi1819.UpClient.Forms
         private void DarkColorViewColorSelected(object sender, EventArgs e)
         {
             DarkPainting.StrongColor = this.uiDarkColorView.Color;
-            this.ThemeColorChanged?.Invoke(this, new ColorChangedEventArgs(this.uiDarkColorView.Color));
+            this.ThemeColorChanged?.Invoke(this, new ColorSelectedEventArgs(this.uiDarkColorView.Color));
         }
 
         private bool FillConfig(Config config, bool fillHotkeys = false)

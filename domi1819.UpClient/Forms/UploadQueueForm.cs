@@ -196,7 +196,7 @@ namespace domi1819.UpClient.Forms
             this.Hide();
         }
 
-        private void ConfigurationFormOnThemeColorChanged(object sender, ColorChangedEventArgs colorChangedEventArgs)
+        private void ConfigurationFormOnThemeColorChanged(object sender, ColorSelectedEventArgs colorChangedEventArgs)
         {
             this.uiProgressBar.BarColor = colorChangedEventArgs.NewColor;
         }
