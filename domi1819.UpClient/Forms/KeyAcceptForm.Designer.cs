@@ -46,14 +46,12 @@
             // 
             this.uiAcceptButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.uiAcceptButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
-            this.uiAcceptButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.uiAcceptButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
             this.uiAcceptButton.Location = new System.Drawing.Point(247, 202);
             this.uiAcceptButton.Name = "uiAcceptButton";
             this.uiAcceptButton.Size = new System.Drawing.Size(100, 23);
             this.uiAcceptButton.TabIndex = 0;
             this.uiAcceptButton.Text = "Accept";
-            this.uiAcceptButton.UseVisualStyleBackColor = false;
             this.uiAcceptButton.Click += new System.EventHandler(this.AcceptButtonOnClick);
             // 
             // uiDenyButton
@@ -61,14 +59,12 @@
             this.uiDenyButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.uiDenyButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
             this.uiDenyButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.uiDenyButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.uiDenyButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
             this.uiDenyButton.Location = new System.Drawing.Point(141, 202);
             this.uiDenyButton.Name = "uiDenyButton";
             this.uiDenyButton.Size = new System.Drawing.Size(100, 23);
             this.uiDenyButton.TabIndex = 1;
             this.uiDenyButton.Text = "Deny";
-            this.uiDenyButton.UseVisualStyleBackColor = false;
             this.uiDenyButton.Click += new System.EventHandler(this.DenyButtonOnClick);
             // 
             // uiInfoLabel
@@ -156,34 +152,24 @@
             // 
             this.uiCopyRemoteButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.uiCopyRemoteButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
-            this.uiCopyRemoteButton.FlatAppearance.BorderSize = 0;
-            this.uiCopyRemoteButton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
-            this.uiCopyRemoteButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(42)))), ((int)(((byte)(44)))));
-            this.uiCopyRemoteButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.uiCopyRemoteButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
             this.uiCopyRemoteButton.Location = new System.Drawing.Point(305, 125);
             this.uiCopyRemoteButton.Name = "uiCopyRemoteButton";
             this.uiCopyRemoteButton.Size = new System.Drawing.Size(42, 23);
             this.uiCopyRemoteButton.TabIndex = 6;
             this.uiCopyRemoteButton.Text = "Copy";
-            this.uiCopyRemoteButton.UseVisualStyleBackColor = false;
             this.uiCopyRemoteButton.Click += new System.EventHandler(this.CopyRemoteButtonOnClick);
             // 
             // uiCopyLocalButton
             // 
             this.uiCopyLocalButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.uiCopyLocalButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
-            this.uiCopyLocalButton.FlatAppearance.BorderSize = 0;
-            this.uiCopyLocalButton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
-            this.uiCopyLocalButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(42)))), ((int)(((byte)(44)))));
-            this.uiCopyLocalButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.uiCopyLocalButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
             this.uiCopyLocalButton.Location = new System.Drawing.Point(305, 164);
             this.uiCopyLocalButton.Name = "uiCopyLocalButton";
             this.uiCopyLocalButton.Size = new System.Drawing.Size(42, 23);
             this.uiCopyLocalButton.TabIndex = 6;
             this.uiCopyLocalButton.Text = "Copy";
-            this.uiCopyLocalButton.UseVisualStyleBackColor = false;
             this.uiCopyLocalButton.Click += new System.EventHandler(this.CopyLocalButtonOnClick);
             // 
             // KeyAcceptForm

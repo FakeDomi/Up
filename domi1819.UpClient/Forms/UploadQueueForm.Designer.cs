@@ -68,7 +68,6 @@
             this.uiProgressBar.Size = new System.Drawing.Size(190, 26);
             this.uiProgressBar.TabIndex = 3;
             this.uiProgressBar.Value = 0F;
-            this.uiProgressBar.ValueInt = 0;
             // 
             // uiSpeedLabel
             // 

@@ -161,7 +161,7 @@ namespace domi1819.UpClient.Forms
 
         private void BackgroundWorkerProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            this.uiProgressBar.ValueInt = e.ProgressPercentage;
+            this.uiProgressBar.Value = e.ProgressPercentage / 100F;
             this.uiSpeedLabel.Text = $"{Util.GetByteSizeText((long)e.UserState)}/s";
         }
 

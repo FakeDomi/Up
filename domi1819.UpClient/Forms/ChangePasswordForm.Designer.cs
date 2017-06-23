@@ -135,14 +135,12 @@
             // 
             this.saveButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
             this.saveButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.saveButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.saveButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
             this.saveButton.Location = new System.Drawing.Point(12, 154);
             this.saveButton.Name = "saveButton";
             this.saveButton.Size = new System.Drawing.Size(249, 23);
             this.saveButton.TabIndex = 2;
             this.saveButton.Text = "Change password";
-            this.saveButton.UseVisualStyleBackColor = false;
             this.saveButton.Click += new System.EventHandler(this.SaveButtonClick);
             // 
             // hidePasswordCheckBox

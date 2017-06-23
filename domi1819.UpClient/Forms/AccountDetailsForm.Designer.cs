@@ -44,7 +44,6 @@
             this.uiProgressBar.Size = new System.Drawing.Size(260, 24);
             this.uiProgressBar.TabIndex = 0;
             this.uiProgressBar.Value = 0F;
-            this.uiProgressBar.ValueInt = 0;
             // 
             // uiLeftLabel
             // 

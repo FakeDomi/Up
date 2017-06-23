@@ -61,10 +61,6 @@
             // uiCloseButton
             // 
             this.uiCloseButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
-            this.uiCloseButton.FlatAppearance.BorderSize = 0;
-            this.uiCloseButton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
-            this.uiCloseButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(42)))), ((int)(((byte)(44)))));
-            this.uiCloseButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.uiCloseButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.uiCloseButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
             this.uiCloseButton.Location = new System.Drawing.Point(285, 3);
@@ -72,7 +68,6 @@
             this.uiCloseButton.Size = new System.Drawing.Size(16, 16);
             this.uiCloseButton.TabIndex = 2;
             this.uiCloseButton.Text = "✖";
-            this.uiCloseButton.UseVisualStyleBackColor = false;
             this.uiCloseButton.Click += new System.EventHandler(this.CloseButtonClick);
             // 
             // InfoForm

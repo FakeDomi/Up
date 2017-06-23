@@ -57,7 +57,6 @@
             this.darkProgressBar1.Size = new System.Drawing.Size(232, 24);
             this.darkProgressBar1.TabIndex = 1;
             this.darkProgressBar1.Value = 0F;
-            this.darkProgressBar1.ValueInt = 0;
             // 
             // remoteVersionTextBox
             // 
@@ -92,17 +91,12 @@
             // installUpdateButton
             // 
             this.installUpdateButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
-            this.installUpdateButton.FlatAppearance.BorderSize = 0;
-            this.installUpdateButton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
-            this.installUpdateButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(42)))), ((int)(((byte)(44)))));
-            this.installUpdateButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.installUpdateButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
             this.installUpdateButton.Location = new System.Drawing.Point(12, 286);
             this.installUpdateButton.Name = "installUpdateButton";
             this.installUpdateButton.Size = new System.Drawing.Size(232, 24);
             this.installUpdateButton.TabIndex = 4;
             this.installUpdateButton.Text = "Install / Update";
-            this.installUpdateButton.UseVisualStyleBackColor = false;
             // 
             // MainForm
             // 
