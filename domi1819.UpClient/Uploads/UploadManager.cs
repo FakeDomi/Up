@@ -51,7 +51,7 @@ namespace domi1819.UpClient.Uploads
             {
                 foreach (string path in paths)
                 {
-                    this.uploadItems.Add(new UploadItem { FolderPath = Path.GetDirectoryName(path), FileName = Path.GetFileNameWithoutExtension(path), FileExtension = Path.GetExtension(path) });
+                    this.uploadItems.Add(new UploadItem(path));
                 }
             }
 
@@ -66,10 +66,12 @@ namespace domi1819.UpClient.Uploads
             {
                 this.queueForm.KeepVisible = true;
                 this.queueForm.BackgroundWorker.RunWorkerAsync();
+                this.queueForm.BackgroundWorkerProgressChanged(this, new ProgressChangedEventArgs(0, 0L));
             }
 
             this.queueForm.Show();
         }
+
 
         private void StartUpload(object sender, DoWorkEventArgs args)
         {
@@ -85,31 +87,11 @@ namespace domi1819.UpClient.Uploads
             }
             catch (SocketException ex)
             {
-                List<UploadItem> cleanupItems;
-
-                lock (this.uploadItems)
-                {
-                    cleanupItems = this.uploadItems.Where(item => item.TemporaryFile).ToList();
-                    this.uploadItems.Clear();
-                }
-
-                foreach (UploadItem item in cleanupItems)
-                {
-                    CleanupTempFile(item.FolderPath, item.FileName, item.FileExtension, this.config.LocalScreenshotCopy);
-                }
-
                 args.Result = new UploadResult { Title = "Connection failed!", Message = ex.Message };
                 return;
             }
 
-            if (this.netClient.Login(this.config.UserId, this.config.Password))
-            {
-                args.Result = this.Upload(worker, this.netClient);
-            }
-            else
-            {
-                args.Result = new UploadResult { Title = "Login failed!", Message = "Please check your account settings." };
-            }
+            args.Result = this.netClient.Login(this.config.UserId, this.config.Password) ? this.Upload(worker, this.netClient) : new UploadResult { Title = "Login failed!", Message = "Please check your account settings." };
 
             this.netClient.ReleaseConnectHandle();
         }
@@ -132,7 +114,7 @@ namespace domi1819.UpClient.Uploads
 
                 if (File.Exists(file))
                 {
-                    string transferKey = client.InitiateUpload(Path.GetFileName(file), new FileInfo(file).Length);
+                    string transferKey = client.InitiateUpload_old(Path.GetFileName(file), new FileInfo(file).Length);
 
                     if (!string.IsNullOrEmpty(transferKey))
                     {
@@ -206,20 +188,32 @@ namespace domi1819.UpClient.Uploads
             {
                 InfoForm.Show(result.Title, result.Message, 5000);
             }
-
-            if (result.SucceededFiles == 1 && result.FailedFiles == 0)
+            else if (result.SucceededFiles == 1 && result.FailedFiles == 0)
             {
-                Clipboard.SetText(result.FileLinks[0]);
+                Clipboard.SetDataObject(result.FileLinks[0], true, 10, 100);
                 InfoForm.Show("Upload completed!", "A link to your file has been copied to your clipboard.", 3000);
             }
             else if (result.SucceededFiles > 2 && result.FailedFiles == 0)
             {
-                Clipboard.SetText(string.Join(Environment.NewLine, result.FileLinks));
+                Clipboard.SetDataObject(string.Join(Environment.NewLine, result.FileLinks), true, 10, 100);
                 InfoForm.Show("Upload completed!", "A list of download links has been copied to your clipboard.", 3000);
             }
             else
             {
-                InfoForm.Show("Upload completed with errors!", "Some files were uploaded, some failed. Links to successfully uploaded files are in your Clipboard. Check the log for details.", 5000);
+                InfoForm.Show("Upload completed with errors!", "Some files were uploaded, some failed. This may happen when your storage is almost full.", 5000);
+            }
+            
+            List<UploadItem> cleanupItems;
+
+            lock (this.uploadItems)
+            {
+                cleanupItems = this.uploadItems.Where(item => item.TemporaryFile).ToList();
+                this.uploadItems.Clear();
+            }
+
+            foreach (UploadItem item in cleanupItems)
+            {
+                CleanupTempFile(item.FolderPath, item.FileName, item.FileExtension, this.config.LocalScreenshotCopy);
             }
         }
 

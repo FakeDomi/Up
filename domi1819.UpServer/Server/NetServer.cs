@@ -95,6 +95,8 @@ namespace domi1819.UpServer.Server
                 {
                     baseStream.Write(this.rsaModulus, 0, this.rsaModulus.Length);
                     baseStream.Write(this.rsaExponent, 0, this.rsaExponent.Length);
+                    
+                    UpConsole.WriteLineRestoreCommand($"Client {client.Client.RemoteEndPoint} disconnected.");
                 }
                 else if (mode == 0x00) // Normal connection
                 {
@@ -137,9 +139,15 @@ namespace domi1819.UpServer.Server
             }
             catch (Exception ex)
             {
-                // TODO change, currently crashes when socket is not connected
-                UpConsole.WriteLineRestoreCommand($"Client {client.Client.RemoteEndPoint} did something stupid, I guess...");
-                UpConsole.WriteLineRestoreCommand(ex.Message);
+                try
+                {
+                    UpConsole.WriteLineRestoreCommand($"Client {client.Client.RemoteEndPoint} did something stupid, I guess...");
+                    UpConsole.WriteLineRestoreCommand(ex.Message);
+                }
+                catch
+                {
+                    UpConsole.WriteLineRestoreCommand("A client did something stupid and their socket doesn't exist...");
+                }
             }
             finally
             {

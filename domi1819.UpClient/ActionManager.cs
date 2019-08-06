@@ -147,7 +147,7 @@ namespace domi1819.UpClient
         //}
 
         /// <summary>
-        /// Toggle the visibilty of the file drop area.
+        /// Toggle the visibility of the file drop area.
         /// </summary>
         internal void ToggleFileDropArea()
         {

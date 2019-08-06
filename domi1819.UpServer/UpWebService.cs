@@ -60,8 +60,9 @@ namespace domi1819.UpServer
         private void Run()
         {
             HttpListener listener = new HttpListener();
+            string prefix = $"http://{this.config.HttpServerListenerName}:{this.config.HttpServerPort}/";
 
-            listener.Prefixes.Add($"http://{this.config.HttpServerListenerName}:{this.config.HttpServerPort}/");
+            listener.Prefixes.Add(prefix);
 
             try
             {
@@ -76,8 +77,12 @@ namespace domi1819.UpServer
             }
             catch (Exception ex)
             {
-                UpConsole.WriteLineRestoreCommand("HTTP listener has been stopped:");
-                UpConsole.WriteLineRestoreCommand(ex.ToString());
+                UpConsole.WriteLineRestoreCommand($"HTTP listener has been stopped: {ex.Message}");
+                UpConsole.WriteLineRestoreCommand("");
+                UpConsole.WriteLineRestoreCommand("If you are on Windows, you need to either run UpServer as admin,");
+                UpConsole.WriteLineRestoreCommand("or grant permission to the HTTP prefix UpServer is using with the command:");
+                UpConsole.WriteLineRestoreCommand($"netsh http add urlacl url={prefix} user=YOUR_DOMAIN\\your_user");
+                UpConsole.WriteLineRestoreCommand("");
             }
         }
 
@@ -134,16 +139,16 @@ namespace domi1819.UpServer
                 {
                     res.ContentLength64 = fileStream.Length;
 
-                    string fileExt = Path.GetExtension(fileName) ?? string.Empty;
+                    string fileExt = Path.GetExtension(fileName)?.ToLowerInvariant() ?? string.Empty;
 
                     if (MimeDict.ContainsKey(fileExt) && !reqUrl.EndsWith("!"))
                     {
-                        res.AddHeader("Content-disposition", "inline; filename=\"" + fileName + "\"");
+                        res.AddHeader("Content-Disposition", "inline; filename=\"" + fileName + "\"");
                         res.ContentType = MimeDict[fileExt];
                     }
                     else
                     {
-                        res.AddHeader("Content-disposition", "attachment; filename=\"" + fileName + "\"");
+                        res.AddHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
                         res.ContentType = "application/octet-stream";
                     }
 

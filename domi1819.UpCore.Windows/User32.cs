@@ -20,7 +20,7 @@ namespace domi1819.UpCore.Windows
         public static extern IntPtr GetForegroundWindow();
 
         [DllImport("user32.dll")]
-        public static extern bool GetWindowRect(IntPtr hWnd, ref RECT lpRecht);
+        public static extern bool GetWindowRect(IntPtr hWnd, ref RECT lpRect);
 
         [DllImport("user32.dll")]
         public static extern bool PrintWindow(IntPtr hWnd, IntPtr dc, uint flags);

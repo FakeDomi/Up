@@ -135,7 +135,7 @@ namespace domi1819.UpClient.Forms
                 case WinConsts.WM_NCACTIVATE:
                     m.WParam = new IntPtr(WinConsts.TRUE);
                     break;
-
+                    
                 case WinConsts.WM_SYSCOMMAND:
                     if ((m.WParam.ToInt32() & WinConsts.SC_MASK) == WinConsts.SC_MOVE)
                     {
@@ -159,7 +159,7 @@ namespace domi1819.UpClient.Forms
             }
         }
 
-        private void BackgroundWorkerProgressChanged(object sender, ProgressChangedEventArgs e)
+        internal void BackgroundWorkerProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             this.uiProgressBar.Value = e.ProgressPercentage / 100F;
             this.uiSpeedLabel.Text = $"{Util.GetByteSizeText((long)e.UserState)}/s";

@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using System.Threading;
 
 namespace domi1819.UpServer
@@ -24,7 +25,17 @@ namespace domi1819.UpServer
                 return File.Exists(path) ? Assembly.LoadFrom(path) : null;
             };
 
-            new UpServer().RunServer();
+            try
+            {
+                new UpServer().RunServer();
+            }
+            catch (Exception ex)
+            {
+                using (StreamWriter writer = new StreamWriter($"crash-{DateTime.Now:s}", false, Encoding.UTF8))
+                {
+                    writer.WriteLine(ex.ToString());
+                }
+            }
         }
     }
 }

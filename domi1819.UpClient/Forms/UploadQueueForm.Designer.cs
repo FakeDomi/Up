@@ -54,6 +54,7 @@
             // coloredBox1
             // 
             this.coloredBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(71)))));
+            this.coloredBox1.BorderColor = System.Drawing.Color.Empty;
             this.coloredBox1.Location = new System.Drawing.Point(12, 82);
             this.coloredBox1.Name = "coloredBox1";
             this.coloredBox1.Size = new System.Drawing.Size(190, 1);
@@ -97,7 +98,6 @@
             this.Controls.Add(this.uiProgressBar);
             this.Controls.Add(this.coloredBox1);
             this.Controls.Add(this.uiUploadItemsListBox);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;

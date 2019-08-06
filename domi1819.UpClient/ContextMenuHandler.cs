@@ -18,20 +18,22 @@ namespace domi1819.UpClient
         /// <param name="upClient">The up client instance creating this context menu handler.</param>
         internal ContextMenuHandler(UpClient upClient)
         {
-            this.menuItemUpdate = new MenuItem("Update", (s, a) => this.upClient.ActionManager.Update());
-            this.menuItemUpload = new MenuItem("Upload file", (s, a) => this.upClient.ActionManager.UploadFile());
-            this.menuItemScreenshot = new MenuItem("Upload screenshot", (s, a) => this.upClient.ActionManager.UploadScreenshot(true, false, 300));
-            this.menuItemScreenArea = new MenuItem("Upload screen area", (s, a) => this.upClient.ActionManager.UploadScreenshot(false, false, 300));
-            this.menuItemClipboard = new MenuItem("Upload clipboard", (s, a) => this.upClient.ActionManager.UploadClipboard());
-            this.menuItemDropArea = new MenuItem("Show file drop area", (s, a) => this.upClient.ActionManager.ToggleFileDropArea());
-            this.menuItemStorageExplorer = new MenuItem("Storage explorer", (s, a) => this.upClient.ActionManager.ShowFiles());
-            this.menuItemConfiguration = new MenuItem("Configuration", (s, a) => this.upClient.ActionManager.ShowConfiguration()) { DefaultItem = true };
-            this.menuItemAbout = new MenuItem("About", (s, a) => this.upClient.ActionManager.ShowInfo());
-            this.menuItemExit = new MenuItem("Exit", (s, a) => this.upClient.ActionManager.Exit());
+            ActionManager actionManager = upClient.ActionManager;
 
-            this.menuItemLocalScreenshot = new MenuItem("Save screenshot", (s, a) => this.upClient.ActionManager.UploadScreenshot(true, true, 300));
-            this.menuItemLocalScreenArea = new MenuItem("Save screen area", (s, a) => this.upClient.ActionManager.UploadScreenshot(false, true, 300));
-            this.menuItemLocalClipboard = new MenuItem("Save clipboard", (s, a) => this.upClient.ActionManager.UploadClipboard(true));
+            this.menuItemUpdate = new MenuItem("Update", (s, a) => actionManager.Update());
+            this.menuItemUpload = new MenuItem("Upload file", (s, a) => actionManager.UploadFile());
+            this.menuItemScreenshot = new MenuItem("Upload screenshot", (s, a) => actionManager.UploadScreenshot(true, false, 300));
+            this.menuItemScreenArea = new MenuItem("Upload screen area", (s, a) => actionManager.UploadScreenshot(false, false, 300));
+            this.menuItemClipboard = new MenuItem("Upload clipboard", (s, a) => actionManager.UploadClipboard());
+            this.menuItemDropArea = new MenuItem("Show file drop area", (s, a) => actionManager.ToggleFileDropArea());
+            this.menuItemStorageExplorer = new MenuItem("Storage explorer", (s, a) => actionManager.ShowFiles());
+            this.menuItemConfiguration = new MenuItem("Configuration", (s, a) => actionManager.ShowConfiguration()) { DefaultItem = true };
+            this.menuItemAbout = new MenuItem("About", (s, a) => actionManager.ShowInfo());
+            this.menuItemExit = new MenuItem("Exit", (s, a) => actionManager.Exit());
+
+            this.menuItemLocalScreenshot = new MenuItem("Save screenshot", (s, a) => actionManager.UploadScreenshot(true, true, 300));
+            this.menuItemLocalScreenArea = new MenuItem("Save screen area", (s, a) => actionManager.UploadScreenshot(false, true, 300));
+            this.menuItemLocalClipboard = new MenuItem("Save clipboard", (s, a) => actionManager.UploadClipboard(true));
 
             this.upClient = upClient;
         }

@@ -50,7 +50,6 @@
     <Compile Include="Utilities\ExtensionConverters.cs" />
     <Compile Include="Network\FileDetails.cs" />
     <Compile Include="Network\MessageDeserializer.cs" />
-    <Compile Include="Network\EncryptionMode.cs" />
     <Compile Include="Network\NetworkMethods.cs" />
     <Compile Include="Network\NetClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -58,6 +57,7 @@
     <Compile Include="Network\StorageInfo.cs" />
     <Compile Include="Config\UpdateBehavior.cs" />
     <Compile Include="Utilities\FancyXmlWriter.cs" />
+    <Compile Include="Utilities\ReusableThread.cs" />
     <Compile Include="Utilities\Util.cs" />
     <Compile Include="Config\Hotkey.cs" />
   </ItemGroup>

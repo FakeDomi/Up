@@ -239,7 +239,7 @@ namespace domi1819.UpCore.Network
             }
         }
 
-        public string InitiateUpload(string fileName, long fileSize)
+        public string InitiateUpload_old(string fileName, long fileSize)
         {
             this.CheckConnected();
 
@@ -255,6 +255,23 @@ namespace domi1819.UpCore.Network
                 bool shouldUpload = this.deserializer.ReadNextBool();
 
                 return shouldUpload ? "12345678" : null; //TODO: Server doesn't need transfer keys anymore
+            }
+        }
+
+        public bool InitiateUpload(string fileName, long fileSize)
+        {
+            this.CheckConnected();
+
+            lock (this.messageLock)
+            {
+                this.serializer.Start(NetworkMethods.InitiateUpload);
+                this.serializer.WriteNextString(fileName);
+                this.serializer.WriteNextLong(fileSize);
+                this.serializer.Flush();
+
+                this.deserializer.ReadMessage(NetworkMethods.InitiateUpload);
+
+                return this.deserializer.ReadNextBool();
             }
         }
 
