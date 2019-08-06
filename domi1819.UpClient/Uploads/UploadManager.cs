@@ -58,6 +58,18 @@ namespace domi1819.UpClient.Uploads
             this.Refresh();
         }
 
+        internal void Invoke(Action e, bool isBackgroundThread)
+        {
+            if (isBackgroundThread)
+            {
+                this.queueForm.Invoke(e);
+            }
+            else
+            {
+                e.Invoke();
+            }
+        }
+
         private void Refresh()
         {
             this.queueForm.FitSize(this.queueForm.RefreshList(this.uploadItems));
@@ -71,7 +83,6 @@ namespace domi1819.UpClient.Uploads
 
             this.queueForm.Show();
         }
-
 
         private void StartUpload(object sender, DoWorkEventArgs args)
         {

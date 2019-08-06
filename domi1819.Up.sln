@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26430.12
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29123.88
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "domi1819.UpCore", "domi1819.UpCore\domi1819.UpCore.csproj", "{F08AC443-D347-48EC-B853-5EE0E1290ADB}"
 EndProject
@@ -16,6 +16,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "domi1819.UpInstaller", "domi1819.UpInstaller\domi1819.UpInstaller.csproj", "{C8E78588-D052-4909-8E96-37EA257AA372}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "domi1819.DarkControls", "..\DarkControls\domi1819.DarkControls\domi1819.DarkControls.csproj", "{555C18DB-450D-4E40-88AD-EA51EF8B5E06}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "domi1819.UpClient.ShellPlugin", "domi1819.UpClient.ShellPlugin\domi1819.UpClient.ShellPlugin.csproj", "{C0C3F2F4-8A99-4C07-A5B4-572444012C1F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,8 +53,15 @@ Global
 		{555C18DB-450D-4E40-88AD-EA51EF8B5E06}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{555C18DB-450D-4E40-88AD-EA51EF8B5E06}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{555C18DB-450D-4E40-88AD-EA51EF8B5E06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0C3F2F4-8A99-4C07-A5B4-572444012C1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0C3F2F4-8A99-4C07-A5B4-572444012C1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0C3F2F4-8A99-4C07-A5B4-572444012C1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0C3F2F4-8A99-4C07-A5B4-572444012C1F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4E24467D-5721-4C06-A35A-42D596F9F12D}
 	EndGlobalSection
 EndGlobal

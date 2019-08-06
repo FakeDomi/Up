@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Windows.Forms;
 using domi1819.DarkControls;
 using domi1819.UpCore.Utilities;
 
@@ -11,7 +12,6 @@ namespace domi1819.UpClient.Forms
             this.InitializeComponent();
 
             this.uiVersionLabel.Text = @"Version " + Assembly.GetExecutingAssembly().GetName().Version;
-            this.uiYearLabel.Text = Constants.BuildYear + @" domi1819";
         }
 
         internal void Restore()
@@ -24,6 +24,15 @@ namespace domi1819.UpClient.Forms
             {
                 this.BringToFront();
                 this.Activate();
+            }
+        }
+        
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
+                e.Cancel = true;
+                this.Hide();
             }
         }
     }

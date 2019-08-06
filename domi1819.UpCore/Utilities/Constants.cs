@@ -5,8 +5,6 @@ namespace domi1819.UpCore.Utilities
 {
     public static class Constants
     {
-        public static readonly int BuildYear = 2017;
-
         public static int Build { get; }
         public static string Version { get; }
 

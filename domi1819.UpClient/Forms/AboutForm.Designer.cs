@@ -42,9 +42,9 @@
             this.uiTitleLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.uiTitleLabel.Location = new System.Drawing.Point(148, 22);
             this.uiTitleLabel.Name = "uiTitleLabel";
-            this.uiTitleLabel.Size = new System.Drawing.Size(132, 15);
+            this.uiTitleLabel.Size = new System.Drawing.Size(131, 15);
             this.uiTitleLabel.TabIndex = 0;
-            this.uiTitleLabel.Text = "^up quicksharing client";
+            this.uiTitleLabel.Text = "Up quick sharing client";
             // 
             // uiVersionLabel
             // 
@@ -62,9 +62,9 @@
             this.uiWebAddressLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.uiWebAddressLabel.Location = new System.Drawing.Point(148, 52);
             this.uiWebAddressLabel.Name = "uiWebAddressLabel";
-            this.uiWebAddressLabel.Size = new System.Drawing.Size(129, 15);
+            this.uiWebAddressLabel.Size = new System.Drawing.Size(101, 15);
             this.uiWebAddressLabel.TabIndex = 0;
-            this.uiWebAddressLabel.Text = "http://up.domi1819.xyz";
+            this.uiWebAddressLabel.Text = "https://up.domi.re";
             // 
             // uiYearLabel
             // 
@@ -72,9 +72,9 @@
             this.uiYearLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.uiYearLabel.Location = new System.Drawing.Point(148, 67);
             this.uiYearLabel.Name = "uiYearLabel";
-            this.uiYearLabel.Size = new System.Drawing.Size(98, 15);
+            this.uiYearLabel.Size = new System.Drawing.Size(132, 15);
             this.uiYearLabel.TabIndex = 0;
-            this.uiYearLabel.Text = "XXXX domi1819";
+            this.uiYearLabel.Text = "2015 - 2019 domi1819";
             // 
             // uiAllRightsReservedLabel
             // 
@@ -82,9 +82,9 @@
             this.uiAllRightsReservedLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.uiAllRightsReservedLabel.Location = new System.Drawing.Point(148, 82);
             this.uiAllRightsReservedLabel.Name = "uiAllRightsReservedLabel";
-            this.uiAllRightsReservedLabel.Size = new System.Drawing.Size(103, 15);
+            this.uiAllRightsReservedLabel.Size = new System.Drawing.Size(116, 15);
             this.uiAllRightsReservedLabel.TabIndex = 0;
-            this.uiAllRightsReservedLabel.Text = "All rights reserved";
+            this.uiAllRightsReservedLabel.Text = "Licensed under MIT";
             // 
             // AboutForm
             // 
@@ -98,7 +98,6 @@
             this.Controls.Add(this.uiWebAddressLabel);
             this.Controls.Add(this.uiVersionLabel);
             this.Controls.Add(this.uiTitleLabel);
-            this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;

@@ -58,6 +58,7 @@
     <Compile Include="Config\UpdateBehavior.cs" />
     <Compile Include="Utilities\FancyXmlWriter.cs" />
     <Compile Include="Utilities\ReusableThread.cs" />
+    <Compile Include="Utilities\SingleInstance.cs" />
     <Compile Include="Utilities\Util.cs" />
     <Compile Include="Config\Hotkey.cs" />
   </ItemGroup>

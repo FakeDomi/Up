@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System.IO;
+using System.Windows.Forms;
 using domi1819.UpClient.Forms;
 using domi1819.UpClient.Uploads;
 using domi1819.UpCore.Config;
@@ -46,10 +47,6 @@ namespace domi1819.UpClient
 
         internal void LaunchApplication(string[] cmdArgs)
         {
-            if (cmdArgs.Length > 0)
-            {
-            }
-
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
@@ -59,8 +56,27 @@ namespace domi1819.UpClient
             this.ActionManager = new ActionManager(this);
             this.ConfigurationForm = new ConfigurationForm(this);
             this.UploadManager = new UploadManager(this);
+            
+            if (cmdArgs.Length > 0)
+            {
+                this.ProcessLiveArgs(cmdArgs, false);
+            }
 
             Application.Run();
+        }
+
+        internal void ProcessLiveArgs(string[] args, bool isBackgroundThread)
+        {
+            if (args != null && args.Length > 0)
+            {
+                if (args[0] == "-upload" && args.Length > 1 && File.Exists(args[1]))
+                {
+                    this.UploadManager.Invoke(() =>
+                    {
+                        this.UploadManager.AddItem(new UploadItem(args[1]));
+                    }, isBackgroundThread);
+                }
+            }
         }
     }
 }

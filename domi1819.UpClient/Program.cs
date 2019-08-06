@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using domi1819.UpCore.Utilities;
 
 namespace domi1819.UpClient
 {
@@ -19,8 +20,32 @@ namespace domi1819.UpClient
                 return File.Exists(path) ? Assembly.LoadFrom(path) : null;
             };
 
-            instance = new UpClient();
-            instance.LaunchApplication(cmdArgs);
+            CheckSingleInstance(cmdArgs);
+        }
+
+        private static void CheckSingleInstance(string[] cmdArgs)
+        {
+            using (SingleInstance singleInst = new SingleInstance(new Guid("{3ca99fee-c832-4156-a721-959df4ffa704}")))
+            {
+                if (singleInst.IsFirstInstance)
+                {
+                    singleInst.ArgumentsReceived += (sender, e) =>
+                    {
+                        instance.ProcessLiveArgs(e.Args, true);
+                    };
+                    singleInst.ListenForArgumentsFromSuccessiveInstances();
+
+                    // ReSharper disable once PossibleNullReferenceException
+                    Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase).Replace("file:\\", ""));
+                    
+                    instance = new UpClient();
+                    instance.LaunchApplication(cmdArgs);
+                }
+                else
+                {
+                    singleInst.PassArgumentsToFirstInstance(cmdArgs);
+                }
+            }
         }
     }
 }

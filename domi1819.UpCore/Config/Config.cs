@@ -35,7 +35,7 @@ namespace domi1819.UpCore.Config
 
         public Config()
         {
-            this.ServerAddress = "up.domi1819.xyz";
+            this.ServerAddress = "up.domi.re";
             this.ServerPort = 1819;
             this.UserId = "username";
             this.Password = "password";
@@ -43,7 +43,7 @@ namespace domi1819.UpCore.Config
             this.DropArea = new DropArea();
             this.PngScreenshots = true;
             this.Hotkeys = new Hotkeys();
-            this.ThemeColor = WrappedColor.Of(Color.FromArgb(16, 48, 128));
+            this.ThemeColor = WrappedColor.Of(Color.FromArgb(0, 128, 192));
             this.TrustFolder = "trust";
         }
 
