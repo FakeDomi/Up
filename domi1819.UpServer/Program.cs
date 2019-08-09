@@ -25,16 +25,33 @@ namespace domi1819.UpServer
                 return File.Exists(path) ? Assembly.LoadFrom(path) : null;
             };
 
+            UpServer server = new UpServer();
+
             try
             {
-                new UpServer().RunServer();
+                server.RunServer();
             }
             catch (Exception ex)
             {
-                using (StreamWriter writer = new StreamWriter($"crash-{DateTime.Now:s}", false, Encoding.UTF8))
+                try
+                {
+                    server.Files?.Shutdown();
+                    server.Users?.Shutdown();
+                }
+                catch (Exception)
+                {
+                    // idc
+                }
+
+                string logPath = $"crash_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.log";
+                System.Console.WriteLine($"Server crashed! Saving crash log to {logPath}.");
+
+                using (StreamWriter writer = new StreamWriter(logPath, false, Encoding.UTF8))
                 {
                     writer.WriteLine(ex.ToString());
                 }
+
+                Environment.Exit(1);
             }
         }
     }

@@ -24,6 +24,10 @@ namespace domi1819.UpServer
 
         public string DataFolder { get; set; }
 
+        public string WebFolder { get; set; }
+
+        public bool WebInterfaceEnabled { get; set; }
+
         private static readonly XmlSerializer Serializer = new XmlSerializer(typeof(ServerConfig));
 
         public ServerConfig()
@@ -37,6 +41,9 @@ namespace domi1819.UpServer
             this.FileStorageFolder = "storage";
             this.FileTransferFolder = "transfer";
             this.DataFolder = "data";
+            this.WebFolder = "web";
+
+            this.WebInterfaceEnabled = true;
         }
 
         public void Save(string filePath)

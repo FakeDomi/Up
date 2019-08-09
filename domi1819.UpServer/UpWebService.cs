@@ -13,23 +13,25 @@ namespace domi1819.UpServer
     {
         private static readonly Dictionary<string, string> MimeDict = new Dictionary<string, string>();
 
-        private static byte[] iconData;
-
         private Thread dispatcherThread;
 
         private readonly ServerConfig config;
         private readonly FileManager files;
+        private readonly UserManager users;
+
+        private readonly CachedFiles cachedFiles;
+        private readonly Sessions sessions;
+
 
         internal UpWebService(UpServer upServer)
         {
             this.config = upServer.Config;
             this.files = upServer.Files;
+            this.users = upServer.Users;
 
-            if (File.Exists(Path.Combine(this.config.DataFolder, "favicon.ico")))
-            {
-                iconData = File.ReadAllBytes(Path.Combine(this.config.DataFolder, "favicon.ico"));
-            }
-
+            this.cachedFiles = new CachedFiles(this.config.WebFolder, !this.config.WebInterfaceEnabled);
+            this.sessions = new Sessions();
+            
             MimeDict.Add(".jpg", "image/jpeg");
             MimeDict.Add(".jpeg", "image/jpeg");
             MimeDict.Add(".png", "image/png");
@@ -55,6 +57,11 @@ namespace domi1819.UpServer
         internal void Stop()
         {
             this.dispatcherThread.Abort();
+        }
+
+        internal void ReloadCachedFiles()
+        {
+            this.cachedFiles.Reload();
         }
 
         private void Run()
@@ -93,25 +100,10 @@ namespace domi1819.UpServer
                 HttpListenerContext ctx = (HttpListenerContext)context;
                 HttpListenerRequest req = ctx.Request;
                 HttpListenerResponse res = ctx.Response;
+
                 string reqUrl = req.RawUrl;
 
-                if (reqUrl.StartsWith("/favicon.ico"))
-                {
-                    if (iconData == null)
-                    {
-                        res.StatusCode = (int)HttpStatusCode.NotFound;
-                        res.Close();
-
-                        return;
-                    }
-
-                    res.ContentLength64 = iconData.Length;
-                    res.OutputStream.Write(iconData, 0, iconData.Length);
-                    res.OutputStream.Close();
-
-                    res.Close();
-                }
-                else if (reqUrl.StartsWith("/d/"))
+                if (reqUrl.StartsWith("/d/"))
                 {
                     this.ProcessFileDownload(reqUrl, res);
                 }
@@ -119,6 +111,79 @@ namespace domi1819.UpServer
                 {
                     this.ProcessFileInfo(reqUrl, res);
                 }
+                else if (reqUrl.StartsWith("/api/"))
+                {
+                    switch (reqUrl)
+                    {
+                        case "/api/login":
+                            this.sessions.InvalidateSession(req.Cookies["session"]?.Value);
+
+                            using (StreamReader reader = new StreamReader(req.InputStream))
+                            {
+                                string user = reader.ReadLine();
+                                string pass = reader.ReadLine();
+
+                                using (StreamWriter writer = new StreamWriter(res.OutputStream))
+                                {
+                                    if (this.users.Verify(user, pass))
+                                    {
+                                        res.SetCookie(new Cookie("session", this.sessions.RegisterSession(user), "/") { Expires = DateTime.Now.AddYears(10) });
+
+                                        writer.Write("ok");
+                                    }
+                                    else
+                                    {
+                                        writer.Write("failed");
+                                    }
+                                }
+                            }
+
+                            break;
+                    }
+                }
+                else
+                {
+                    if (reqUrl == "/")
+                    {
+                        reqUrl = "/login";
+                    }
+
+                    string session = req.Cookies["session"]?.Value;
+                    string user = this.sessions.GetUserFromSession(session);
+
+                    if (reqUrl == "/login" && user != null)
+                    {
+                        res.Redirect("/home");
+                    }
+                    else if (reqUrl == "/home" && user == null)
+                    {
+                        res.Redirect("/login");
+                    }
+                    else if (reqUrl == "/logout")
+                    {
+                        this.sessions.InvalidateSession(req.Cookies["session"]?.Value);
+
+                        res.SetCookie(new Cookie("session", "", "/") { Expired = true });
+                        res.Redirect("/login");
+                    }
+                    else
+                    {
+                        byte[] data = this.cachedFiles[reqUrl];
+
+                        if (data == null)
+                        {
+                            res.StatusCode = (int)HttpStatusCode.NotFound;
+                        }
+                        else
+                        {
+                            res.ContentLength64 = data.Length;
+                            res.OutputStream.Write(data, 0, data.Length);
+                            res.OutputStream.Close();
+                        }
+                    }
+                }
+
+                res.Close();
             }
             catch (Exception ex)
             {
@@ -221,6 +286,86 @@ namespace domi1819.UpServer
             res.OutputStream.Close();
 
             res.Close();
+        }
+
+        private class CachedFiles
+        {
+            private readonly string[] fileNamesMinimal = { "favicon.ico" };
+            private readonly string[] fileNames = { "favicon.ico", "login.html", "home.html", "style.css", "custom-font" };
+
+            private readonly string path;
+            private readonly bool minimal;
+            
+            private readonly Dictionary<string, byte[]> files = new Dictionary<string, byte[]>();
+
+            internal byte[] this[string url]
+            {
+                get
+                {
+                    lock (this.files)
+                    {
+                        return this.files.ContainsKey(url) ? this.files[url] : null;
+                    }
+                }
+            } 
+
+            internal CachedFiles(string path, bool minimal)
+            {
+                this.path = path;
+                this.minimal = minimal;
+
+                this.Reload();
+            }
+
+            public void Reload()
+            {
+                lock (this.files)
+                {
+                    this.files.Clear();
+                    
+                    foreach (string fileName in this.minimal ? this.fileNamesMinimal : this.fileNames)
+                    {
+                        string filePath = Path.Combine(this.path, fileName);
+
+                        if (File.Exists(filePath))
+                        {
+                            this.files.Add("/" + fileName.Replace(".html", ""), File.ReadAllBytes(filePath));
+                        }
+                    }
+                }
+            }
+        }
+
+        private class Sessions
+        {
+            private readonly Dictionary<string, string> sessionToUser = new Dictionary<string, string>();
+
+            internal void InvalidateSession(string session)
+            {
+                if (session != null)
+                {
+                    this.sessionToUser.Remove(session);
+                }
+            }
+
+            internal string GetUserFromSession(string session)
+            {
+                return session != null && this.sessionToUser.ContainsKey(session) ? this.sessionToUser[session] : null;
+            }
+
+            internal string RegisterSession(string user)
+            {
+                string key = Util.GetRandomString(10);
+
+                while (this.sessionToUser.ContainsKey(key))
+                {
+                    key = Util.GetRandomString(10);
+                }
+
+                this.sessionToUser.Add(key, user);
+
+                return key;
+            }
         }
     }
 }

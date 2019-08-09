@@ -80,7 +80,7 @@ namespace domi1819.UpServer
 
         internal bool Verify(string user, string password)
         {
-            if (this.HasUser(user))
+            if (this.HasUser(user) && password != null)
             {
                 NanoDBLine line = this.dbFile.GetLine(user);
 

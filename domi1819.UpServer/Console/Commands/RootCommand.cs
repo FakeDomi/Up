@@ -8,6 +8,7 @@ namespace domi1819.UpServer.Console.Commands
         {
             this.SubCommands.Add("stop", new CommandStop(this));
             this.SubCommands.Add("user", new CommandUser(this, server.Users));
+            this.SubCommands.Add("reload-web-content", new CommandReloadWebContent(this, server.WebService));
         }
 
         protected override Result Run(IEnumerable<string> input)

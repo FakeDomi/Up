@@ -20,6 +20,8 @@ namespace domi1819.UpServer
 
         internal FileManager Files { get; private set; }
 
+        internal UpWebService WebService { get; private set; }
+
         private NetServer messageServer;
 
         internal UpServer()
@@ -40,6 +42,7 @@ namespace domi1819.UpServer
             Directory.CreateDirectory(this.Config.DataFolder);
             Directory.CreateDirectory(this.Config.FileStorageFolder);
             Directory.CreateDirectory(this.Config.FileTransferFolder);
+            Directory.CreateDirectory(this.Config.WebFolder);
 
             string publicKeyPath = Path.Combine(this.Config.DataFolder, Constants.Encryption.PublicKeyFile);
             string privateKeyPath = Path.Combine(this.Config.DataFolder, Constants.Encryption.PrivateKeyFile);
@@ -73,8 +76,8 @@ namespace domi1819.UpServer
 
             UpConsole.WriteLineRestoreCommand("UpServer started.");
 
-            UpWebService webService = new UpWebService(this);
-            webService.Start();
+            this.WebService = new UpWebService(this);
+            this.WebService.Start();
 
             Thread.Sleep(500);
 
@@ -82,7 +85,7 @@ namespace domi1819.UpServer
 
             UpConsole.WriteLineRestoreCommand("Stopping UpServer...");
 
-            webService.Stop();
+            this.WebService.Stop();
             this.messageServer.Stop();
             this.Users.Shutdown();
             this.Files.Shutdown();
