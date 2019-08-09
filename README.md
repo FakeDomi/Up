@@ -10,3 +10,4 @@
 
 - UpCore
 - [NanoDB](https://git.domi.re/Domi/NanoDB)
+- [UpWeb](https://git.domi.re/Domi/UpWeb) (only if the up web app is enabled)
