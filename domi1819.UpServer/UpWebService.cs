@@ -82,7 +82,7 @@ namespace domi1819.UpServer
                     ThreadPool.QueueUserWorkItem(this.ProcessHttpRequest, listener.GetContext());
                 }
             }
-            catch (Exception ex)
+            catch (HttpListenerException ex)
             {
                 UpConsole.WriteLineRestoreCommand($"HTTP listener has been stopped: {ex.Message}");
                 UpConsole.WriteLineRestoreCommand("");
@@ -113,6 +113,10 @@ namespace domi1819.UpServer
                 }
                 else if (reqUrl.StartsWith("/api/"))
                 {
+                    
+                    string session = req.Cookies["session"]?.Value;
+                    string user = this.sessions.GetUserFromSession(session);
+
                     switch (reqUrl)
                     {
                         case "/api/login":
@@ -120,14 +124,16 @@ namespace domi1819.UpServer
 
                             using (StreamReader reader = new StreamReader(req.InputStream))
                             {
-                                string user = reader.ReadLine();
+                                string loginUser = reader.ReadLine();
                                 string pass = reader.ReadLine();
 
                                 using (StreamWriter writer = new StreamWriter(res.OutputStream))
                                 {
-                                    if (this.users.Verify(user, pass))
+                                    if (this.users.Verify(loginUser, pass))
                                     {
-                                        res.SetCookie(new Cookie("session", this.sessions.RegisterSession(user), "/") { Expires = DateTime.Now.AddYears(10) });
+                                        // the commented out line doesn't work on mono as they ignore the expiration date
+                                        // res.SetCookie(new Cookie("session", this.sessions.RegisterSession(user), "/") { Expires = DateTime.Now.AddYears(10) });
+                                        res.AddHeader("Set-Cookie", $"session={this.sessions.RegisterSession(loginUser, req.RemoteEndPoint?.Address)}; Max-Age=315619200; Path=/");
 
                                         writer.Write("ok");
                                     }
@@ -136,6 +142,30 @@ namespace domi1819.UpServer
                                         writer.Write("failed");
                                     }
                                 }
+                            }
+
+                            break;
+
+                        case "/api/get-sessions":
+                            if (user != null)
+                            {
+                                const string format = "yyyy-MM-dd HH:mm:ss";
+
+                                using (StreamWriter writer = new StreamWriter(res.OutputStream))
+                                {
+                                    writer.NewLine = "\n";
+
+                                    foreach (string s in this.sessions.GetSessionsFromUser(user))
+                                    {
+                                        Sessions.SessionData data = this.sessions.GetData(s);
+
+                                        writer.WriteLine($"{s};{data.FirstLogin.ToString(format)};{data.LastActivity.ToString(format)};{data.LastIp}");
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                res.StatusCode = (int)HttpStatusCode.Forbidden;
                             }
 
                             break;
@@ -164,6 +194,10 @@ namespace domi1819.UpServer
                         this.sessions.InvalidateSession(req.Cookies["session"]?.Value);
 
                         res.SetCookie(new Cookie("session", "", "/") { Expired = true });
+                        res.Redirect("/login");
+                    }
+                    else if (reqUrl == "/sessions" && user == null)
+                    {
                         res.Redirect("/login");
                     }
                     else
@@ -291,7 +325,7 @@ namespace domi1819.UpServer
         private class CachedFiles
         {
             private readonly string[] fileNamesMinimal = { "favicon.ico" };
-            private readonly string[] fileNames = { "favicon.ico", "login.html", "home.html", "style.css", "custom-font" };
+            private readonly string[] fileNames = { "favicon.ico", "login.html", "home.html", "sessions.html", "style.css", "custom-font" };
 
             private readonly string path;
             private readonly bool minimal;
@@ -339,11 +373,20 @@ namespace domi1819.UpServer
         private class Sessions
         {
             private readonly Dictionary<string, string> sessionToUser = new Dictionary<string, string>();
+            private readonly Dictionary<string, List<string>> userToSessions = new Dictionary<string, List<string>>();
+            private readonly Dictionary<string, SessionData> sessionData = new Dictionary<string, SessionData>();
 
             internal void InvalidateSession(string session)
             {
-                if (session != null)
+                if (session != null && this.sessionToUser.ContainsKey(session))
                 {
+                    string user = this.sessionToUser[session];
+
+                    if (this.userToSessions.ContainsKey(user))
+                    {
+                        this.userToSessions[user].Remove(session);
+                    }
+
                     this.sessionToUser.Remove(session);
                 }
             }
@@ -353,18 +396,51 @@ namespace domi1819.UpServer
                 return session != null && this.sessionToUser.ContainsKey(session) ? this.sessionToUser[session] : null;
             }
 
-            internal string RegisterSession(string user)
+            internal List<string> GetSessionsFromUser(string user)
             {
-                string key = Util.GetRandomString(10);
+                return user != null && this.userToSessions.ContainsKey(user) ? this.userToSessions[user] : new List<string>();
+            }
 
-                while (this.sessionToUser.ContainsKey(key))
+            internal string RegisterSession(string user, IPAddress address)
+            {
+                string session = Util.GetRandomString(10);
+
+                while (this.sessionToUser.ContainsKey(session))
                 {
-                    key = Util.GetRandomString(10);
+                    session = Util.GetRandomString(10);
                 }
+                
+                if (!this.userToSessions.ContainsKey(user))
+                {
+                    this.userToSessions.Add(user, new List<string>());
+                }
+                
+                this.sessionToUser.Add(session, user);
+                this.userToSessions[user].Add(session);
+                this.sessionData.Add(session, new SessionData(address));
 
-                this.sessionToUser.Add(key, user);
+                return session;
+            }
 
-                return key;
+            internal SessionData GetData(string session)
+            {
+                return this.sessionData[session];
+            }
+
+            internal struct SessionData
+            {
+                internal DateTime FirstLogin { get; }
+
+                internal DateTime LastActivity { get; set; }
+
+                internal IPAddress LastIp { get; set; }
+
+                internal SessionData(IPAddress address)
+                {
+                    this.FirstLogin = DateTime.Now;
+                    this.LastActivity = DateTime.Now;
+                    this.LastIp = address;
+                }
             }
         }
     }
