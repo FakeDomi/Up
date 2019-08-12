@@ -101,7 +101,7 @@ namespace domi1819.UpServer
                 HttpListenerRequest req = ctx.Request;
                 HttpListenerResponse res = ctx.Response;
 
-                string reqUrl = req.RawUrl;
+                string reqUrl = req.Url.AbsolutePath;
 
                 if (reqUrl.StartsWith("/d/"))
                 {
@@ -115,7 +115,7 @@ namespace domi1819.UpServer
                 {
                     
                     string session = req.Cookies["session"]?.Value;
-                    string user = this.sessions.GetUserFromSession(session);
+                    string user = this.sessions.GetUserFromSession(session, req.RemoteEndPoint?.Address);
 
                     switch (reqUrl)
                     {
@@ -155,11 +155,36 @@ namespace domi1819.UpServer
                                 {
                                     writer.NewLine = "\n";
 
-                                    foreach (string s in this.sessions.GetSessionsFromUser(user))
+                                    foreach (string sessionEntry in this.sessions.GetSessionsFromUser(user))
                                     {
-                                        Sessions.SessionData data = this.sessions.GetData(s);
+                                        Sessions.SessionData data = this.sessions.GetData(sessionEntry);
 
-                                        writer.WriteLine($"{s};{data.FirstLogin.ToString(format)};{data.LastActivity.ToString(format)};{data.LastIp}");
+                                        writer.WriteLine($"{sessionEntry};{data.FirstLogin.ToString(format)};{data.LastActivity.ToString(format)};{(object)data.LastIp ?? "unknown"}");
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                res.StatusCode = (int)HttpStatusCode.Forbidden;
+                            }
+
+                            break;
+
+                        case "/api/end-session":
+                            if (user != null)
+                            {
+                                using (StreamReader reader = new StreamReader(res.OutputStream))
+                                {
+                                    string s = reader.ReadLine();
+
+                                    if (this.sessions.HasSession(user, s))
+                                    {
+                                        this.sessions.InvalidateSession(s);
+
+                                        using (StreamWriter writer = new StreamWriter(res.OutputStream))
+                                        {
+                                            writer.Write(s == session ? "redirect" : "ok");
+                                        }
                                     }
                                 }
                             }
@@ -179,7 +204,7 @@ namespace domi1819.UpServer
                     }
 
                     string session = req.Cookies["session"]?.Value;
-                    string user = this.sessions.GetUserFromSession(session);
+                    string user = this.sessions.GetUserFromSession(session, req.RemoteEndPoint?.Address);
 
                     if (reqUrl == "/login" && user != null)
                     {
@@ -388,17 +413,35 @@ namespace domi1819.UpServer
                     }
 
                     this.sessionToUser.Remove(session);
+                    this.sessionData.Remove(session);
                 }
             }
 
-            internal string GetUserFromSession(string session)
+            internal string GetUserFromSession(string session, IPAddress address)
             {
-                return session != null && this.sessionToUser.ContainsKey(session) ? this.sessionToUser[session] : null;
+                if (session == null || !this.sessionToUser.ContainsKey(session))
+                {
+                    return null;
+                }
+
+                SessionData data = this.sessionData[session];
+
+                data.LastActivity = DateTime.Now;
+                data.LastIp = address ?? data.LastIp;
+
+                this.sessionData[session] = data;
+
+                return this.sessionToUser[session];
             }
 
             internal List<string> GetSessionsFromUser(string user)
             {
                 return user != null && this.userToSessions.ContainsKey(user) ? this.userToSessions[user] : new List<string>();
+            }
+
+            internal bool HasSession(string user, string session)
+            {
+                return this.userToSessions.ContainsKey(user) && this.userToSessions[user].Contains(session);
             }
 
             internal string RegisterSession(string user, IPAddress address)

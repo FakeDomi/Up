@@ -33,7 +33,7 @@ namespace domi1819.UpServer
         {
             UpConsole.WriteLineRestoreCommand("================================");
             UpConsole.WriteLineRestoreCommand($"UpServer {Assembly.GetExecutingAssembly().GetName().Version}");
-            UpConsole.WriteLineRestoreCommand("https://up.domi1819.xyz");
+            UpConsole.WriteLineRestoreCommand("https://up.domi.re");
             UpConsole.WriteLineRestoreCommand("================================\n");
 
             this.Config = ServerConfig.Load(Constants.Server.ConfigFileName);
