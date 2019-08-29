@@ -115,7 +115,7 @@ namespace domi1819.UpServer
                 {
                     
                     string session = req.Cookies["session"]?.Value;
-                    string user = this.sessions.GetUserFromSession(session, req.RemoteEndPoint?.Address);
+                    string user = this.sessions.GetUserFromSession(session, GetRealIp(req));
 
                     switch (reqUrl)
                     {
@@ -133,7 +133,7 @@ namespace domi1819.UpServer
                                     {
                                         // the commented out line doesn't work on mono as they ignore the expiration date
                                         // res.SetCookie(new Cookie("session", this.sessions.RegisterSession(user), "/") { Expires = DateTime.Now.AddYears(10) });
-                                        res.AddHeader("Set-Cookie", $"session={this.sessions.RegisterSession(loginUser, req.RemoteEndPoint?.Address)}; Max-Age=315619200; Path=/");
+                                        res.AddHeader("Set-Cookie", $"session={this.sessions.RegisterSession(loginUser, GetRealIp(req))}; Max-Age=315619200; Path=/");
 
                                         writer.Write("ok");
                                     }
@@ -204,7 +204,7 @@ namespace domi1819.UpServer
                     }
 
                     string session = req.Cookies["session"]?.Value;
-                    string user = this.sessions.GetUserFromSession(session, req.RemoteEndPoint?.Address);
+                    string user = this.sessions.GetUserFromSession(session, GetRealIp(req));
 
                     if (reqUrl == "/login" && user != null)
                     {
@@ -345,6 +345,18 @@ namespace domi1819.UpServer
             res.OutputStream.Close();
 
             res.Close();
+        }
+
+        private static IPAddress GetRealIp(HttpListenerRequest req)
+        {
+            if (req.RemoteEndPoint != null && IPAddress.IsLoopback(req.RemoteEndPoint.Address) &&
+                (IPAddress.TryParse(req.Headers.Get("X-Real-IP"), out IPAddress address) || 
+                 IPAddress.TryParse(req.Headers.Get("X-Forwarded-For"), out address)))
+            {
+                return address;
+            }
+
+            return null;
         }
 
         private class CachedFiles
