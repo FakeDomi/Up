@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "domi1819.DarkControls", "..
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "domi1819.UpClient.ShellPlugin", "domi1819.UpClient.ShellPlugin\domi1819.UpClient.ShellPlugin.csproj", "{C0C3F2F4-8A99-4C07-A5B4-572444012C1F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "domi1819.Up.Tests", "domi1819.Up.Tests\domi1819.Up.Tests.csproj", "{37F89C8D-D8AD-4D94-BD27-CE21580805AF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{C0C3F2F4-8A99-4C07-A5B4-572444012C1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C0C3F2F4-8A99-4C07-A5B4-572444012C1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C0C3F2F4-8A99-4C07-A5B4-572444012C1F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37F89C8D-D8AD-4D94-BD27-CE21580805AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37F89C8D-D8AD-4D94-BD27-CE21580805AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37F89C8D-D8AD-4D94-BD27-CE21580805AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37F89C8D-D8AD-4D94-BD27-CE21580805AF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

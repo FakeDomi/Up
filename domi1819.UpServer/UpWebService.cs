@@ -22,7 +22,6 @@ namespace domi1819.UpServer
         private readonly CachedFiles cachedFiles;
         private readonly Sessions sessions;
 
-
         internal UpWebService(UpServer upServer)
         {
             this.config = upServer.Config;
@@ -115,7 +114,7 @@ namespace domi1819.UpServer
                 {
                     
                     string session = req.Cookies["session"]?.Value;
-                    string user = this.sessions.GetUserFromSession(session, GetRealIp(req));
+                    string user = this.sessions.GetUserFromSession(session, Http.GetRealIp(req));
 
                     switch (reqUrl)
                     {
@@ -133,7 +132,7 @@ namespace domi1819.UpServer
                                     {
                                         // the commented out line doesn't work on mono as they ignore the expiration date
                                         // res.SetCookie(new Cookie("session", this.sessions.RegisterSession(user), "/") { Expires = DateTime.Now.AddYears(10) });
-                                        res.AddHeader("Set-Cookie", $"session={this.sessions.RegisterSession(loginUser, GetRealIp(req))}; Max-Age=315619200; Path=/");
+                                        res.AddHeader("Set-Cookie", $"session={this.sessions.RegisterSession(loginUser, Http.GetRealIp(req))}; Max-Age=315619200; Path=/");
 
                                         writer.Write("ok");
                                     }
@@ -204,7 +203,7 @@ namespace domi1819.UpServer
                     }
 
                     string session = req.Cookies["session"]?.Value;
-                    string user = this.sessions.GetUserFromSession(session, GetRealIp(req));
+                    string user = this.sessions.GetUserFromSession(session, Http.GetRealIp(req));
 
                     if (reqUrl == "/login" && user != null)
                     {
@@ -261,15 +260,20 @@ namespace domi1819.UpServer
 
                 using (FileStream fileStream = File.OpenRead(Path.Combine(this.config.FileStorageFolder, fileId)))
                 {
-                    string rangeHeader = req.Headers.Get("Range");
+                    if (Http.GetRange(req.Headers.Get("Range"), out long start, out long end, fileStream.Length))
+                    {
+                        res.ContentLength64 = end - start + 1;
+                        res.AddHeader("Content-Range", $"bytes {start}-{end}/{fileStream.Length}");
+                        res.StatusCode = (int)HttpStatusCode.PartialContent;
 
-
-
-
-                    long length = fileStream.Length;
-
-                    res.ContentLength64 = fileStream.Length;
-
+                        fileStream.Seek(start, SeekOrigin.Begin);
+                    }
+                    else
+                    {
+                        res.ContentLength64 = fileStream.Length;
+                        res.AddHeader("Accept-Ranges", "bytes");
+                    }
+                    
                     string fileExt = Path.GetExtension(fileName)?.ToLowerInvariant() ?? string.Empty;
 
                     if (MimeDict.ContainsKey(fileExt) && !reqUrl.EndsWith("!"))
@@ -285,11 +289,13 @@ namespace domi1819.UpServer
 
                     Stream outStream = res.OutputStream;
                     byte[] buffer = new byte[4 * 1024];
+                    long bytesToSend = res.ContentLength64;
                     int bytesRead;
 
-                    while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) > 0)
+                    while (bytesToSend > 0 && (bytesRead = fileStream.Read(buffer, 0, (int)Math.Min(buffer.Length, bytesToSend))) > 0)
                     {
                         outStream.Write(buffer, 0, bytesRead);
+                        bytesToSend -= bytesRead;
 
                         //if (!this.files.GetDownloadableFlag(fileId))
                         //{
@@ -313,64 +319,6 @@ namespace domi1819.UpServer
 
                 res.Close();
             }
-        }
-
-        private static bool GetRange(HttpWebRequest req, out long start, out long end, long fileSize)
-        {
-            start = -1;
-            end = -1;
-
-            string[] separators = new[] { "=", ", " };
-            string header = req.Headers.Get("Range");
-
-            if (header != null)
-            {
-                string[] parts = header.Split(separators, StringSplitOptions.None);
-
-                if (parts.Length == 2 && parts[0].Equals("bytes", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    string[] ranges = parts[1].Split('-');
-                    if (ranges.Length == 2)
-                    {
-                        if (ranges[1] == "" || long.TryParse(ranges[1], out end))
-                        {
-                            if (ranges[0] == "")
-                            {
-                                // Format: bytes=-XXX
-
-                                // Can't be bytes=-
-                                if (ranges[1] != "")
-                                {
-                                    start = fileSize - end;
-                                    end = fileSize - 1;
-
-                                    return true;
-                                }
-                            }
-                            else if (!long.TryParse(ranges[0], out start))
-                            {
-                                // Format: bytes=XXX-XXX
-
-                                if (end >= fileSize)
-                                {
-                                    end = fileSize - 1;
-                                }
-
-                                if (start > end)
-                                {
-                                    long swap = start;
-                                    start = end;
-                                    end = swap;
-                                }
-
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
-
-            return false;
         }
 
         private void ProcessFileInfo(string reqUrl, HttpListenerResponse res)
@@ -410,23 +358,6 @@ namespace domi1819.UpServer
             res.OutputStream.Close();
 
             res.Close();
-        }
-
-        private static IPAddress GetRealIp(HttpListenerRequest req)
-        {
-            if (req.RemoteEndPoint != null)
-            {
-                if (IPAddress.IsLoopback(req.RemoteEndPoint.Address) &&
-                    (IPAddress.TryParse(req.Headers.Get("X-Real-IP"), out IPAddress address) ||
-                     IPAddress.TryParse(req.Headers.Get("X-Forwarded-For")?.Split(',')[0].Trim(), out address)))
-                {
-                    return address;
-                }
-
-                return req.RemoteEndPoint.Address;
-            }
-
-            return null;
         }
 
         private class CachedFiles
