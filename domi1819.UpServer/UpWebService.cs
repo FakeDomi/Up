@@ -245,7 +245,10 @@ namespace domi1819.UpServer
             }
             catch (Exception ex)
             {
-                UpConsole.WriteLineRestoreCommand(ex.ToString());
+                if (!(ex is IOException))
+                {
+                    UpConsole.WriteLineRestoreCommand(ex.ToString());
+                }
             }
         }
 

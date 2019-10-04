@@ -32,7 +32,7 @@ namespace domi1819.UpServer
         internal void RunServer()
         {
             UpConsole.WriteLineRestoreCommand("================================");
-            UpConsole.WriteLineRestoreCommand($"UpServer {Assembly.GetExecutingAssembly().GetName().Version}");
+            UpConsole.WriteLineRestoreCommand($"UpServer {Assembly.GetExecutingAssembly().GetName().Version.ToString(3)}");
             UpConsole.WriteLineRestoreCommand("https://up.domi.re");
             UpConsole.WriteLineRestoreCommand("================================\n");
 
@@ -49,7 +49,7 @@ namespace domi1819.UpServer
 
             if (!File.Exists(privateKeyPath))
             {
-                UpConsole.WriteLineRestoreCommand($"Generating a RSA-{Constants.Encryption.RsaKeySize} key. This might take a few seconds... ");
+                UpConsole.WriteLineRestoreCommand($"Generating an RSA-{Constants.Encryption.RsaKeySize} key. This might take a few seconds... ");
 
                 Rsa.GenerateKeyPair(privateKeyPath, publicKeyPath, Constants.Encryption.RsaKeySize);
 
