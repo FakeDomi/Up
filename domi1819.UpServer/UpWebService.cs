@@ -105,7 +105,7 @@ namespace domi1819.UpServer
 
                 if (reqUrl.StartsWith("/d/"))
                 {
-                    this.ProcessFileDownload(reqUrl, res);
+                    this.ProcessFileDownload(req, reqUrl, res);
                 }
                 else if (reqUrl.StartsWith("/i/"))
                 {
@@ -250,7 +250,7 @@ namespace domi1819.UpServer
             }
         }
 
-        private void ProcessFileDownload(string reqUrl, HttpListenerResponse res)
+        private void ProcessFileDownload(HttpListenerRequest req, string reqUrl, HttpListenerResponse res)
         {
             // Link format: /d/12345678
             string fileId = reqUrl.Substring(3, Constants.Server.FileIdLength);
@@ -261,6 +261,13 @@ namespace domi1819.UpServer
 
                 using (FileStream fileStream = File.OpenRead(Path.Combine(this.config.FileStorageFolder, fileId)))
                 {
+                    string rangeHeader = req.Headers.Get("Range");
+
+
+
+
+                    long length = fileStream.Length;
+
                     res.ContentLength64 = fileStream.Length;
 
                     string fileExt = Path.GetExtension(fileName)?.ToLowerInvariant() ?? string.Empty;
@@ -308,6 +315,64 @@ namespace domi1819.UpServer
             }
         }
 
+        private static bool GetRange(HttpWebRequest req, out long start, out long end, long fileSize)
+        {
+            start = -1;
+            end = -1;
+
+            string[] separators = new[] { "=", ", " };
+            string header = req.Headers.Get("Range");
+
+            if (header != null)
+            {
+                string[] parts = header.Split(separators, StringSplitOptions.None);
+
+                if (parts.Length == 2 && parts[0].Equals("bytes", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    string[] ranges = parts[1].Split('-');
+                    if (ranges.Length == 2)
+                    {
+                        if (ranges[1] == "" || long.TryParse(ranges[1], out end))
+                        {
+                            if (ranges[0] == "")
+                            {
+                                // Format: bytes=-XXX
+
+                                // Can't be bytes=-
+                                if (ranges[1] != "")
+                                {
+                                    start = fileSize - end;
+                                    end = fileSize - 1;
+
+                                    return true;
+                                }
+                            }
+                            else if (!long.TryParse(ranges[0], out start))
+                            {
+                                // Format: bytes=XXX-XXX
+
+                                if (end >= fileSize)
+                                {
+                                    end = fileSize - 1;
+                                }
+
+                                if (start > end)
+                                {
+                                    long swap = start;
+                                    start = end;
+                                    end = swap;
+                                }
+
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
         private void ProcessFileInfo(string reqUrl, HttpListenerResponse res)
         {
             // Link format: /i/12345678
@@ -349,11 +414,16 @@ namespace domi1819.UpServer
 
         private static IPAddress GetRealIp(HttpListenerRequest req)
         {
-            if (req.RemoteEndPoint != null && IPAddress.IsLoopback(req.RemoteEndPoint.Address) &&
-                (IPAddress.TryParse(req.Headers.Get("X-Real-IP"), out IPAddress address) || 
-                 IPAddress.TryParse(req.Headers.Get("X-Forwarded-For"), out address)))
+            if (req.RemoteEndPoint != null)
             {
-                return address;
+                if (IPAddress.IsLoopback(req.RemoteEndPoint.Address) &&
+                    (IPAddress.TryParse(req.Headers.Get("X-Real-IP"), out IPAddress address) ||
+                     IPAddress.TryParse(req.Headers.Get("X-Forwarded-For")?.Split(',')[0].Trim(), out address)))
+                {
+                    return address;
+                }
+
+                return req.RemoteEndPoint.Address;
             }
 
             return null;
