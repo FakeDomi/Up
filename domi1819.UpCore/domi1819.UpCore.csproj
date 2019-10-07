@@ -39,6 +39,8 @@
   <ItemGroup>
     <Compile Include="Crypto\Blake2.cs" />
     <Compile Include="Crypto\Rsa.cs" />
+    <Compile Include="Mime\MimeSniffer.cs" />
+    <Compile Include="Mime\MimeType.cs" />
     <Compile Include="Network\RsaCache.cs" />
     <Compile Include="Network\RsaKey.cs" />
     <Compile Include="Utilities\ArrayPool.cs" />
