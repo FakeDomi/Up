@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -45,6 +46,7 @@ namespace domi1819.UpServer
             MimeDict.Add(".mp3", "audio/mpeg");
             MimeDict.Add(".mp4", "video/mp4");
             MimeDict.Add(".webm", "video/webm");
+            MimeDict.Add(".mkv", "video/webm");
         }
 
         internal void Start()
@@ -245,8 +247,17 @@ namespace domi1819.UpServer
             }
             catch (Exception ex)
             {
+                // ERROR_DEV_NOT_EXIST
+                if ((ex as HttpListenerException)?.ErrorCode == 55)
+                {
+                    return;
+                }
+
                 if (!(ex is IOException))
                 {
+                    Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+                    Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
+
                     UpConsole.WriteLineRestoreCommand(ex.ToString());
                 }
             }

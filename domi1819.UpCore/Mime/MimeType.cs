@@ -20,7 +20,6 @@ namespace domi1819.UpCore.Mime
         public static readonly MimeType ApplicationOctetStream;
         public static readonly MimeType ApplicationPdf;
         public static readonly MimeType ApplicationPostScript;
-        public static readonly MimeType ApplicationVndMsFontObject;
         public static readonly MimeType ApplicationWasm;
         public static readonly MimeType ApplicationXGzip;
         public static readonly MimeType ApplicationXRarCompressed;
@@ -80,7 +79,6 @@ namespace domi1819.UpCore.Mime
             ApplicationOctetStream = new MimeType("application/octet-stream");
             ApplicationPdf = new MimeType("application/pdf");
             ApplicationPostScript = new MimeType("application/postscript");
-            ApplicationVndMsFontObject = new MimeType("vnd.ms-fontobject");
             ApplicationWasm = new MimeType("application/wasm");
             ApplicationXGzip = new MimeType("application/x-gzip");
             ApplicationXRarCompressed = new MimeType("application/x-rar-compressed");
