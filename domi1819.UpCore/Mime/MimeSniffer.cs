@@ -5,7 +5,7 @@ using System.Text;
 
 namespace domi1819.UpCore.Mime
 {
-    class MimeSniffer
+    public static class MimeSniffer
     {
         private static readonly byte[] mask444 = new byte[] { 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff };
         private static readonly byte[] mask446 = new byte[] { 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
@@ -46,16 +46,44 @@ namespace domi1819.UpCore.Mime
             new SimplePattern(new byte[] { 0x50, 0x4b, 0x03, 0x04 }, MimeType.ApplicationZip)
         };
 
-        public static MimeType GetMimeType(byte[] bytes)
-        {
+        private static Decoder Utf8 = Encoding.GetEncoding(Encoding.UTF8.CodePage, new EncoderExceptionFallback(), new DecoderExceptionFallback()).GetDecoder();
 
+        public static MimeType GetMimeType(byte[] bytes, int length)
+        {
+            foreach(Pattern pattern in patterns)
+            {
+                if (pattern.matches(bytes, length))
+                {
+                    return pattern.MimeType;
+                }
+            }
+
+            try
+            {
+                Utf8.GetCharCount(bytes, 0, length);
+                return MimeType.TextPlainUtf8;
+            }
+            catch (DecoderFallbackException)
+            {
+                if (bytes.Length >= 2 && length >= 2)
+                {
+                    if (bytes[0] == 0xfe && bytes[1] == 0xff)
+                    {
+                        return MimeType.TextPlainUtf16Be;
+                    }
+                    else if (bytes[0] == 0xff && bytes[1] == 0xfe)
+                    {
+                        return MimeType.TextPlainUtf16Le;
+                    }
+                }
+            }
 
             return MimeType.ApplicationOctetStream;
         }
 
         private interface Pattern
         {
-            bool matches(byte[] bytes);
+            bool matches(byte[] bytes, int length);
 
             MimeType MimeType { get; }
         }
@@ -72,9 +100,9 @@ namespace domi1819.UpCore.Mime
                 this.MimeType = mineType;
             }
 
-            public bool matches(byte[] bytes)
+            public bool matches(byte[] bytes, int length)
             {
-                if (bytes.Length >= this.magic.Length)
+                if (bytes.Length >= this.magic.Length && length > this.magic.Length)
                 {
                     for (int i = 0; i < this.magic.Length; i++)
                     {
@@ -105,9 +133,9 @@ namespace domi1819.UpCore.Mime
                 this.MimeType = mineType;
             }
 
-            public bool matches(byte[] bytes)
+            public bool matches(byte[] bytes, int length)
             {
-                if (bytes.Length >= this.magic.Length)
+                if (bytes.Length >= this.magic.Length && length >= this.magic.Length)
                 {
                     for (int i = 0; i < this.magic.Length; i++)
                     {
@@ -128,15 +156,15 @@ namespace domi1819.UpCore.Mime
         {
             public MimeType MimeType => MimeType.VideoMp4;
 
-            public bool matches(byte[] bytes)
+            public bool matches(byte[] bytes, int length)
             {
                 // https://mimesniff.spec.whatwg.org/#signature-for-mp4
 
-                if (bytes.Length >= 12)
+                if (bytes.Length >= 12 && length >= 12)
                 {
                     int boxSize = bytes[0] << 24 | bytes[1] << 16 | bytes[2] << 8 | bytes[3];
 
-                    if (bytes.Length >= boxSize && boxSize % 4 == 0 && 
+                    if (bytes.Length >= boxSize && length >= boxSize && boxSize % 4 == 0 && 
                         bytes[4] == 0x66 && bytes[5] == 0x74 && bytes[6] == 0x79 && bytes[7] == 0x70)
                     {
                         for(int offset = 8; offset < boxSize; offset += 4)
@@ -151,16 +179,6 @@ namespace domi1819.UpCore.Mime
                 }
 
                 return false;
-            }
-        }
-
-        private class TextPattern : Pattern
-        {
-            public MimeType MimeType => throw new NotImplementedException();
-
-            public bool matches(byte[] bytes)
-            {
-                throw new NotImplementedException();
             }
         }
     }

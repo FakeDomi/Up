@@ -1,4 +1,7 @@
-﻿using System.IO;
+﻿using domi1819.UpCore.Mime;
+using domi1819.UpCore.Utilities;
+using domi1819.UpServer.Console;
+using System.IO;
 
 namespace domi1819.UpServer.Server.Messages
 {
@@ -25,7 +28,16 @@ namespace domi1819.UpServer.Server.Messages
                 unit.FileStream.Dispose();
 
                 string fileId = this.files.GetNewFileId();
-                this.files.AddFile(fileId, unit.FileName, connection.UserId, unit.Size);
+
+                byte[] fileBytes = new byte[Constants.Server.SniffBytes];
+                int bytesRead = 0;
+
+                using (FileStream fs = File.OpenRead(unit.TempFile))
+                {
+                    bytesRead = fs.Read(fileBytes, 0, fileBytes.Length);
+                }
+
+                this.files.AddFile(fileId, unit.FileName, connection.UserId, unit.Size, MimeSniffer.GetMimeType(fileBytes, bytesRead));
 
                 File.Move(unit.TempFile, Path.Combine(this.config.FileStorageFolder, fileId));
                 this.users.RemoveTransferStorage(connection.UserId, unit.Size);

@@ -47,6 +47,7 @@ namespace domi1819.UpServer
             MimeDict.Add(".mp4", "video/mp4");
             MimeDict.Add(".webm", "video/webm");
             MimeDict.Add(".mkv", "video/webm");
+            MimeDict.Add(".html", "text/html");
         }
 
         internal void Start()

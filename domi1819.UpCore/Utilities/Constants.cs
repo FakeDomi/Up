@@ -56,6 +56,8 @@ namespace domi1819.UpCore.Utilities
             public static readonly int FileIdLength = 8;
 
             public static readonly string ConfigFileName = "config.xml";
+
+            public static readonly int SniffBytes = 512;
         }
 
         public static class Client

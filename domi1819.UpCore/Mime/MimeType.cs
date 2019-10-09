@@ -38,18 +38,10 @@ namespace domi1819.UpCore.Mime
         public static readonly MimeType ImageXIcon;
         public static readonly MimeType ImageWebP;
 
-        public static readonly MimeType TextHtml;
-        public static readonly MimeType TextHtmlUtf8;
-        public static readonly MimeType TextHtmlUtf16Be;
-        public static readonly MimeType TextHtmlUtf16Le;
         public static readonly MimeType TextPlain;
         public static readonly MimeType TextPlainUtf8;
         public static readonly MimeType TextPlainUtf16Be;
         public static readonly MimeType TextPlainUtf16Le;
-        public static readonly MimeType TextXml;
-        public static readonly MimeType TextXmlUtf8;
-        public static readonly MimeType TextXmlUtf16Be;
-        public static readonly MimeType TextXmlUtf16Le;
 
         public static readonly MimeType VideoAvi;
         public static readonly MimeType VideoMp4;
@@ -64,6 +56,11 @@ namespace domi1819.UpCore.Mime
             this.Type = type;
             this.Id = mimeTypes.Count;
             mimeTypes.Add(this);
+        }
+
+        public override string ToString()
+        {
+            return this.Type;
         }
 
         static MimeType()
@@ -97,18 +94,10 @@ namespace domi1819.UpCore.Mime
             ImageXIcon = new MimeType("image/x-icon");
             ImageWebP = new MimeType("image/webp");
 
-            TextHtml = new MimeType("text/html");
-            TextHtmlUtf8 = new MimeType("text/html; charset=utf-8");
-            TextHtmlUtf16Be = new MimeType("text/html; charset=utf-16be");
-            TextHtmlUtf16Le = new MimeType("text/html; charset=utf-16le");
             TextPlain = new MimeType("text/plain");
             TextPlainUtf8 = new MimeType("text/plain; charset=utf-8");
             TextPlainUtf16Be = new MimeType("text/plain; charset=utf-16be");
             TextPlainUtf16Le = new MimeType("text/plain; charset=utf-16le");
-            TextXml = new MimeType("text/xml");
-            TextXmlUtf8 = new MimeType("text/xml; charset=utf-8");
-            TextXmlUtf16Be = new MimeType("text/xml; charset=utf-16be");
-            TextXmlUtf16Le = new MimeType("text/xml; charset=utf-16le");
 
             VideoAvi = new MimeType("video/avi");
             VideoMp4 = new MimeType("video/mp4");
