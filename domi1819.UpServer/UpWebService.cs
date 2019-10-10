@@ -13,6 +13,7 @@ namespace domi1819.UpServer
     internal class UpWebService
     {
         private static readonly Dictionary<string, string> MimeDict = new Dictionary<string, string>();
+        private static readonly Dictionary<string, string> OtherMimeCache = new Dictionary<string, string>();
 
         private Thread dispatcherThread;
 
@@ -31,23 +32,34 @@ namespace domi1819.UpServer
 
             this.cachedFiles = new CachedFiles(this.config.WebFolder, !this.config.WebInterfaceEnabled);
             this.sessions = new Sessions();
-            
+
+            MimeDict.Add(".flac", "audio/flac");
+            MimeDict.Add(".mp3", "audio/mpeg");
+            MimeDict.Add(".ogg", "audio/ogg");
+            MimeDict.Add(".oga", "audio/ogg");
+            MimeDict.Add(".opus", "audio/ogg");
+            MimeDict.Add(".wav", "audio/wave");
+
+            MimeDict.Add(".pdf", "application/pdf");
+
+            MimeDict.Add(".apng", "image/apng");
+            MimeDict.Add(".bmp", "image/bmp");
+            MimeDict.Add(".gif", "image/gif");
+            MimeDict.Add(".ico", "image/x-icon");
+            MimeDict.Add(".cur", "image/x-icon");
             MimeDict.Add(".jpg", "image/jpeg");
             MimeDict.Add(".jpeg", "image/jpeg");
+            MimeDict.Add(".jfif", "image/jpeg");
+            MimeDict.Add(".pjpeg", "image/jpeg");
+            MimeDict.Add(".pjp", "image/jpeg");
             MimeDict.Add(".png", "image/png");
-            MimeDict.Add(".txt", "text/plain; charset=UTF-8");
-            MimeDict.Add(".xml", "text/plain; charset=UTF-8");
-            MimeDict.Add(".java", "text/plain; charset=UTF-8");
-            MimeDict.Add(".cs", "text/plain; charset=UTF-8");
-            MimeDict.Add(".cfg", "text/plain; charset=UTF-8");
-            MimeDict.Add(".conf", "text/plain; charset=UTF-8");
-            MimeDict.Add(".log", "text/plain; charset=UTF-8");
-            MimeDict.Add(".pdf", "application/pdf");
-            MimeDict.Add(".mp3", "audio/mpeg");
+            MimeDict.Add(".svg", "image/svg+xml");
+            MimeDict.Add(".webp", "image/webp");
+
             MimeDict.Add(".mp4", "video/mp4");
+            MimeDict.Add(".m4a", "video/mp4");
+            MimeDict.Add(".ogv", "video/ogg");
             MimeDict.Add(".webm", "video/webm");
-            MimeDict.Add(".mkv", "video/webm");
-            MimeDict.Add(".html", "text/html");
         }
 
         internal void Start()
@@ -290,15 +302,16 @@ namespace domi1819.UpServer
                     }
                     
                     string fileExt = Path.GetExtension(fileName)?.ToLowerInvariant() ?? string.Empty;
+                    bool forcedDownload = reqUrl.EndsWith("!");
 
-                    if (MimeDict.ContainsKey(fileExt) && !reqUrl.EndsWith("!"))
+                    if (!forcedDownload && (MimeDict.TryGetValue(fileExt, out string mime) || this.GuessTextMimeType(fileId, out mime)))
                     {
-                        res.AddHeader("Content-Disposition", "inline; filename=\"" + fileName + "\"");
-                        res.ContentType = MimeDict[fileExt];
+                        res.AddHeader("Content-Disposition", $"inline; filename=\"{fileName}\"");
+                        res.ContentType = mime;
                     }
                     else
                     {
-                        res.AddHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+                        res.AddHeader("Content-Disposition", $"attachment; filename=\"{fileName}\"");
                         res.ContentType = "application/octet-stream";
                     }
 
@@ -333,6 +346,100 @@ namespace domi1819.UpServer
                 res.OutputStream.Close();
 
                 res.Close();
+            }
+        }
+
+
+        private static Decoder Utf8 = Encoding.GetEncoding(Encoding.UTF8.CodePage, new EncoderExceptionFallback(), new DecoderExceptionFallback()).GetDecoder();
+
+        /// <summary>
+        /// Tries to analyze whether a given text file is encoded in UTF-8, UTF-16BE, UTF-16LE or an ASCII-based code page.
+        /// </summary>
+        /// <param name="fileId">The id of the file to check.</param>
+        /// <param name="mime">The mime type of the text file, or null.</param>
+        /// <returns>True if the file has been detected as a text file, false otherwise.</returns>
+        private bool GuessTextMimeType(string fileId, out string mime)
+        {
+            if (OtherMimeCache.TryGetValue(fileId, out mime))
+            {
+                return mime != null;
+            }
+
+            byte[] bytes = new byte[Constants.Server.SniffBytes];
+
+            using (FileStream fs = File.OpenRead(Path.Combine(this.config.FileStorageFolder, fileId)))
+            {
+                int bytesRead = fs.Read(bytes, 0, bytes.Length);
+
+                try
+                {
+                    Utf8.GetCharCount(bytes, 0, bytesRead);
+
+                    mime = "text/plain; charset=utf-8";
+                    OtherMimeCache.Add(fileId, mime);
+                    return true;
+                }
+                catch (DecoderFallbackException)
+                {
+                    if (bytesRead >= 2)
+                    {
+                        if (bytes[0] == 0xfe && bytes[1] == 0xff)
+                        {
+                            mime = "text/plain; charset=utf-16be";
+                            OtherMimeCache.Add(fileId, mime);
+                            return true;
+                        }
+                        else if (bytes[0] == 0xff && bytes[1] == 0xfe)
+                        {
+                            mime = "text/plain; charset=utf-16le";
+                            OtherMimeCache.Add(fileId, mime);
+                            return true;
+                        }
+                    }
+
+                    for (int i = 0; i < bytesRead; i++)
+                    {
+                        byte b = bytes[i];
+                        switch (b)
+                        {
+                            case 0x00:
+                            case 0x01:
+                            case 0x02:
+                            case 0x03:
+                            case 0x04:
+                            case 0x05:
+                            case 0x06:
+                            case 0x07:
+                            case 0x08:
+                            case 0x0E:
+                            case 0x0F:
+                            case 0x10:
+                            case 0x11:
+                            case 0x12:
+                            case 0x13:
+                            case 0x14:
+                            case 0x15:
+                            case 0x16:
+                            case 0x17:
+                            case 0x18:
+                            case 0x19:
+                            case 0x1A:
+                            case 0x1B:
+                            case 0x1C:
+                            case 0x1D:
+                            case 0x1E:
+                            case 0x1F:
+                            case 0x7F:
+                                mime = null;
+                                OtherMimeCache.Add(fileId, mime);
+                                return false;
+                        }
+                    }
+
+                    mime = "text/plain";
+                    OtherMimeCache.Add(fileId, mime);
+                    return true;
+                }
             }
         }
 

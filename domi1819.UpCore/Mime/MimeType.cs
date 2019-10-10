@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -66,7 +67,6 @@ namespace domi1819.UpCore.Mime
         static MimeType()
         {
             AudioAiff = new MimeType("audio/aiff");
-            AudioBasic = new MimeType("audio/basic");
             AudioFlac = new MimeType("audio/flac");
             AudioMidi = new MimeType("audio/midi");
             AudioMpeg = new MimeType("audio/mpeg");

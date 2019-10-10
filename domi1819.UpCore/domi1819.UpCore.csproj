@@ -59,6 +59,7 @@
     <Compile Include="Network\StorageInfo.cs" />
     <Compile Include="Config\UpdateBehavior.cs" />
     <Compile Include="Utilities\FancyXmlWriter.cs" />
+    <Compile Include="Utilities\Files.cs" />
     <Compile Include="Utilities\Http.cs" />
     <Compile Include="Utilities\ReusableThread.cs" />
     <Compile Include="Utilities\SingleInstance.cs" />

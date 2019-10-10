@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace domi1819.UpCore.Mime
@@ -17,6 +16,7 @@ namespace domi1819.UpCore.Mime
             new SimplePattern(new byte[] { 0x66, 0x4c, 0x61, 0x43 }, MimeType.AudioFlac),
             new SimplePattern(new byte[] { 0x4d, 0x54, 0x68, 0x64, 0x00, 0x00, 0x00, 0x06 }, MimeType.AudioMidi),
             new SimplePattern(new byte[] { 0x49, 0x44, 0x33 }, MimeType.AudioMpeg),
+            new SimplePattern(new byte[] { 0xff, 0xfb }, MimeType.AudioMpeg),
             new MaskedPattern(new byte[] { 0x52, 0x49, 0x46, 0x46, 0x00, 0x00, 0x00, 0x00, 0x57, 0x41, 0x56, 0x45 }, mask444, MimeType.AudioWave),
 
             new SimplePattern(new byte[] { 0x74, 0x74, 0x63, 0x66 }, MimeType.FontCollection),
@@ -27,7 +27,7 @@ namespace domi1819.UpCore.Mime
 
             new SimplePattern(new byte[] { 0x00, 0x00, 0x01, 0x00 }, MimeType.ImageXIcon),
             new SimplePattern(new byte[] { 0x00, 0x00, 0x02, 0x00 }, MimeType.ImageXIcon),
-            new SimplePattern(new byte[] { 0x42, 0x4d }, MimeType.ImageBmp),
+            new BmpPattern(),
             new SimplePattern(new byte[] { 0x47, 0x49, 0x46, 0x38, 0x37, 0x61 }, MimeType.ImageGif),
             new SimplePattern(new byte[] { 0x47, 0x49, 0x46, 0x38, 0x39, 0x61 }, MimeType.ImageGif),
             new MaskedPattern(new byte[] { 0x52, 0x49, 0x46, 0x46, 0x00, 0x00, 0x00, 0x00, 0x57, 0x45, 0x42, 0x50, 0x56, 0x50 }, mask446, MimeType.ImageWebP),
@@ -48,11 +48,11 @@ namespace domi1819.UpCore.Mime
 
         private static Decoder Utf8 = Encoding.GetEncoding(Encoding.UTF8.CodePage, new EncoderExceptionFallback(), new DecoderExceptionFallback()).GetDecoder();
 
-        public static MimeType GetMimeType(byte[] bytes, int length)
+        public static MimeType GetMimeType(byte[] bytes, int length, long fileSize)
         {
             foreach(Pattern pattern in patterns)
             {
-                if (pattern.matches(bytes, length))
+                if (pattern.Matches(bytes, length, fileSize))
                 {
                     return pattern.MimeType;
                 }
@@ -76,14 +76,51 @@ namespace domi1819.UpCore.Mime
                         return MimeType.TextPlainUtf16Le;
                     }
                 }
-            }
 
-            return MimeType.ApplicationOctetStream;
+                for (int i = 0; i < Math.Min(bytes.Length, length); i++)
+                {
+                    byte b = bytes[i];
+                    switch (b)
+                    {
+                        case 0x00:
+                        case 0x01:
+                        case 0x02:
+                        case 0x03:
+                        case 0x04:
+                        case 0x05:
+                        case 0x06:
+                        case 0x07:
+                        case 0x08:
+                        case 0x0E:
+                        case 0x0F:
+                        case 0x10:
+                        case 0x11:
+                        case 0x12:
+                        case 0x13:
+                        case 0x14:
+                        case 0x15:
+                        case 0x16:
+                        case 0x17:
+                        case 0x18:
+                        case 0x19:
+                        case 0x1A:
+                        case 0x1B:
+                        case 0x1C:
+                        case 0x1D:
+                        case 0x1E:
+                        case 0x1F:
+                        case 0x7F:
+                            return MimeType.ApplicationOctetStream;
+                    }
+                }
+
+                return MimeType.TextPlain;
+            }
         }
 
         private interface Pattern
         {
-            bool matches(byte[] bytes, int length);
+            bool Matches(byte[] bytes, int length, long fileSize);
 
             MimeType MimeType { get; }
         }
@@ -100,7 +137,7 @@ namespace domi1819.UpCore.Mime
                 this.MimeType = mineType;
             }
 
-            public bool matches(byte[] bytes, int length)
+            public virtual bool Matches(byte[] bytes, int length, long fileSize)
             {
                 if (bytes.Length >= this.magic.Length && length > this.magic.Length)
                 {
@@ -133,7 +170,7 @@ namespace domi1819.UpCore.Mime
                 this.MimeType = mineType;
             }
 
-            public bool matches(byte[] bytes, int length)
+            public bool Matches(byte[] bytes, int length, long fileSize)
             {
                 if (bytes.Length >= this.magic.Length && length >= this.magic.Length)
                 {
@@ -152,11 +189,23 @@ namespace domi1819.UpCore.Mime
             }
         }
 
+        private class BmpPattern : SimplePattern
+        {
+            public BmpPattern() : base(new byte[] { 0x42, 0x4d }, MimeType.ImageBmp)
+            {
+            }
+
+            public override bool Matches(byte[] bytes, int length, long fileSize)
+            {
+                return base.Matches(bytes, length, fileSize) && bytes.Length >= 6 && length >= 6 && (bytes[2] | bytes[3] << 8 | bytes[4] << 16 | bytes[5] << 24) == fileSize;
+            }
+        }
+
         private class Mp4Pattern : Pattern
         {
             public MimeType MimeType => MimeType.VideoMp4;
 
-            public bool matches(byte[] bytes, int length)
+            public bool Matches(byte[] bytes, int length, long fileSize)
             {
                 // https://mimesniff.spec.whatwg.org/#signature-for-mp4
 
