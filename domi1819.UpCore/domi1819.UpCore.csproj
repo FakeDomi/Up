@@ -39,8 +39,6 @@
   <ItemGroup>
     <Compile Include="Crypto\Blake2.cs" />
     <Compile Include="Crypto\Rsa.cs" />
-    <Compile Include="Mime\MimeSniffer.cs" />
-    <Compile Include="Mime\MimeType.cs" />
     <Compile Include="Network\RsaCache.cs" />
     <Compile Include="Network\RsaKey.cs" />
     <Compile Include="Utilities\ArrayPool.cs" />
@@ -61,6 +59,7 @@
     <Compile Include="Utilities\FancyXmlWriter.cs" />
     <Compile Include="Utilities\Files.cs" />
     <Compile Include="Utilities\Http.cs" />
+    <Compile Include="Utilities\Mime.cs" />
     <Compile Include="Utilities\ReusableThread.cs" />
     <Compile Include="Utilities\SingleInstance.cs" />
     <Compile Include="Utilities\Util.cs" />

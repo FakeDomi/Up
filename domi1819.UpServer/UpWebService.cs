@@ -13,7 +13,6 @@ namespace domi1819.UpServer
     internal class UpWebService
     {
         private static readonly Dictionary<string, string> MimeDict = new Dictionary<string, string>();
-        private static readonly Dictionary<string, string> OtherMimeCache = new Dictionary<string, string>();
 
         private Thread dispatcherThread;
 
@@ -284,8 +283,9 @@ namespace domi1819.UpServer
             if (this.files.FileExists(fileId) && this.files.GetDownloadableFlag(fileId))
             {
                 string fileName = this.files.GetFileName(fileId);
+                string storagePath = Path.Combine(this.config.FileStorageFolder, fileId);
 
-                using (FileStream fileStream = File.OpenRead(Path.Combine(this.config.FileStorageFolder, fileId)))
+                using (FileStream fileStream = File.OpenRead(storagePath))
                 {
                     if (Http.GetRange(req.Headers.Get("Range"), out long start, out long end, fileStream.Length))
                     {
@@ -304,7 +304,7 @@ namespace domi1819.UpServer
                     string fileExt = Path.GetExtension(fileName)?.ToLowerInvariant() ?? string.Empty;
                     bool forcedDownload = reqUrl.EndsWith("!");
 
-                    if (!forcedDownload && (MimeDict.TryGetValue(fileExt, out string mime) || this.GuessTextMimeType(fileId, out mime)))
+                    if (!forcedDownload && (MimeDict.TryGetValue(fileExt, out string mime) || Mime.GuessTextType(storagePath, fileId, out mime)))
                     {
                         res.AddHeader("Content-Disposition", $"inline; filename=\"{fileName}\"");
                         res.ContentType = mime;
@@ -346,100 +346,6 @@ namespace domi1819.UpServer
                 res.OutputStream.Close();
 
                 res.Close();
-            }
-        }
-
-
-        private static Decoder Utf8 = Encoding.GetEncoding(Encoding.UTF8.CodePage, new EncoderExceptionFallback(), new DecoderExceptionFallback()).GetDecoder();
-
-        /// <summary>
-        /// Tries to analyze whether a given text file is encoded in UTF-8, UTF-16BE, UTF-16LE or an ASCII-based code page.
-        /// </summary>
-        /// <param name="fileId">The id of the file to check.</param>
-        /// <param name="mime">The mime type of the text file, or null.</param>
-        /// <returns>True if the file has been detected as a text file, false otherwise.</returns>
-        private bool GuessTextMimeType(string fileId, out string mime)
-        {
-            if (OtherMimeCache.TryGetValue(fileId, out mime))
-            {
-                return mime != null;
-            }
-
-            byte[] bytes = new byte[Constants.Server.SniffBytes];
-
-            using (FileStream fs = File.OpenRead(Path.Combine(this.config.FileStorageFolder, fileId)))
-            {
-                int bytesRead = fs.Read(bytes, 0, bytes.Length);
-
-                try
-                {
-                    Utf8.GetCharCount(bytes, 0, bytesRead);
-
-                    mime = "text/plain; charset=utf-8";
-                    OtherMimeCache.Add(fileId, mime);
-                    return true;
-                }
-                catch (DecoderFallbackException)
-                {
-                    if (bytesRead >= 2)
-                    {
-                        if (bytes[0] == 0xfe && bytes[1] == 0xff)
-                        {
-                            mime = "text/plain; charset=utf-16be";
-                            OtherMimeCache.Add(fileId, mime);
-                            return true;
-                        }
-                        else if (bytes[0] == 0xff && bytes[1] == 0xfe)
-                        {
-                            mime = "text/plain; charset=utf-16le";
-                            OtherMimeCache.Add(fileId, mime);
-                            return true;
-                        }
-                    }
-
-                    for (int i = 0; i < bytesRead; i++)
-                    {
-                        byte b = bytes[i];
-                        switch (b)
-                        {
-                            case 0x00:
-                            case 0x01:
-                            case 0x02:
-                            case 0x03:
-                            case 0x04:
-                            case 0x05:
-                            case 0x06:
-                            case 0x07:
-                            case 0x08:
-                            case 0x0E:
-                            case 0x0F:
-                            case 0x10:
-                            case 0x11:
-                            case 0x12:
-                            case 0x13:
-                            case 0x14:
-                            case 0x15:
-                            case 0x16:
-                            case 0x17:
-                            case 0x18:
-                            case 0x19:
-                            case 0x1A:
-                            case 0x1B:
-                            case 0x1C:
-                            case 0x1D:
-                            case 0x1E:
-                            case 0x1F:
-                            case 0x7F:
-                                mime = null;
-                                OtherMimeCache.Add(fileId, mime);
-                                return false;
-                        }
-                    }
-
-                    mime = "text/plain";
-                    OtherMimeCache.Add(fileId, mime);
-                    return true;
-                }
             }
         }
 

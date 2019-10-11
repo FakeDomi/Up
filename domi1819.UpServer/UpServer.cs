@@ -70,9 +70,7 @@ namespace domi1819.UpServer
             this.Files = new FileManager(this);
 
             this.messageServer = new NetServer(this);
-            this.messageServer.Start(this.Config.UpServerPort, rsaKey);
-
-            UpConsole.WriteLineRestoreCommand($"Message server listening on port {this.Config.UpServerPort}.");
+            this.messageServer.Start(this.Config.UpServerPorts, rsaKey);
 
             UpConsole.WriteLineRestoreCommand("UpServer started.");
 

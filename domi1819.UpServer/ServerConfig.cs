@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Xml.Serialization;
 using domi1819.UpCore.Utilities;
 
@@ -10,7 +11,7 @@ namespace domi1819.UpServer
     {
         public string HostName { get; set; }
 
-        public int UpServerPort { get; set; }
+        public int[] UpServerPorts { get; set; }
 
         public int HttpServerPort { get; set; }
 
@@ -33,7 +34,7 @@ namespace domi1819.UpServer
         public ServerConfig()
         {
             this.HostName = "localhost";
-            this.UpServerPort = 1819;
+            this.UpServerPorts = new[] { 1819 };
             this.HttpServerPort = 1880;
             this.HttpServerListenerName = "+";
             this.UrlOverride = "";
@@ -65,6 +66,22 @@ namespace domi1819.UpServer
             }
 
             return new ServerConfig();
+        }
+
+        static ServerConfig()
+        {
+            Serializer.UnknownElement += (sender, args) =>
+            {
+                if (args.Element.Name == "UpServerPort")
+                {
+                    ServerConfig config = (ServerConfig)args.ObjectBeingDeserialized;
+
+                    if (int.TryParse(args.Element.InnerText, out int port))
+                    {
+                        config.UpServerPorts = new[] { port };
+                    }
+                }
+            };
         }
     }
 }

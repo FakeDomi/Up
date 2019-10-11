@@ -4,7 +4,6 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using domi1819.NanoDB;
-using domi1819.UpCore.Mime;
 using domi1819.UpCore.Network;
 using domi1819.UpCore.Utilities;
 using domi1819.UpServer.Console;
@@ -13,8 +12,8 @@ namespace domi1819.UpServer
 {
     internal class FileManager
     {
-        // ----------------------------------------------------------- FileId --------------- Filename --------------- Downloads -------- Owner ----------------- Filesize ---------- UploadDate ------------ Downloadable ------ Mime Type
-        private static readonly NanoDBLayout layout = new NanoDBLayout(NanoDBElement.String8, NanoDBElement.String128, NanoDBElement.Int, NanoDBElement.String32, NanoDBElement.Long, NanoDBElement.DateTime, NanoDBElement.Bool, NanoDBElement.Int);
+        // ----------------------------------------------------------- FileId --------------- Filename --------------- Downloads -------- Owner ----------------- Filesize ---------- UploadDate ------------ Downloadable ------
+        private static readonly NanoDBLayout layout = new NanoDBLayout(NanoDBElement.String8, NanoDBElement.String128, NanoDBElement.Int, NanoDBElement.String32, NanoDBElement.Long, NanoDBElement.DateTime, NanoDBElement.Bool);
 
         private readonly NanoDBFile dbFile;
         private readonly List<NanoDBLine> emptyFilterList = new List<NanoDBLine>(0);
@@ -81,9 +80,9 @@ namespace domi1819.UpServer
             return suggestion;
         }
 
-        internal bool AddFile(string key, string fileName, string owner, long fileSize, MimeType mimeType)
+        internal bool AddFile(string key, string fileName, string owner, long fileSize)
         {
-            bool success = this.dbFile.AddLine(key, fileName, 0, owner, fileSize, DateTime.Now, false, mimeType.Id) != null;
+            bool success = this.dbFile.AddLine(key, fileName, 0, owner, fileSize, DateTime.Now, false) != null;
 
             if (success)
             {
@@ -236,12 +235,12 @@ namespace domi1819.UpServer
 
         private static class DatabaseUpdater
         {
-            // ------------------------------------------------------------- FileId --------------- Filename --------------- Downloads -------- Owner ----------------- Filesize ---------- UploadDate ------------ Downloadable
+            // ------------------------------------------------------------- FileId --------------- Filename --------------- Downloads -------- Owner ----------------- Filesize ---------- UploadDate ------------ Downloadable ------
             private static readonly NanoDBLayout layoutV1 = new NanoDBLayout(NanoDBElement.String8, NanoDBElement.String128, NanoDBElement.Int, NanoDBElement.String32, NanoDBElement.Long, NanoDBElement.DateTime, NanoDBElement.Bool);
 
             public static bool TryUpdate(NanoDBFile dbFile, ServerConfig config, out NanoDBFile newDb)
             {
-                try
+                /*try
                 {
                     // Update from V1
                     if (dbFile.Layout.Compare(layoutV1))
@@ -297,7 +296,7 @@ namespace domi1819.UpServer
                     UpConsole.WriteLineRestoreCommand("Update failed:");
                     UpConsole.WriteLineRestoreCommand(ex.ToString());
                     throw ex;
-                }
+                }*/
 
                 newDb = null;
                 return false;
