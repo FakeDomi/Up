@@ -11,7 +11,7 @@ namespace domi1819.UpCore.Utilities
 
             do
             {
-                tempFilePath = Path.Combine(directory, String.Format(file, Util.GetRandomString(randomLength)));
+                tempFilePath = Path.Combine(directory, string.Format(file, Util.GetRandomString(randomLength)));
             } while (File.Exists(tempFilePath));
 
             return tempFilePath;

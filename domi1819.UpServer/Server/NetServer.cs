@@ -45,12 +45,13 @@ namespace domi1819.UpServer.Server
 
             foreach (int port in ports)
             {
-                TcpListener listener = new TcpListener(IPAddress.Any, port);
-                this.listeners.Add(listener);
-
                 Thread dispatcher = new Thread(this.Run) { Name = "NetServer Dispatcher" };
-                dispatcher.Start(new TcpListener(IPAddress.Any, port));
+                TcpListener listener = new TcpListener(IPAddress.Any, port);
 
+                this.listeners.Add(listener);
+                listener.Start();
+                dispatcher.Start(listener);
+                
                 UpConsole.WriteLineRestoreCommand($"Message server listening on port {port}.");
             }
         }

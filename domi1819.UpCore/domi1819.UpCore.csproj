@@ -37,6 +37,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Utilities\CrashHandler.cs" />
     <Compile Include="Crypto\Blake2.cs" />
     <Compile Include="Crypto\Rsa.cs" />
     <Compile Include="Network\RsaCache.cs" />

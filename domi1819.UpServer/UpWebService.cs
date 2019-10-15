@@ -12,9 +12,13 @@ namespace domi1819.UpServer
 {
     internal class UpWebService
     {
+        private const int ERROR_OPERATION_ABORTED = 995;
+        private const int MonoErrorListenerClosed = 500;
+
         private static readonly Dictionary<string, string> MimeDict = new Dictionary<string, string>();
 
         private Thread dispatcherThread;
+        private HttpListener listener;
 
         private readonly ServerConfig config;
         private readonly FileManager files;
@@ -63,13 +67,34 @@ namespace domi1819.UpServer
 
         internal void Start()
         {
+            string prefix = $"http://{this.config.HttpServerListenerName}:{this.config.HttpServerPort}/";
+
+            try
+            {
+                this.listener = new HttpListener();
+                this.listener.Prefixes.Add(prefix);
+                this.listener.Start();
+            }
+            catch (HttpListenerException ex)
+            {
+                UpConsole.WriteLineRestoreCommand($"HTTP listener has been stopped: {ex.Message}");
+                UpConsole.WriteLineRestoreCommand($"ErrorCode = {ex.ErrorCode}");
+                UpConsole.WriteLineRestoreCommand("");
+                UpConsole.WriteLineRestoreCommand("If you are on Windows, you need to either run UpServer as admin,");
+                UpConsole.WriteLineRestoreCommand("or grant permission to the HTTP prefix UpServer is using with the command:");
+                UpConsole.WriteLineRestoreCommand($"netsh http add urlacl url={prefix} user=YOUR_DOMAIN\\your_user");
+                UpConsole.WriteLineRestoreCommand("");
+            }
+
+            UpConsole.WriteLineRestoreCommand($"Listening for HTTP connections ({this.config.HttpServerListenerName}:{this.config.HttpServerPort})");
+
             this.dispatcherThread = new Thread(this.Run) { Name = "Up HTTP Server Dispatcher" };
             this.dispatcherThread.Start();
         }
 
         internal void Stop()
         {
-            this.dispatcherThread.Abort();
+            this.listener.Abort();
         }
 
         internal void ReloadCachedFiles()
@@ -79,30 +104,16 @@ namespace domi1819.UpServer
 
         private void Run()
         {
-            HttpListener listener = new HttpListener();
-            string prefix = $"http://{this.config.HttpServerListenerName}:{this.config.HttpServerPort}/";
-
-            listener.Prefixes.Add(prefix);
-
             try
             {
-                listener.Start();
-
-                UpConsole.WriteLineRestoreCommand($"Listening for HTTP connections ({this.config.HostName}:{this.config.HttpServerPort})");
-
                 while (true)
                 {
-                    ThreadPool.QueueUserWorkItem(this.ProcessHttpRequest, listener.GetContext());
+                    ThreadPool.QueueUserWorkItem(this.ProcessHttpRequest, this.listener.GetContext());
                 }
             }
-            catch (HttpListenerException ex)
+            catch (HttpListenerException ex) when (ex.ErrorCode == ERROR_OPERATION_ABORTED || ex.ErrorCode == MonoErrorListenerClosed)
             {
-                UpConsole.WriteLineRestoreCommand($"HTTP listener has been stopped: {ex.Message}");
-                UpConsole.WriteLineRestoreCommand("");
-                UpConsole.WriteLineRestoreCommand("If you are on Windows, you need to either run UpServer as admin,");
-                UpConsole.WriteLineRestoreCommand("or grant permission to the HTTP prefix UpServer is using with the command:");
-                UpConsole.WriteLineRestoreCommand($"netsh http add urlacl url={prefix} user=YOUR_DOMAIN\\your_user");
-                UpConsole.WriteLineRestoreCommand("");
+                // HTTP listener has been stopped.
             }
         }
 
