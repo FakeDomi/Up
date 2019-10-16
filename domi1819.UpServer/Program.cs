@@ -5,13 +5,13 @@ using System.Threading;
 
 namespace domi1819.UpServer
 {
-    internal static class Program
+    public static class Program
     {
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        internal static void Main()
+        public static void Main(string[] args)
         {
             Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
             
