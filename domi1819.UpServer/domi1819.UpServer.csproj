@@ -72,11 +72,6 @@
     <Compile Include="UserManager.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config">
-      <SubType>Designer</SubType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\nanodb\NanoDB\domi1819.NanoDB.csproj">
       <Project>{aa32b774-ec0f-4853-929f-f432887639be}</Project>
       <Name>domi1819.NanoDB</Name>
