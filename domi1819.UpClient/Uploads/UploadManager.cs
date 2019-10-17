@@ -30,6 +30,7 @@ namespace domi1819.UpClient.Uploads
             this.netClient = upClient.NetClient;
 
             this.queueForm = new UploadQueueForm(upClient);
+            this.queueForm.CreateHandle();
 
             this.queueForm.BackgroundWorker.DoWork += this.StartUpload;
             this.queueForm.BackgroundWorker.RunWorkerCompleted += this.UploadCompleted;

@@ -20,7 +20,12 @@ namespace domi1819.UpClient
                 return File.Exists(path) ? Assembly.LoadFrom(path) : null;
             };
 
-            CheckSingleInstance(cmdArgs);
+            Run(cmdArgs);
+        }
+
+        private static void Run(string[] cmdArgs)
+        {
+            CrashHandler.Run(() => CheckSingleInstance(cmdArgs));
         }
 
         private static void CheckSingleInstance(string[] cmdArgs)
