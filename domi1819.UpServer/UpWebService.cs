@@ -12,6 +12,7 @@ namespace domi1819.UpServer
 {
     internal class UpWebService
     {
+        // ReSharper disable once InconsistentNaming
         private const int ERROR_OPERATION_ABORTED = 995;
         private const int MonoErrorListenerClosed = 500;
 

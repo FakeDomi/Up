@@ -14,8 +14,7 @@ namespace domi1819.UpServer.Server
     internal class NetServer
     {
         private readonly ArrayPool<byte> messageBufferPool = new ArrayPool<byte>(Constants.Network.MessageBufferSize);
-
-        private List<TcpListener> listeners = new List<TcpListener>();
+        private readonly List<TcpListener> listeners = new List<TcpListener>();
 
         private RSACryptoServiceProvider rsaCsp;
         private byte[] rsaModulus;
@@ -77,15 +76,9 @@ namespace domi1819.UpServer.Server
                     ThreadPool.QueueUserWorkItem(this.ProcessClient, listener.AcceptTcpClient());
                 }
             }
-            catch (SocketException ex)
+            catch (SocketException ex) when (ex.SocketErrorCode == SocketError.Interrupted)
             {
-                // Tcp listener has been stopped 
-                if (ex.SocketErrorCode == SocketError.Interrupted)
-                {
-                    return;
-                }
-
-                throw ex;
+                // Tcp listener has been stopped
             }
         }
 

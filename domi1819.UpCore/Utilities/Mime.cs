@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 
 namespace domi1819.UpCore.Utilities
 {
     public static class Mime
     {
-        private static Decoder Utf8Decoder = Encoding.GetEncoding(Encoding.UTF8.CodePage, new EncoderExceptionFallback(), new DecoderExceptionFallback()).GetDecoder();
+        private static readonly Decoder Utf8Decoder = Encoding.GetEncoding(Encoding.UTF8.CodePage, new EncoderExceptionFallback(), new DecoderExceptionFallback()).GetDecoder();
         private static readonly Dictionary<string, string> MimeCache = new Dictionary<string, string>();
 
         /// <summary>
@@ -91,7 +89,7 @@ namespace domi1819.UpCore.Utilities
                             case 0x1F:
                             case 0x7F:
                                 mime = null;
-                                MimeCache.Add(cacheKey, mime);
+                                MimeCache.Add(cacheKey, null);
                                 return false;
                         }
                     }

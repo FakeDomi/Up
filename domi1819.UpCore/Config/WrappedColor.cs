@@ -5,23 +5,26 @@ namespace domi1819.UpCore.Config
     public class WrappedColor
     {
         private Color color;
-
+        
+        // ReSharper disable once UnusedMember.Global
         public int Red
         {
-            get { return this.color.R; }
-            set { this.color = Color.FromArgb(value, this.color.G, this.color.B); }
+            get => this.color.R;
+            set => this.color = Color.FromArgb(value, this.color.G, this.color.B);
         }
-
+        
+        // ReSharper disable once UnusedMember.Global
         public int Green
         {
-            get { return this.color.G; }
-            set { this.color = Color.FromArgb(this.color.R, value, this.color.B); }
+            get => this.color.G;
+            set => this.color = Color.FromArgb(this.color.R, value, this.color.B);
         }
-
+        
+        // ReSharper disable once UnusedMember.Global
         public int Blue
         {
-            get { return this.color.B; }
-            set { this.color = Color.FromArgb(this.color.R, this.color.G, value); }
+            get => this.color.B;
+            set => this.color = Color.FromArgb(this.color.R, this.color.G, value);
         }
 
         public static WrappedColor Of(Color color)

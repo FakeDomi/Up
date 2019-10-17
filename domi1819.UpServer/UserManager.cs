@@ -74,7 +74,7 @@ namespace domi1819.UpServer
                 NanoDBLine line = this.dbFile.GetLine(user);
 
                 string salt = (string)line[Index.Salt];
-                byte[] savedHash = (byte[])line[Index.PasswdHash];
+                byte[] savedHash = (byte[])line[Index.PasswordHash];
                 byte[] verificationHash = Util.Hash(password, salt);
 
                 return !savedHash.Where((t, i) => t != verificationHash[i]).Any();
@@ -92,7 +92,7 @@ namespace domi1819.UpServer
 
                 NanoDBLine line = this.dbFile.GetLine(user);
 
-                line[Index.PasswdHash] = hash;
+                line[Index.PasswordHash] = hash;
                 line[Index.Salt] = salt;
 
                 return true;
@@ -186,7 +186,7 @@ namespace domi1819.UpServer
         private static class Index
         {
             internal const int UserName = 0;
-            internal const int PasswdHash = 1;
+            internal const int PasswordHash = 1;
             internal const int Salt = 2;
             internal const int MaxCapacity = 3;
             internal const int CurCapacity = 4;

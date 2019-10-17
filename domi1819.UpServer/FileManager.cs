@@ -13,7 +13,7 @@ namespace domi1819.UpServer
     internal class FileManager
     {
         // ----------------------------------------------------------- FileId --------------- Filename --------------- Downloads -------- Owner ----------------- Filesize ---------- UploadDate ------------ Downloadable ------
-        private static readonly NanoDBLayout layout = new NanoDBLayout(NanoDBElement.String8, NanoDBElement.String128, NanoDBElement.Int, NanoDBElement.String32, NanoDBElement.Long, NanoDBElement.DateTime, NanoDBElement.Bool);
+        private static readonly NanoDBLayout Layout = new NanoDBLayout(NanoDBElement.String8, NanoDBElement.String128, NanoDBElement.Int, NanoDBElement.String32, NanoDBElement.Long, NanoDBElement.DateTime, NanoDBElement.Bool);
 
         private readonly NanoDBFile dbFile;
         private readonly List<NanoDBLine> emptyFilterList = new List<NanoDBLine>(0);
@@ -36,7 +36,7 @@ namespace domi1819.UpServer
             {
                 UpConsole.WriteLineRestoreCommand("File database does not exist or could not be read. Creating a new one...");
 
-                this.dbFile.CreateNew(layout, Index.FileId, Index.Owner);
+                this.dbFile.CreateNew(Layout, Index.FileId, Index.Owner);
             }
 
             LoadResult loadResult = this.dbFile.Load(Index.FileId, Index.Owner);
@@ -47,7 +47,7 @@ namespace domi1819.UpServer
                 throw new Exception("Database file corrupt.");
             }
 
-            if (!this.dbFile.Layout.Compare(layout))
+            if (!this.dbFile.Layout.Compare(Layout))
             {
                 UpConsole.WriteLineRestoreCommand("Database layout is outdated. Attempting update now:");
 
@@ -230,13 +230,12 @@ namespace domi1819.UpServer
             internal const int FileSize = 4;
             internal const int UploadDate = 5;
             internal const int DirectDownloadFlag = 6;
-            internal const int MimeType = 7;
         }
 
         private static class DatabaseUpdater
         {
             // ------------------------------------------------------------- FileId --------------- Filename --------------- Downloads -------- Owner ----------------- Filesize ---------- UploadDate ------------ Downloadable ------
-            private static readonly NanoDBLayout layoutV1 = new NanoDBLayout(NanoDBElement.String8, NanoDBElement.String128, NanoDBElement.Int, NanoDBElement.String32, NanoDBElement.Long, NanoDBElement.DateTime, NanoDBElement.Bool);
+            private static readonly NanoDBLayout LayoutV1 = new NanoDBLayout(NanoDBElement.String8, NanoDBElement.String128, NanoDBElement.Int, NanoDBElement.String32, NanoDBElement.Long, NanoDBElement.DateTime, NanoDBElement.Bool);
 
             public static bool TryUpdate(NanoDBFile dbFile, ServerConfig config, out NanoDBFile newDb)
             {
