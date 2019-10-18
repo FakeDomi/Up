@@ -172,17 +172,17 @@ namespace domi1819.UpServer
                         case "/api/end-session":
                             if (user != null)
                             {
-                                using (StreamReader reader = new StreamReader(res.OutputStream))
+                                using (StreamReader reader = new StreamReader(req.InputStream))
                                 {
-                                    string s = reader.ReadLine();
+                                    string sessionToEnd = reader.ReadLine();
 
-                                    if (this.sessions.HasSession(user, s))
+                                    if (this.sessions.HasSession(user, sessionToEnd))
                                     {
-                                        this.sessions.InvalidateSession(s);
+                                        this.sessions.InvalidateSession(sessionToEnd);
 
                                         using (StreamWriter writer = new StreamWriter(res.OutputStream))
                                         {
-                                            writer.Write(s == session ? "redirect" : "ok");
+                                            writer.Write(sessionToEnd == session ? "redirect" : "ok");
                                         }
                                     }
                                 }
