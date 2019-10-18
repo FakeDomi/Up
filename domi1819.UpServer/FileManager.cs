@@ -12,6 +12,9 @@ namespace domi1819.UpServer
 {
     internal class FileManager
     {
+        // ----------------------------------------------------------- FileId --------------- Filename --------------- Downloads -------- Owner ----------------- Filesize ---------- UploadDate ------------ Downloadable ------
+        private static readonly NanoDBLayout Layout = new NanoDBLayout(NanoDBElement.String8, NanoDBElement.String128, NanoDBElement.Int, NanoDBElement.String32, NanoDBElement.Long, NanoDBElement.DateTime, NanoDBElement.Bool);
+
         private readonly NanoDBFile dbFile;
         private readonly List<NanoDBLine> emptyFilterList = new List<NanoDBLine>(0);
 
@@ -33,8 +36,7 @@ namespace domi1819.UpServer
             {
                 UpConsole.WriteLineRestoreCommand("File database does not exist or could not be read. Creating a new one...");
 
-                // FileId - Filename - Downloads - Owner - Filesize - UploadDate - Downloadable
-                this.dbFile.CreateNew(new NanoDBLayout(NanoDBElement.String8, NanoDBElement.String128, NanoDBElement.Int, NanoDBElement.String32, NanoDBElement.Long, NanoDBElement.DateTime, NanoDBElement.Bool), Index.FileId, Index.Owner);
+                this.dbFile.CreateNew(Layout, Index.FileId, Index.Owner);
             }
 
             LoadResult loadResult = this.dbFile.Load(Index.FileId, Index.Owner);
@@ -43,6 +45,19 @@ namespace domi1819.UpServer
             {
                 //logger.Log("File database could not be read because it seems to be corrupt. Please fix or delete the file database.");
                 throw new Exception("Database file corrupt.");
+            }
+
+            if (!this.dbFile.Layout.Compare(Layout))
+            {
+                UpConsole.WriteLineRestoreCommand("Database layout is outdated. Attempting update now:");
+
+                if (!DatabaseUpdater.TryUpdate(this.dbFile, upServer.Config, out this.dbFile))
+                {
+                    UpConsole.WriteLineRestoreCommand("Error: Unknown layout.");
+                    throw new Exception("Failed to update database layout. (Unknown layout)");
+                }
+
+                UpConsole.WriteLineRestoreCommand("Update completed successfully.");
             }
 
             this.dbFile.Bind();
@@ -215,6 +230,76 @@ namespace domi1819.UpServer
             internal const int FileSize = 4;
             internal const int UploadDate = 5;
             internal const int DirectDownloadFlag = 6;
+        }
+
+        private static class DatabaseUpdater
+        {
+            // ------------------------------------------------------------- FileId --------------- Filename --------------- Downloads -------- Owner ----------------- Filesize ---------- UploadDate ------------ Downloadable ------
+            private static readonly NanoDBLayout LayoutV1 = new NanoDBLayout(NanoDBElement.String8, NanoDBElement.String128, NanoDBElement.Int, NanoDBElement.String32, NanoDBElement.Long, NanoDBElement.DateTime, NanoDBElement.Bool);
+
+            public static bool TryUpdate(NanoDBFile dbFile, ServerConfig config, out NanoDBFile newDb)
+            {
+                /*try
+                {
+                    // Update from V1
+                    if (dbFile.Layout.Compare(layoutV1))
+                    {
+                        string tempFilePath = Files.FindTempFilePath(config.DataFolder, "files_update_{0}.nano", 6);
+
+                        NanoDBFile tempDb = new NanoDBFile(tempFilePath);
+
+                        tempDb.CreateNew(layout, Index.FileId, Index.Owner);
+                        tempDb.Load(Index.FileId, Index.Owner);
+                        tempDb.Bind();
+
+                        byte[] fileBytes = new byte[Constants.Server.SniffBytes];
+                        int bytesRead = 0;
+
+                        foreach (NanoDBLine line in dbFile.Lines.Values)
+                        {
+                            using (FileStream fs = File.OpenRead(Path.Combine(config.FileStorageFolder, (string)line[Index.FileId])))
+                            {
+                                bytesRead = fs.Read(fileBytes, 0, fileBytes.Length);
+                                tempDb.AddLine(line.Content[0], line.Content[1], line.Content[2], line.Content[3], line.Content[4], line.Content[5], line.Content[6], MimeSniffer.GetMimeType(fileBytes, Math.Min(fileBytes.Length, bytesRead), fs.Length).Id);
+                            }
+                        }
+
+                        tempDb.Unbind();
+
+                        string mainDbPath = Path.Combine(config.DataFolder, Constants.Database.FileDbName);
+
+                        File.Move(mainDbPath, Files.FindTempFilePath(config.DataFolder, "files_old_{0}.nano", 6));
+                        File.Move(tempFilePath, mainDbPath);
+
+                        newDb = new NanoDBFile(mainDbPath);
+
+                        InitializeResult initResult = newDb.Initialize();
+
+                        if (initResult != InitializeResult.Success)
+                        {
+                            throw new Exception("Could not initialize new NanoDB file although updating seems to have completed successfully.");
+                        }
+
+                        LoadResult loadResult = newDb.Load(Index.FileId, Index.Owner);
+
+                        if (loadResult != LoadResult.Okay && loadResult != LoadResult.HasDuplicates)
+                        {
+                            throw new Exception("Could not load new NanoDB file although updating seems to have completed successfully.");
+                        }
+
+                        return true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    UpConsole.WriteLineRestoreCommand("Update failed:");
+                    UpConsole.WriteLineRestoreCommand(ex.ToString());
+                    throw ex;
+                }*/
+
+                newDb = null;
+                return false;
+            }
         }
     }
 }

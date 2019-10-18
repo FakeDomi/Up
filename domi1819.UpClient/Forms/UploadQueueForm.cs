@@ -148,6 +148,11 @@ namespace domi1819.UpClient.Forms
             base.WndProc(ref m);
         }
 
+        internal void CreateHandle()
+        {
+            base.CreateHandle();
+        }
+
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             if (e.CloseReason == CloseReason.UserClosing)

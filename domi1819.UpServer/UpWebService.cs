@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -11,9 +12,14 @@ namespace domi1819.UpServer
 {
     internal class UpWebService
     {
+        // ReSharper disable once InconsistentNaming
+        private const int ERROR_OPERATION_ABORTED = 995;
+        private const int MonoErrorListenerClosed = 500;
+
         private static readonly Dictionary<string, string> MimeDict = new Dictionary<string, string>();
 
         private Thread dispatcherThread;
+        private HttpListener listener;
 
         private readonly ServerConfig config;
         private readonly FileManager files;
@@ -30,32 +36,66 @@ namespace domi1819.UpServer
 
             this.cachedFiles = new CachedFiles(this.config.WebFolder, !this.config.WebInterfaceEnabled);
             this.sessions = new Sessions();
-            
+
+            MimeDict.Add(".flac", "audio/flac");
+            MimeDict.Add(".mp3", "audio/mpeg");
+            MimeDict.Add(".ogg", "audio/ogg");
+            MimeDict.Add(".oga", "audio/ogg");
+            MimeDict.Add(".opus", "audio/ogg");
+            MimeDict.Add(".wav", "audio/wave");
+
+            MimeDict.Add(".pdf", "application/pdf");
+
+            MimeDict.Add(".apng", "image/apng");
+            MimeDict.Add(".bmp", "image/bmp");
+            MimeDict.Add(".gif", "image/gif");
+            MimeDict.Add(".ico", "image/x-icon");
+            MimeDict.Add(".cur", "image/x-icon");
             MimeDict.Add(".jpg", "image/jpeg");
             MimeDict.Add(".jpeg", "image/jpeg");
+            MimeDict.Add(".jfif", "image/jpeg");
+            MimeDict.Add(".pjpeg", "image/jpeg");
+            MimeDict.Add(".pjp", "image/jpeg");
             MimeDict.Add(".png", "image/png");
-            MimeDict.Add(".txt", "text/plain; charset=UTF-8");
-            MimeDict.Add(".xml", "text/plain; charset=UTF-8");
-            MimeDict.Add(".java", "text/plain; charset=UTF-8");
-            MimeDict.Add(".cs", "text/plain; charset=UTF-8");
-            MimeDict.Add(".cfg", "text/plain; charset=UTF-8");
-            MimeDict.Add(".conf", "text/plain; charset=UTF-8");
-            MimeDict.Add(".log", "text/plain; charset=UTF-8");
-            MimeDict.Add(".pdf", "application/pdf");
-            MimeDict.Add(".mp3", "audio/mpeg");
+            MimeDict.Add(".svg", "image/svg+xml");
+            MimeDict.Add(".webp", "image/webp");
+
             MimeDict.Add(".mp4", "video/mp4");
+            MimeDict.Add(".m4a", "video/mp4");
+            MimeDict.Add(".ogv", "video/ogg");
             MimeDict.Add(".webm", "video/webm");
         }
 
         internal void Start()
         {
+            string prefix = $"http://{this.config.HttpServerListenerName}:{this.config.HttpServerPort}/";
+
+            try
+            {
+                this.listener = new HttpListener();
+                this.listener.Prefixes.Add(prefix);
+                this.listener.Start();
+            }
+            catch (HttpListenerException ex)
+            {
+                UpConsole.WriteLineRestoreCommand($"HTTP listener has been stopped: {ex.Message}");
+                UpConsole.WriteLineRestoreCommand($"ErrorCode = {ex.ErrorCode}");
+                UpConsole.WriteLineRestoreCommand("");
+                UpConsole.WriteLineRestoreCommand("If you are on Windows, you need to either run UpServer as admin,");
+                UpConsole.WriteLineRestoreCommand("or grant permission to the HTTP prefix UpServer is using with the command:");
+                UpConsole.WriteLineRestoreCommand($"netsh http add urlacl url={prefix} user=YOUR_DOMAIN\\your_user");
+                UpConsole.WriteLineRestoreCommand("");
+            }
+
+            UpConsole.WriteLineRestoreCommand($"Listening for HTTP connections ({this.config.HttpServerListenerName}:{this.config.HttpServerPort})");
+
             this.dispatcherThread = new Thread(this.Run) { Name = "Up HTTP Server Dispatcher" };
             this.dispatcherThread.Start();
         }
 
         internal void Stop()
         {
-            this.dispatcherThread.Abort();
+            this.listener.Abort();
         }
 
         internal void ReloadCachedFiles()
@@ -65,30 +105,16 @@ namespace domi1819.UpServer
 
         private void Run()
         {
-            HttpListener listener = new HttpListener();
-            string prefix = $"http://{this.config.HttpServerListenerName}:{this.config.HttpServerPort}/";
-
-            listener.Prefixes.Add(prefix);
-
             try
             {
-                listener.Start();
-
-                UpConsole.WriteLineRestoreCommand($"Listening for HTTP connections ({this.config.HostName}:{this.config.HttpServerPort})");
-
                 while (true)
                 {
-                    ThreadPool.QueueUserWorkItem(this.ProcessHttpRequest, listener.GetContext());
+                    ThreadPool.QueueUserWorkItem(this.ProcessHttpRequest, this.listener.GetContext());
                 }
             }
-            catch (HttpListenerException ex)
+            catch (HttpListenerException ex) when (ex.ErrorCode == ERROR_OPERATION_ABORTED || ex.ErrorCode == MonoErrorListenerClosed)
             {
-                UpConsole.WriteLineRestoreCommand($"HTTP listener has been stopped: {ex.Message}");
-                UpConsole.WriteLineRestoreCommand("");
-                UpConsole.WriteLineRestoreCommand("If you are on Windows, you need to either run UpServer as admin,");
-                UpConsole.WriteLineRestoreCommand("or grant permission to the HTTP prefix UpServer is using with the command:");
-                UpConsole.WriteLineRestoreCommand($"netsh http add urlacl url={prefix} user=YOUR_DOMAIN\\your_user");
-                UpConsole.WriteLineRestoreCommand("");
+                // HTTP listener has been stopped.
             }
         }
 
@@ -245,8 +271,17 @@ namespace domi1819.UpServer
             }
             catch (Exception ex)
             {
+                // ERROR_DEV_NOT_EXIST
+                if ((ex as HttpListenerException)?.ErrorCode == 55)
+                {
+                    return;
+                }
+
                 if (!(ex is IOException))
                 {
+                    Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+                    Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
+
                     UpConsole.WriteLineRestoreCommand(ex.ToString());
                 }
             }
@@ -260,8 +295,9 @@ namespace domi1819.UpServer
             if (this.files.FileExists(fileId) && this.files.GetDownloadableFlag(fileId))
             {
                 string fileName = this.files.GetFileName(fileId);
+                string storagePath = Path.Combine(this.config.FileStorageFolder, fileId);
 
-                using (FileStream fileStream = File.OpenRead(Path.Combine(this.config.FileStorageFolder, fileId)))
+                using (FileStream fileStream = File.OpenRead(storagePath))
                 {
                     if (Http.GetRange(req.Headers.Get("Range"), out long start, out long end, fileStream.Length))
                     {
@@ -278,15 +314,16 @@ namespace domi1819.UpServer
                     }
                     
                     string fileExt = Path.GetExtension(fileName)?.ToLowerInvariant() ?? string.Empty;
+                    bool forcedDownload = reqUrl.EndsWith("!");
 
-                    if (MimeDict.ContainsKey(fileExt) && !reqUrl.EndsWith("!"))
+                    if (!forcedDownload && (MimeDict.TryGetValue(fileExt, out string mime) || Mime.GuessTextType(storagePath, fileId, out mime)))
                     {
-                        res.AddHeader("Content-Disposition", "inline; filename=\"" + fileName + "\"");
-                        res.ContentType = MimeDict[fileExt];
+                        res.AddHeader("Content-Disposition", $"inline; filename=\"{fileName}\"");
+                        res.ContentType = mime;
                     }
                     else
                     {
-                        res.AddHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+                        res.AddHeader("Content-Disposition", $"attachment; filename=\"{fileName}\"");
                         res.ContentType = "application/octet-stream";
                     }
 

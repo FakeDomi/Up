@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
 using System.Threading;
 using domi1819.UpCore.Crypto;
@@ -22,7 +21,7 @@ namespace domi1819.UpServer
 
         internal UpWebService WebService { get; private set; }
 
-        private NetServer messageServer;
+        public NetServer MessageServer { get; private set; }
 
         internal UpServer()
         {
@@ -69,28 +68,23 @@ namespace domi1819.UpServer
             this.Users = new UserManager(this);
             this.Files = new FileManager(this);
 
-            this.messageServer = new NetServer(this);
-            this.messageServer.Start(this.Config.UpServerPort, rsaKey);
-
-            UpConsole.WriteLineRestoreCommand($"Message server listening on port {this.Config.UpServerPort}.");
-
-            UpConsole.WriteLineRestoreCommand("UpServer started.");
+            this.MessageServer = new NetServer(this);
+            this.MessageServer.Start(this.Config.UpServerPorts, rsaKey);
 
             this.WebService = new UpWebService(this);
             this.WebService.Start();
 
             Thread.Sleep(500);
 
+            UpConsole.WriteLineRestoreCommand("UpServer started.");
             UpConsole.ProcessConsoleInput(this);
 
             UpConsole.WriteLineRestoreCommand("Stopping UpServer...");
 
             this.WebService.Stop();
-            this.messageServer.Stop();
+            this.MessageServer.Stop();
             this.Users.Shutdown();
             this.Files.Shutdown();
-
-            Environment.Exit(0);
         }
     }
 }

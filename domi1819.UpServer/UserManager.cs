@@ -33,17 +33,12 @@ namespace domi1819.UpServer
                 throw new Exception("Database version not supported.");
             }
 
-            bool newDb = false;
-
-            /*else*/
             if (initResult != InitializeResult.Success)
             {
                 UpConsole.WriteLineRestoreCommand("User database does not exist or could not be read. Creating a new one...");
 
                 // UserName - PasswordHash - Salt - MaxCapacity - CurCapacity - Admin
                 this.dbFile.CreateNew(new NanoDBLayout(NanoDBElement.String32, NanoDBElement.DataBlob32, NanoDBElement.String8, NanoDBElement.Long, NanoDBElement.Long, NanoDBElement.Bool), Index.UserName);
-
-                newDb = true;
             }
 
             LoadResult loadResult = this.dbFile.Load(Index.UserName);
@@ -55,12 +50,6 @@ namespace domi1819.UpServer
             }
 
             this.dbFile.Bind();
-
-            if (newDb)
-            {
-                UpConsole.WriteLineRestoreCommand("Creating admin account...\n Username:  admin\n Password:  password\nDon't forget to change the password!!");
-                this.CreateUser("admin", "password", 10737418240 /*314572800*/, true);
-            }
         }
 
         internal bool HasUser(string name)
@@ -85,7 +74,7 @@ namespace domi1819.UpServer
                 NanoDBLine line = this.dbFile.GetLine(user);
 
                 string salt = (string)line[Index.Salt];
-                byte[] savedHash = (byte[])line[Index.PasswdHash];
+                byte[] savedHash = (byte[])line[Index.PasswordHash];
                 byte[] verificationHash = Util.Hash(password, salt);
 
                 return !savedHash.Where((t, i) => t != verificationHash[i]).Any();
@@ -103,7 +92,7 @@ namespace domi1819.UpServer
 
                 NanoDBLine line = this.dbFile.GetLine(user);
 
-                line[Index.PasswdHash] = hash;
+                line[Index.PasswordHash] = hash;
                 line[Index.Salt] = salt;
 
                 return true;
@@ -197,7 +186,7 @@ namespace domi1819.UpServer
         private static class Index
         {
             internal const int UserName = 0;
-            internal const int PasswdHash = 1;
+            internal const int PasswordHash = 1;
             internal const int Salt = 2;
             internal const int MaxCapacity = 3;
             internal const int CurCapacity = 4;

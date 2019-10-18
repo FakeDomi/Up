@@ -14,9 +14,7 @@ namespace domi1819.UpServer.Server
     internal class NetServer
     {
         private readonly ArrayPool<byte> messageBufferPool = new ArrayPool<byte>(Constants.Network.MessageBufferSize);
-
-        private Thread dispatcherThread;
-        private TcpListener listener;
+        private readonly List<TcpListener> listeners = new List<TcpListener>();
 
         private RSACryptoServiceProvider rsaCsp;
         private byte[] rsaModulus;
@@ -37,42 +35,51 @@ namespace domi1819.UpServer.Server
             this.messages.Add(NetworkMethods.ListFiles, new ListFiles(upServer.Files, upServer.Users));
         }
 
-        internal void Start(int port, RsaKey rsaKey)
+        internal void Start(int[] ports, RsaKey rsaKey)
         {
-            this.listener = new TcpListener(IPAddress.Any, port);
-
             this.rsaCsp = rsaKey.Csp;
             this.rsaModulus = rsaKey.Modulus;
             this.rsaExponent = rsaKey.Exponent;
             this.rsaFingerprint = rsaKey.Fingerprint;
 
-            this.dispatcherThread = new Thread(this.Run) { Name = "NetServer Dispatcher" };
-            this.dispatcherThread.Start();
+            foreach (int port in ports)
+            {
+                Thread dispatcher = new Thread(this.Run) { Name = "NetServer Dispatcher" };
+                TcpListener listener = new TcpListener(IPAddress.Any, port);
+
+                this.listeners.Add(listener);
+                listener.Start();
+                dispatcher.Start(listener);
+                
+                UpConsole.WriteLineRestoreCommand($"Message server listening on port {port}.");
+            }
         }
 
         internal void Stop()
         {
-            this.dispatcherThread.Abort();
+            foreach (TcpListener listener in this.listeners)
+            {
+                listener.Stop();
+            }
         }
 
-        private void Run()
+        private void Run(object listenerObj)
         {
-            this.listener.Start();
+            TcpListener listener = (TcpListener)listenerObj;
 
-            while (true)
+            listener.Start();
+
+            try
             {
-                if (this.listener.Pending())
+                while (true)
                 {
-                    ThreadPool.QueueUserWorkItem(this.ProcessClient, this.listener.AcceptTcpClient());
-                }
-                else
-                {
-                    Thread.Sleep(100);
+                    ThreadPool.QueueUserWorkItem(this.ProcessClient, listener.AcceptTcpClient());
                 }
             }
-
-            // ReSharper disable once FunctionNeverReturns
-            // TODO: add remote shutdown or similar
+            catch (SocketException ex) when (ex.SocketErrorCode == SocketError.Interrupted)
+            {
+                // Tcp listener has been stopped
+            }
         }
 
         private void ProcessClient(object clientObject)

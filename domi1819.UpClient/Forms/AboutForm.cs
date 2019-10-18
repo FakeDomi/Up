@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using System.Windows.Forms;
 using domi1819.DarkControls;
-using domi1819.UpCore.Utilities;
 
 namespace domi1819.UpClient.Forms
 {

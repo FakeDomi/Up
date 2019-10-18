@@ -7,7 +7,7 @@ namespace domi1819.UpClient.ShellPlugin
 {
     internal static class Program
     {
-        private static void Main(string[] args)
+        private static void Main()
         {
             try
             {
