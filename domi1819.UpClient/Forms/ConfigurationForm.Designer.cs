@@ -247,7 +247,7 @@ namespace domi1819.UpClient.Forms
             this.uiNotifyIcon.BalloonTipText = "w";
             this.uiNotifyIcon.BalloonTipTitle = "w";
             this.uiNotifyIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("uiNotifyIcon.Icon")));
-            this.uiNotifyIcon.Text = "^up";
+            this.uiNotifyIcon.Text = "Up";
             this.uiNotifyIcon.Visible = true;
             this.uiNotifyIcon.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.NotifyIconOnMouseDoubleClick);
             // 

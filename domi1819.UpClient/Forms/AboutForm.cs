@@ -10,7 +10,7 @@ namespace domi1819.UpClient.Forms
         {
             this.InitializeComponent();
 
-            this.uiVersionLabel.Text = @"Version " + Assembly.GetExecutingAssembly().GetName().Version;
+            this.uiVersionLabel.Text = $"Version {Assembly.GetExecutingAssembly().GetName().Version.ToString(3)}";
         }
 
         internal void Restore()

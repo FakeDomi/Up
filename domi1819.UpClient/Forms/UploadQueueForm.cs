@@ -148,7 +148,7 @@ namespace domi1819.UpClient.Forms
             base.WndProc(ref m);
         }
 
-        internal void CreateHandle()
+        internal new void CreateHandle()
         {
             base.CreateHandle();
         }
