@@ -62,6 +62,8 @@ namespace domi1819.UpCore.Utilities
 
         public static class Client
         {
+            public static readonly int ProtocolVersion = 1;
+
             public static readonly string LocalItemsFolder = "local";
 
             public static readonly string ConfigFileName = "up.xml";

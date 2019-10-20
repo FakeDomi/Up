@@ -145,7 +145,7 @@ namespace domi1819.UpCore.Network
                     throw new Exception("The connection could not be established: Connection test failed.");
                 }
 
-                if (this.deserializer.ReadNextInt() > Constants.Build)
+                if (this.deserializer.ReadNextInt() > Constants.Client.ProtocolVersion)
                 {
                     throw new Exception("This client is too outdated to communicate with the server. Consider updating.");
                 }
