@@ -4,6 +4,7 @@ using domi1819.UpClient.Forms;
 using domi1819.UpClient.Uploads;
 using domi1819.UpCore.Config;
 using domi1819.UpCore.Network;
+using domi1819.UpCore.Windows;
 
 namespace domi1819.UpClient
 {
@@ -47,6 +48,8 @@ namespace domi1819.UpClient
 
         internal void LaunchApplication(string[] cmdArgs)
         {
+            Shcore.SetProcessDpiAwareness(Shcore.PROCESS_DPI_AWARENESS.PROCESS_PER_MONITOR_DPI_AWARE);
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
