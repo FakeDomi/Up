@@ -138,17 +138,19 @@ namespace domi1819.UpServer
                 }
                 else if (reqUrl.StartsWith("/api/"))
                 {
-                    
-                    string session = req.Cookies["session"]?.Value;
-                    string user = this.sessions.GetUserFromSession(session, Http.GetRealIp(req));
-
-                    switch (reqUrl)
+                    using (StreamReader reader = new StreamReader(req.InputStream))
                     {
-                        case "/api/login":
-                            this.sessions.InvalidateSession(req.Cookies["session"]?.Value);
+                        string session = reader.ReadLine();
+                        string user = this.sessions.GetUserFromSession(session, Http.GetRealIp(req));
 
-                            using (StreamReader reader = new StreamReader(req.InputStream))
-                            {
+                        /*string session = req.Cookies["session"]?.Value;
+                        string user = this.sessions.GetUserFromSession(session, Http.GetRealIp(req));*/
+
+                        switch (reqUrl)
+                        {
+                            case "/api/login":
+                                this.sessions.InvalidateSession(session);
+
                                 string loginUser = reader.ReadLine();
                                 string pass = reader.ReadLine();
 
@@ -167,38 +169,35 @@ namespace domi1819.UpServer
                                         writer.Write("failed");
                                     }
                                 }
-                            }
 
-                            break;
+                                break;
 
-                        case "/api/get-sessions":
-                            if (user != null)
-                            {
-                                const string format = "yyyy-MM-dd HH:mm:ss";
-
-                                using (StreamWriter writer = new StreamWriter(res.OutputStream))
+                            case "/api/get-sessions":
+                                if (user != null)
                                 {
-                                    writer.NewLine = "\n";
+                                    const string format = "yyyy-MM-dd HH:mm:ss";
 
-                                    foreach (string sessionEntry in this.sessions.GetSessionsFromUser(user))
+                                    using (StreamWriter writer = new StreamWriter(res.OutputStream))
                                     {
-                                        Sessions.SessionData data = this.sessions.GetData(sessionEntry);
+                                        writer.NewLine = "\n";
 
-                                        writer.WriteLine($"{sessionEntry};{data.FirstLogin.ToString(format)};{data.LastActivity.ToString(format)};{(object)data.LastIp ?? "unknown"}");
+                                        foreach (string sessionEntry in this.sessions.GetSessionsFromUser(user))
+                                        {
+                                            Sessions.SessionData data = this.sessions.GetData(sessionEntry);
+
+                                            writer.WriteLine($"{sessionEntry};{data.FirstLogin.ToString(format)};{data.LastActivity.ToString(format)};{(object)data.LastIp ?? "unknown"}");
+                                        }
                                     }
                                 }
-                            }
-                            else
-                            {
-                                res.StatusCode = (int)HttpStatusCode.Forbidden;
-                            }
+                                else
+                                {
+                                    res.StatusCode = (int)HttpStatusCode.Forbidden;
+                                }
 
-                            break;
+                                break;
 
-                        case "/api/end-session":
-                            if (user != null)
-                            {
-                                using (StreamReader reader = new StreamReader(req.InputStream))
+                            case "/api/end-session":
+                                if (user != null)
                                 {
                                     string sessionToEnd = reader.ReadLine();
 
@@ -212,13 +211,13 @@ namespace domi1819.UpServer
                                         }
                                     }
                                 }
-                            }
-                            else
-                            {
-                                res.StatusCode = (int)HttpStatusCode.Forbidden;
-                            }
+                                else
+                                {
+                                    res.StatusCode = (int)HttpStatusCode.Forbidden;
+                                }
 
-                            break;
+                                break;
+                        }
                     }
                 }
                 else
