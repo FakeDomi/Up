@@ -142,10 +142,7 @@ namespace domi1819.UpServer
                     {
                         string session = reader.ReadLine();
                         string user = this.sessions.GetUserFromSession(session, Http.GetRealIp(req));
-
-                        /*string session = req.Cookies["session"]?.Value;
-                        string user = this.sessions.GetUserFromSession(session, Http.GetRealIp(req));*/
-
+                        
                         switch (reqUrl)
                         {
                             case "/api/login":
@@ -236,13 +233,6 @@ namespace domi1819.UpServer
                     }
                     else if (reqUrl == "/home" && user == null)
                     {
-                        res.Redirect("/login");
-                    }
-                    else if (reqUrl == "/logout")
-                    {
-                        this.sessions.InvalidateSession(req.Cookies["session"]?.Value);
-
-                        res.SetCookie(new Cookie("session", "", "/") { Expired = true });
                         res.Redirect("/login");
                     }
                     else if (reqUrl == "/sessions" && user == null)
@@ -402,7 +392,7 @@ namespace domi1819.UpServer
         private class CachedFiles
         {
             private readonly string[] fileNamesMinimal = { "favicon.ico" };
-            private readonly string[] fileNames = { "favicon.ico", "login.html", "home.html", "sessions.html", "style.css", "custom-font" };
+            private readonly string[] fileNames = { "favicon.ico", "login.html", "home.html", "sessions.html", "logout.html", "style.css", "custom-font" };
 
             private readonly string path;
             private readonly bool minimal;
