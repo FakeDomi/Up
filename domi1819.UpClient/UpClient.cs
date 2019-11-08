@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Windows.Forms;
 using domi1819.UpClient.Forms;
 using domi1819.UpClient.Uploads;
@@ -48,7 +49,31 @@ namespace domi1819.UpClient
 
         internal void LaunchApplication(string[] cmdArgs)
         {
-            Shcore.SetProcessDpiAwareness(Shcore.PROCESS_DPI_AWARENESS.PROCESS_PER_MONITOR_DPI_AWARE);
+            try
+            {
+                // Windows 10 creators update
+                User32.SetProcessDpiAwarenessContext(User32.DPI_AWARENESS_CONTEXT.DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+            }
+            catch
+            {
+                try
+                {
+                    // Windows 8.1
+                    Shcore.SetProcessDpiAwareness(Shcore.PROCESS_DPI_AWARENESS.PROCESS_PER_MONITOR_DPI_AWARE);
+                }
+                catch
+                {
+                    try
+                    {
+                        // Windows Vista
+                        User32.SetProcessDPIAware();
+                    }
+                    catch
+                    {
+                        // WTF are you trying to run this on XP
+                    }
+                }
+            }
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

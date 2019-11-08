@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
+// ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable FieldCanBeMadeReadOnly.Global
@@ -32,6 +33,12 @@ namespace domi1819.UpCore.Windows
         [DllImport("user32.dll")]
         public static extern int DestroyIcon(IntPtr hIcon);
 
+        [DllImport("user32.dll")]
+        public static extern bool SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT value);
+
+        [DllImport("user32.dll")]
+        public static extern bool SetProcessDPIAware();
+
         [StructLayout(LayoutKind.Sequential)]
         // ReSharper disable once InconsistentNaming
         public struct RECT
@@ -40,6 +47,15 @@ namespace domi1819.UpCore.Windows
             public int Top;
             public int Right;
             public int Bottom;
+        }
+
+        public enum DPI_AWARENESS_CONTEXT
+        {
+            DPI_AWARENESS_CONTEXT_UNAWARE = -1,
+            DPI_AWARENESS_CONTEXT_SYSTEM_AWARE = -2,
+            DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE = -3,
+            DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 = -4,
+            DPI_AWARENESS_CONTEXT_UNAWARE_GDISCALE = -5
         }
     }
 }
