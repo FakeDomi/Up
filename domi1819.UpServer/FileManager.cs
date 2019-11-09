@@ -221,7 +221,7 @@ namespace domi1819.UpServer
             return $"http://{config.HostName}{port}/d/{{0}}";
         }
 
-        private static class Index
+        internal static class Index
         {
             internal const int FileId = 0;
             internal const int FileName = 1;

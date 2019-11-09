@@ -5,6 +5,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading;
+using domi1819.NanoDB;
 using domi1819.UpCore.Utilities;
 using domi1819.UpServer.Console;
 
@@ -15,6 +16,8 @@ namespace domi1819.UpServer
         // ReSharper disable once InconsistentNaming
         private const int ERROR_OPERATION_ABORTED = 995;
         private const int MonoErrorListenerClosed = 500;
+
+        private const string DateFormat = "yyyy-MM-dd HH:mm:ss";
 
         private static readonly Dictionary<string, string> MimeDict = new Dictionary<string, string>();
 
@@ -172,8 +175,6 @@ namespace domi1819.UpServer
                             case "/api/get-sessions":
                                 if (user != null)
                                 {
-                                    const string format = "yyyy-MM-dd HH:mm:ss";
-
                                     using (StreamWriter writer = new StreamWriter(res.OutputStream))
                                     {
                                         writer.NewLine = "\n";
@@ -182,7 +183,7 @@ namespace domi1819.UpServer
                                         {
                                             Sessions.SessionData data = this.sessions.GetData(sessionEntry);
 
-                                            writer.WriteLine($"{sessionEntry};{data.FirstLogin.ToString(format)};{data.LastActivity.ToString(format)};{(object)data.LastIp ?? "unknown"}");
+                                            writer.WriteLine($"{sessionEntry};{data.FirstLogin.ToString(DateFormat)};{data.LastActivity.ToString(DateFormat)};{(object)data.LastIp ?? "unknown"}");
                                         }
                                     }
                                 }
@@ -214,6 +215,40 @@ namespace domi1819.UpServer
                                 }
 
                                 break;
+
+                            case "/api/get-files":
+                                if (user != null)
+                                {
+                                    using (StreamWriter writer = new StreamWriter(res.OutputStream))
+                                    {
+                                        List<NanoDBLine> userFiles = this.files.GetFiles(user);
+                                        const string separator = "\n";
+
+                                        writer.Write(this.files.GetLinkFormat());
+                                        writer.Write(separator);
+
+                                        foreach (NanoDBLine line in userFiles)
+                                        {
+                                            writer.Write(line[FileManager.Index.FileId]);
+                                            writer.Write(separator);
+                                            writer.Write(Util.GetByteSizeText((long)line[FileManager.Index.FileSize]));
+                                            writer.Write(separator);
+                                            writer.Write(line[FileManager.Index.Downloads]);
+                                            writer.Write("x");
+                                            writer.Write(separator);
+                                            writer.Write(((DateTime)line[FileManager.Index.UploadDate]).ToString(DateFormat));
+                                            writer.Write(separator);
+                                            writer.Write(line[FileManager.Index.FileName]);
+                                            writer.Write(separator);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    res.StatusCode = (int)HttpStatusCode.Forbidden;
+                                }
+
+                                break;
                         }
                     }
                 }
@@ -232,6 +267,10 @@ namespace domi1819.UpServer
                         res.Redirect("/home");
                     }
                     else if (reqUrl == "/home" && user == null)
+                    {
+                        res.Redirect("/login");
+                    }
+                    else if (reqUrl == "/files" && user == null)
                     {
                         res.Redirect("/login");
                     }
@@ -392,7 +431,7 @@ namespace domi1819.UpServer
         private class CachedFiles
         {
             private readonly string[] fileNamesMinimal = { "favicon.ico" };
-            private readonly string[] fileNames = { "favicon.ico", "login.html", "home.html", "sessions.html", "logout.html", "style.css", "custom-font" };
+            private readonly string[] fileNames = { "favicon.ico", "login.html", "home.html", "files.html", "sessions.html", "logout.html", "style.css", "custom-font", "logo.png" };
 
             private readonly string path;
             private readonly bool minimal;
