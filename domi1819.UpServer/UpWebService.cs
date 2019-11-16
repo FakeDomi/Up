@@ -45,7 +45,7 @@ namespace domi1819.UpServer
             MimeDict.Add(".ogg", "audio/ogg");
             MimeDict.Add(".oga", "audio/ogg");
             MimeDict.Add(".opus", "audio/ogg");
-            MimeDict.Add(".wav", "audio/wave");
+            MimeDict.Add(".wav", "audio/wav");
 
             MimeDict.Add(".pdf", "application/pdf");
 
@@ -317,76 +317,86 @@ namespace domi1819.UpServer
 
         private void ProcessFileDownload(HttpListenerRequest req, string reqUrl, HttpListenerResponse res)
         {
-            // Link format: /d/12345678
-            string fileId = reqUrl.Substring(3, Constants.Server.FileIdLength);
+            const int preIdLength = 3;
+            int withIdLength = preIdLength + Constants.Server.FileIdLength;
+            // Link format: /d/12345678[!|+][/filename.ext]
 
-            if (this.files.FileExists(fileId) && this.files.GetDownloadableFlag(fileId))
+            if (reqUrl.Length >= withIdLength)
             {
-                string fileName = this.files.GetFileName(fileId);
-                string storagePath = Path.Combine(this.config.FileStorageFolder, fileId);
+                string fileId = reqUrl.Substring(preIdLength, Constants.Server.FileIdLength);
 
-                using (FileStream fileStream = File.OpenRead(storagePath))
+                if (this.files.FileExists(fileId) && this.files.GetDownloadableFlag(fileId))
                 {
-                    if (Http.GetRange(req.Headers.Get("Range"), out long start, out long end, fileStream.Length))
-                    {
-                        res.ContentLength64 = end - start + 1;
-                        res.AddHeader("Content-Range", $"bytes {start}-{end}/{fileStream.Length}");
-                        res.StatusCode = (int)HttpStatusCode.PartialContent;
+                    string fileName = this.files.GetFileName(fileId);
+                    bool forcedDownload = reqUrl.Length > preIdLength + Constants.Server.FileIdLength && (reqUrl[withIdLength] == '!' || reqUrl[withIdLength] == '+');
 
-                        fileStream.Seek(start, SeekOrigin.Begin);
-                    }
-                    else
+                    if (reqUrl.Length <= withIdLength + 1)
                     {
-                        res.ContentLength64 = fileStream.Length;
-                        res.AddHeader("Accept-Ranges", "bytes");
-                    }
-                    
-                    string fileExt = Path.GetExtension(fileName)?.ToLowerInvariant() ?? string.Empty;
-                    bool forcedDownload = reqUrl.EndsWith("!");
-
-                    if (!forcedDownload && (MimeDict.TryGetValue(fileExt, out string mime) || Mime.GuessTextType(storagePath, fileId, out mime)))
-                    {
-                        res.AddHeader("Content-Disposition", $"inline; filename=\"{fileName}\"");
-                        res.ContentType = mime;
-                    }
-                    else
-                    {
-                        res.AddHeader("Content-Disposition", $"attachment; filename=\"{fileName}\"");
-                        res.ContentType = "application/octet-stream";
+                        res.Redirect(string.Format(this.files.GetLinkFormat(), $"{fileId}{(forcedDownload ? "!" : "")}/{fileName}"));
+                        return;
                     }
 
-                    Stream outStream = res.OutputStream;
-                    byte[] buffer = new byte[4 * 1024];
-                    long bytesToSend = res.ContentLength64;
-                    int bytesRead;
+                    string storagePath = Path.Combine(this.config.FileStorageFolder, fileId);
 
-                    while (bytesToSend > 0 && (bytesRead = fileStream.Read(buffer, 0, (int)Math.Min(buffer.Length, bytesToSend))) > 0)
+                    using (FileStream fileStream = File.OpenRead(storagePath))
                     {
-                        outStream.Write(buffer, 0, bytesRead);
-                        bytesToSend -= bytesRead;
+                        if (Http.GetRange(req.Headers.Get("Range"), out long start, out long end, fileStream.Length))
+                        {
+                            res.ContentLength64 = end - start + 1;
+                            res.AddHeader("Content-Range", $"bytes {start}-{end}/{fileStream.Length}");
+                            res.StatusCode = (int)HttpStatusCode.PartialContent;
 
-                        //if (!this.files.GetDownloadableFlag(fileId))
-                        //{
-                        //    throw new Exception("abort download");
-                        //}
+                            fileStream.Seek(start, SeekOrigin.Begin);
+                        }
+                        else
+                        {
+                            res.ContentLength64 = fileStream.Length;
+                            res.AddHeader("Accept-Ranges", "bytes");
+                        }
+
+                        string fileExt = Path.GetExtension(fileName)?.ToLowerInvariant() ?? string.Empty;
+
+                        if (!forcedDownload && (MimeDict.TryGetValue(fileExt, out string mime) || Mime.GuessTextType(storagePath, fileId, out mime)))
+                        {
+                            res.AddHeader("Content-Disposition", $"inline; filename=\"{fileName}\"");
+                            res.ContentType = mime;
+                        }
+                        else
+                        {
+                            res.AddHeader("Content-Disposition", $"attachment; filename=\"{fileName}\"");
+                            res.ContentType = "application/octet-stream";
+                        }
+
+                        Stream outStream = res.OutputStream;
+                        byte[] buffer = new byte[4 * 1024];
+                        long bytesToSend = res.ContentLength64;
+                        int bytesRead;
+
+                        while (bytesToSend > 0 && (bytesRead = fileStream.Read(buffer, 0, (int)Math.Min(buffer.Length, bytesToSend))) > 0)
+                        {
+                            outStream.Write(buffer, 0, bytesRead);
+                            bytesToSend -= bytesRead;
+
+                            //if (!this.files.GetDownloadableFlag(fileId))
+                            //{
+                            //    throw new Exception("abort download");
+                            //}
+                        }
+
+                        res.OutputStream.Close();
+
+                        this.files.IncrementDownloadCount(fileId);
+
+                        return;
                     }
-
-                    res.OutputStream.Close();
-                    res.Close();
-
-                    this.files.IncrementDownloadCount(fileId);
                 }
             }
-            else
-            {
-                byte[] bytes = Encoding.UTF8.GetBytes("<html><head><title>^up - File not found</title></head><body bgcolor=\"#2D2D30\"><font color=\"#F1F1F1\">The requested file " + fileId + " doesn't exist.<br><address>UpServer " + Constants.Version + " at " + "localhost" + "</address></body></html>");
 
-                res.ContentLength64 = bytes.Length;
-                res.OutputStream.Write(bytes, 0, bytes.Length);
-                res.OutputStream.Close();
+            byte[] bytes = Encoding.UTF8.GetBytes("<html><head><title>^up - File not found</title></head><body bgcolor=\"#2D2D30\"><font color=\"#F1F1F1\">The requested file doesn't exist.<br><address>UpServer " + UpServer.Version + " at " + "localhost" + "</address></body></html>");
 
-                res.Close();
-            }
+            res.ContentLength64 = bytes.Length;
+            res.OutputStream.Write(bytes, 0, bytes.Length);
+            res.OutputStream.Close();
         }
 
         private void ProcessFileInfo(string reqUrl, HttpListenerResponse res)

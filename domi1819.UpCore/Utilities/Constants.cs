@@ -5,17 +5,8 @@ namespace domi1819.UpCore.Utilities
 {
     public static class Constants
     {
-        public static int Build { get; }
-        public static string Version { get; }
-
-        static Constants()
-        {
-            Version version = Assembly.GetEntryAssembly().GetName().Version;
-
-            Build = version.Revision;
-            Version = version.ToString();
-        }
-
+        public static string Version { get; } = Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
+        
         public static class Database
         {
             public static readonly int MaxUsernameLength = 32;

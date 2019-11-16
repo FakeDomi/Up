@@ -11,6 +11,8 @@ namespace domi1819.UpServer
 {
     internal class UpServer
     {
+        internal static string Version { get; } = Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
+
         internal static UpServer Instance { get; private set; }
 
         internal ServerConfig Config { get; private set; }
@@ -31,7 +33,7 @@ namespace domi1819.UpServer
         internal void RunServer()
         {
             UpConsole.WriteLineRestoreCommand("================================");
-            UpConsole.WriteLineRestoreCommand($"UpServer {Assembly.GetExecutingAssembly().GetName().Version.ToString(3)}");
+            UpConsole.WriteLineRestoreCommand($"UpServer {Version}");
             UpConsole.WriteLineRestoreCommand("https://up.domi.re");
             UpConsole.WriteLineRestoreCommand("================================\n");
 
