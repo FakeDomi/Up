@@ -75,7 +75,7 @@ namespace domi1819.UpCore.Network
         {
             lock (this.messageLock)
             {
-                this.client = new TcpClient();
+                this.client = new TcpClient { Client = null };
                 this.client.Connect(this.Host, this.Port);
 
                 NetworkStream netStream = this.client.GetStream();
@@ -160,7 +160,7 @@ namespace domi1819.UpCore.Network
         {
             lock (this.messageLock)
             {
-                TcpClient tempClient = new TcpClient();
+                TcpClient tempClient = new TcpClient { Client = null };
 
                 tempClient.Connect(this.Host, this.Port);
 

@@ -16,6 +16,8 @@ namespace domi1819.UpServer.Server
         private readonly ArrayPool<byte> messageBufferPool = new ArrayPool<byte>(Constants.Network.MessageBufferSize);
         private readonly List<TcpListener> listeners = new List<TcpListener>();
 
+        private readonly bool useIpv6;
+
         private RSACryptoServiceProvider rsaCsp;
         private byte[] rsaModulus;
         private byte[] rsaExponent;
@@ -33,6 +35,8 @@ namespace domi1819.UpServer.Server
             this.messages.Add(NetworkMethods.FinishUpload, new FinishUpload(upServer.Files, upServer.Users, upServer.Config));
             this.messages.Add(NetworkMethods.InitiateUpload, new InitiateUpload(upServer.Files, upServer.Users));
             this.messages.Add(NetworkMethods.ListFiles, new ListFiles(upServer.Files, upServer.Users));
+
+            this.useIpv6 = upServer.Config.Ipv6Allowed;
         }
 
         internal void Start(int[] ports, RsaKey rsaKey)
@@ -45,10 +49,20 @@ namespace domi1819.UpServer.Server
             foreach (int port in ports)
             {
                 Thread dispatcher = new Thread(this.Run) { Name = "NetServer Dispatcher" };
-                TcpListener listener = new TcpListener(IPAddress.Any, port);
+                TcpListener listener;
+
+                if (this.useIpv6)
+                {
+                    listener = new TcpListener(IPAddress.IPv6Any, port);
+                    listener.Server.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.IPv6Only, false);
+                }
+                else
+                {
+                    listener = new TcpListener(IPAddress.Any, port);
+                }
 
                 this.listeners.Add(listener);
-                listener.Start();
+
                 dispatcher.Start(listener);
                 
                 UpConsole.WriteLineRestoreCommand($"Message server listening on port {port}.");

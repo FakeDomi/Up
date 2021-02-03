@@ -14,6 +14,8 @@ namespace domi1819.UpServer
 
         public int HttpServerPort { get; set; }
 
+        public bool Ipv6Allowed { get; set; }
+
         public string HttpServerListenerName { get; set; }
 
         public string UrlOverride { get; set; }
@@ -35,6 +37,7 @@ namespace domi1819.UpServer
             this.HostName = "localhost";
             this.UpServerPorts = new[] { 1819 };
             this.HttpServerPort = 1880;
+            this.Ipv6Allowed = true;
             this.HttpServerListenerName = "+";
             this.UrlOverride = "";
 
