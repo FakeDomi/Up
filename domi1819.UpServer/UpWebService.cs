@@ -78,6 +78,11 @@ namespace domi1819.UpServer
                 this.listener = new HttpListener();
                 this.listener.Prefixes.Add(prefix);
                 this.listener.Start();
+
+                UpConsole.WriteLineRestoreCommand($"Listening for HTTP connections ({this.config.HttpServerListenerName}:{this.config.HttpServerPort})");
+
+                this.dispatcherThread = new Thread(this.Run) { Name = "Up HTTP Server Dispatcher" };
+                this.dispatcherThread.Start();
             }
             catch (HttpListenerException ex)
             {
@@ -89,11 +94,6 @@ namespace domi1819.UpServer
                 UpConsole.WriteLineRestoreCommand($"netsh http add urlacl url={prefix} user=YOUR_DOMAIN\\your_user");
                 UpConsole.WriteLineRestoreCommand("");
             }
-
-            UpConsole.WriteLineRestoreCommand($"Listening for HTTP connections ({this.config.HttpServerListenerName}:{this.config.HttpServerPort})");
-
-            this.dispatcherThread = new Thread(this.Run) { Name = "Up HTTP Server Dispatcher" };
-            this.dispatcherThread.Start();
         }
 
         internal void Stop()
