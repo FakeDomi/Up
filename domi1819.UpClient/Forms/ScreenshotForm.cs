@@ -19,12 +19,14 @@ namespace domi1819.UpClient.Forms
 
         private readonly UpClient upClient;
 
+        private Rectangle screen;
+
         private int startX, startY;
         private int drawStartX, drawStartY;
         private int drawEndX, drawEndY;
 
         private int lastX, lastY;
-        private bool drawSelection;
+        private bool isUserSelecting;
         private bool drawBackground = true;
 
         private bool finalized;
@@ -64,10 +66,12 @@ namespace domi1819.UpClient.Forms
                 return;
             }
 
-            this.Width = SystemInformation.VirtualScreen.Width;
-            this.Height = SystemInformation.VirtualScreen.Height;
+            this.screen = SystemInformation.VirtualScreen;
 
-            this.Opacity = 1;
+            this.Width = this.screen.Width;
+            this.Height = this.screen.Height;
+            
+            this.Opacity = 1D;
 
             this.drawBackground = !fullscreen;
             this.finalized = false;
@@ -77,7 +81,7 @@ namespace domi1819.UpClient.Forms
             using (Graphics graphics = Graphics.FromImage(bitmap))
             {
                 graphics.Clear(Color.Black);
-                graphics.CopyFromScreen(0, 0, 0, 0, new Size(this.Width, this.Height));
+                graphics.CopyFromScreen(this.screen.Left, this.screen.Top, 0, 0, new Size(this.Width, this.Height));
             }
 
             this.backgroundImage = bitmap;
@@ -97,65 +101,7 @@ namespace domi1819.UpClient.Forms
                 this.Cursor = Cursors.Cross;
             }
         }
-
-        protected override void WndProc(ref Message m)
-        {
-            if (m.Msg == WinConsts.WM_MOUSEACTIVATE)
-            {
-                m.Result = new IntPtr(WinConsts.MA_NOACTIVATE);
-                return;
-            }
-
-            if (m.Msg != WinConsts.WM_ACTIVATE)
-            {
-                base.WndProc(ref m);
-            }
-        }
-
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            base.OnPaint(e);
-
-            if (this.drawSelection)
-            {
-                e.Graphics.FillRectangle(this.inactiveRegion, 0, 0, this.Width, this.drawStartY);
-                e.Graphics.FillRectangle(this.inactiveRegion, 0, this.drawEndY, this.Width, this.Height - this.drawEndY);
-
-                e.Graphics.FillRectangle(this.inactiveRegion, 0, this.drawStartY, this.drawStartX, this.drawEndY - this.drawStartY);
-                e.Graphics.FillRectangle(this.inactiveRegion, this.drawEndX, this.drawStartY, this.Width - this.drawEndX, this.drawEndY - this.drawStartY);
-
-                ControlPaint.DrawBorder(e.Graphics, new Rectangle(this.drawStartX - 1, this.drawStartY - 1, this.drawEndX - this.drawStartX + 2, this.drawEndY - this.drawStartY + 2), DarkPainting.PaleColor, ButtonBorderStyle.Solid);
-                ControlPaint.DrawBorder(e.Graphics, new Rectangle(this.drawStartX, this.drawStartY, this.drawEndX - this.drawStartX, this.drawEndY - this.drawStartY), DarkPainting.StrongColor, ButtonBorderStyle.Solid);
-            }
-            else if (this.drawBackground)
-            {
-                e.Graphics.FillRectangle(this.inactiveRegion, 0, 0, this.Width, this.Height);
-            }
-        }
-
-        protected override void OnMouseDown(MouseEventArgs e)
-        {
-            base.OnMouseDown(e);
-
-            if (e.Button == MouseButtons.Right)
-            {
-                this.FinalizeScreenshot(true);
-            }
-            else if (e.Button == MouseButtons.Left)
-            {
-                this.startX = Cursor.Position.X;
-                this.startY = Cursor.Position.Y;
-
-                this.drawSelection = true;
-                this.uiTimer.Start();
-            }
-        }
-
-        protected override void OnPaintBackground(PaintEventArgs e)
-        {
-            e.Graphics.DrawImage(this.backgroundImage, 0, 0, this.backgroundImage.Width, this.backgroundImage.Height);
-        }
-
+        
         private void SelectFullscreen()
         {
             this.drawStartX = 0;
@@ -173,8 +119,7 @@ namespace domi1819.UpClient.Forms
                 return;
             }
 
-            this.uiTimer.Stop();
-            this.drawSelection = false;
+            this.isUserSelecting = false;
             this.drawBackground = false;
 
             int areaWidth = this.drawEndX - this.drawStartX;
@@ -240,6 +185,65 @@ namespace domi1819.UpClient.Forms
             this.finalized = true;
         }
 
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            base.OnMouseDown(e);
+
+            if (e.Button == MouseButtons.Right)
+            {
+                this.FinalizeScreenshot(true);
+            }
+            else if (e.Button == MouseButtons.Left)
+            {
+                Point cursorPosition = this.GetRelativeCursorPosition();
+                this.startX = cursorPosition.X;
+                this.startY = cursorPosition.Y;
+
+                this.isUserSelecting = true;
+            }
+        }
+
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            base.OnMouseMove(e);
+
+            if (this.isUserSelecting)
+            {
+                Point cursorPosition = this.GetRelativeCursorPosition();
+                int curX = cursorPosition.X, curY = cursorPosition.Y;
+
+                if (this.lastX != curX || this.lastY != curY)
+                {
+                    if (this.startX <= curX)
+                    {
+                        this.drawStartX = this.startX;
+                        this.drawEndX = curX + 1;
+                    }
+                    else
+                    {
+                        this.drawStartX = curX;
+                        this.drawEndX = this.startX + 1;
+                    }
+
+                    if (this.startY <= curY)
+                    {
+                        this.drawStartY = this.startY;
+                        this.drawEndY = curY + 1;
+                    }
+                    else
+                    {
+                        this.drawStartY = curY;
+                        this.drawEndY = this.startY + 1;
+                    }
+
+                    this.lastX = curX;
+                    this.lastY = curY;
+
+                    this.Invalidate();
+                }
+            }
+        }
+
         protected override void OnMouseUp(MouseEventArgs e)
         {
             base.OnMouseUp(e);
@@ -261,39 +265,50 @@ namespace domi1819.UpClient.Forms
             }
         }
 
-        private void TimerTick(object sender, EventArgs e)
+        protected override void WndProc(ref Message m)
         {
-            int curX = Cursor.Position.X, curY = Cursor.Position.Y;
-
-            if (this.lastX != curX || this.lastY != curY)
+            if (m.Msg == WinConsts.WM_MOUSEACTIVATE)
             {
-                if (this.startX <= curX)
-                {
-                    this.drawStartX = this.startX;
-                    this.drawEndX = curX + 1;
-                }
-                else
-                {
-                    this.drawStartX = curX;
-                    this.drawEndX = this.startX + 1;
-                }
-
-                if (this.startY <= curY)
-                {
-                    this.drawStartY = this.startY;
-                    this.drawEndY = curY + 1;
-                }
-                else
-                {
-                    this.drawStartY = curY;
-                    this.drawEndY = this.startY + 1;
-                }
-
-                this.lastX = curX;
-                this.lastY = curY;
-
-                this.Invalidate();
+                m.Result = new IntPtr(WinConsts.MA_NOACTIVATE);
+                return;
             }
+
+            if (m.Msg != WinConsts.WM_ACTIVATE)
+            {
+                base.WndProc(ref m);
+            }
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
+
+            if (this.isUserSelecting)
+            {
+                e.Graphics.FillRectangle(this.inactiveRegion, 0, 0, this.Width, this.drawStartY);
+                e.Graphics.FillRectangle(this.inactiveRegion, 0, this.drawEndY, this.Width, this.Height - this.drawEndY);
+
+                e.Graphics.FillRectangle(this.inactiveRegion, 0, this.drawStartY, this.drawStartX, this.drawEndY - this.drawStartY);
+                e.Graphics.FillRectangle(this.inactiveRegion, this.drawEndX, this.drawStartY, this.Width - this.drawEndX, this.drawEndY - this.drawStartY);
+
+                ControlPaint.DrawBorder(e.Graphics, new Rectangle(this.drawStartX - 1, this.drawStartY - 1, this.drawEndX - this.drawStartX + 2, this.drawEndY - this.drawStartY + 2), DarkPainting.PaleColor, ButtonBorderStyle.Solid);
+                ControlPaint.DrawBorder(e.Graphics, new Rectangle(this.drawStartX, this.drawStartY, this.drawEndX - this.drawStartX, this.drawEndY - this.drawStartY), DarkPainting.StrongColor, ButtonBorderStyle.Solid);
+            }
+            else if (this.drawBackground)
+            {
+                e.Graphics.FillRectangle(this.inactiveRegion, 0, 0, this.Width, this.Height);
+            }
+        }
+
+        protected override void OnPaintBackground(PaintEventArgs e)
+        {
+            e.Graphics.DrawImage(this.backgroundImage, 0, 0, this.backgroundImage.Width, this.backgroundImage.Height);
+        }
+
+        private Point GetRelativeCursorPosition()
+        {
+            Point absolutePosition = Cursor.Position;
+            return new Point(absolutePosition.X - this.screen.X, absolutePosition.Y - this.screen.Y);
         }
     }
 }

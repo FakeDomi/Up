@@ -28,14 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.uiTimer = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
-            // 
-            // uiTimer
-            // 
-            this.uiTimer.Interval = 15;
-            this.uiTimer.Tick += new System.EventHandler(this.TimerTick);
             // 
             // ScreenshotForm
             // 
@@ -58,7 +51,5 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.Timer uiTimer;
     }
 }
