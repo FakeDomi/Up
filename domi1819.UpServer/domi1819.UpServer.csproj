@@ -44,7 +44,10 @@
     <Compile Include="Console\Commands\CommandReloadWebContent.cs" />
     <Compile Include="Console\Commands\CommandStop.cs" />
     <Compile Include="Console\Commands\CommandUser.cs" />
+    <Compile Include="Console\Commands\CommandUserFind.cs" />
+    <Compile Include="Console\Commands\CommandUserQuery.cs" />
     <Compile Include="Console\Commands\CommandUserSet.cs" />
+    <Compile Include="Console\Commands\CommandUserSetCapacity.cs" />
     <Compile Include="Console\Commands\CommandUserSetPassword.cs" />
     <Compile Include="Console\Commands\Feedback.cs" />
     <Compile Include="Console\Commands\Result.cs" />

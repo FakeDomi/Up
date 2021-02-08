@@ -7,7 +7,7 @@ namespace domi1819.UpServer.Console.Commands
         public RootCommand(UpServer server) : base(null)
         {
             this.SubCommands.Add("stop", new CommandStop(this));
-            this.SubCommands.Add("user", new CommandUser(this, server.Users));
+            this.SubCommands.Add("user", new CommandUser(this, server.Users, server.Files));
             this.SubCommands.Add("reload-web-content", new CommandReloadWebContent(this, server.WebService));
         }
 

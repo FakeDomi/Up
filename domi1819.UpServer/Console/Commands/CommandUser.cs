@@ -5,10 +5,12 @@ namespace domi1819.UpServer.Console.Commands
 {
     internal class CommandUser : BaseCommand
     {
-        public CommandUser(BaseCommand parent, UserManager users) : base(parent)
+        public CommandUser(BaseCommand parent, UserManager users, FileManager files) : base(parent)
         {
             this.SubCommands.Add("add", new CommandUserAdd(this, users));
             this.SubCommands.Add("set", new CommandUserSet(this, users));
+            this.SubCommands.Add("find", new CommandUserFind(this, users));
+            this.SubCommands.Add("query", new CommandUserQuery(this, users, files));
         }
 
         private class CommandUserAdd : BaseCommand

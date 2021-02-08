@@ -178,6 +178,11 @@ namespace domi1819.UpServer
             return password.Length >= PasswordMinLength && password.Length <= Constants.Database.PasswordMaxLength;
         }
 
+        internal IEnumerable<string> Find(string searchTerm)
+        {
+            return this.dbFile.Keys().Where(x => x.IndexOf(searchTerm, StringComparison.InvariantCultureIgnoreCase) >= 0);
+        }
+
         internal void Shutdown()
         {
             this.dbFile.Unbind();

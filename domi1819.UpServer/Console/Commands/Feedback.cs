@@ -26,7 +26,7 @@ namespace domi1819.UpServer.Console.Commands
                     return false;
                 }
 
-                if (!validator.Invoke(userInput))
+                if (validator != null && !validator.Invoke(userInput))
                 {
                     WriteLine(invalidText);
                     userInput = null;
@@ -54,7 +54,7 @@ namespace domi1819.UpServer.Console.Commands
                     return false;
                 }
 
-                if (!validator.Invoke(userInput))
+                if (validator != null && !validator.Invoke(userInput))
                 {
                     WriteLine(invalidText);
                     userInput = null;
