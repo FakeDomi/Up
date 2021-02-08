@@ -218,7 +218,7 @@ namespace domi1819.UpServer
 
             string port = config.HttpServerPort == 80 ? "" : $":{config.HttpServerPort}";
 
-            return $"http://{config.HostName}{port}/d/{{0}}";
+            return $"http://{config.HostName}{port}/{{0}}";
         }
 
         internal static class Index

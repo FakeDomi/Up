@@ -6,6 +6,7 @@ using domi1819.UpCore.Network;
 using domi1819.UpCore.Utilities;
 using domi1819.UpServer.Console;
 using domi1819.UpServer.Server;
+using domi1819.UpServer.Web;
 
 namespace domi1819.UpServer
 {
