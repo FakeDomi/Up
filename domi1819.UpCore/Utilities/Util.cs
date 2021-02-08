@@ -41,7 +41,7 @@ namespace domi1819.UpCore.Utilities
 
         public static long? GetRevSize(string input)
         {
-            string str = input.ToLower();
+            input = input.ToLower();
             int exp = 0;
 
             for (int i = 0; i < RevSizeUnits.Length; i++)
@@ -52,10 +52,9 @@ namespace domi1819.UpCore.Utilities
                 }
             }
 
-            Match match = Regex.Match(str, @"\d+");
-            long longValue;
+            Match match = Regex.Match(input, @"\d+");
 
-            if (match.Success && long.TryParse(match.Value, out longValue))
+            if (match.Success && long.TryParse(match.Value, out long longValue))
             {
                 return longValue * (long)Math.Pow(1024, exp);
             }
