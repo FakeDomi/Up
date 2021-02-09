@@ -138,7 +138,7 @@ namespace domi1819.UpServer.Web
                     using (StreamReader reader = new StreamReader(req.InputStream))
                     using (StreamWriter writer = new StreamWriter(res.OutputStream))
                     {
-                        string session = reader.ReadLine();
+                        string session = req.Headers[Headers.Session];
                         string user = this.sessions.GetUserFromSession(session, Http.GetRealIp(req));
 
                         ApiEndpoint endpoint = ApiEndpoint.Endpoints[reqUrl];

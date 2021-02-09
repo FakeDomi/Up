@@ -27,5 +27,11 @@ namespace domi1819.UpServer.Web
             this.HttpRequest = req;
             this.HttpResponse = res;
         }
+
+        internal void SetError(string errorMessage)
+        {
+            this.HttpResponse.AddHeader(Headers.Result, Results.Error);
+            this.HttpResponse.AddHeader(Headers.ErrorMessage, errorMessage);
+        }
     }
 }

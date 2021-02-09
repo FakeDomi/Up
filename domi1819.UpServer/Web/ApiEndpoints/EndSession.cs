@@ -6,13 +6,12 @@
         
         internal override void Process(Request request)
         {
-            string sessionToEnd = request.Reader.ReadLine();
+            string sessionToEnd = request.HttpRequest.Headers[Headers.EndSession];
 
             if (request.Sessions.HasSession(request.User, sessionToEnd))
             {
                 request.Sessions.InvalidateSession(sessionToEnd);
-
-                request.Writer.Write(sessionToEnd == request.Session ? "redirect" : "ok");
+                request.HttpResponse.Headers.Add(Headers.Result, sessionToEnd == request.Session ? Results.Redirect : Results.Ok);
             }
         }
     }
