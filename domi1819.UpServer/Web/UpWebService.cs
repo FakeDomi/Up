@@ -151,6 +151,7 @@ namespace domi1819.UpServer.Web
                             }
                             else
                             {
+                                res.AddHeader(Headers.Result, Results.Ok);
                                 endpoint.Process(new Request(session, user, this.sessions, this.users, this.files, reader, writer, req, res));
                             }
                         }
@@ -214,19 +215,17 @@ namespace domi1819.UpServer.Web
             }
             catch (Exception ex)
             {
-                // ERROR_DEV_NOT_EXIST
-                if ((ex as HttpListenerException)?.ErrorCode == 55)
+                if (ex is HttpListenerException)
                 {
+                    // There are a handful of different errors that throw this exception.
+                    // Let's just hide them all and hope nothing important was in there.
                     return;
                 }
 
-                if (!(ex is IOException))
-                {
-                    Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
-                    Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
+                Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+                Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
 
-                    UpConsole.WriteLineRestoreCommand(ex.ToString());
-                }
+                UpConsole.WriteLineRestoreCommand(ex.ToString());
             }
         }
 
