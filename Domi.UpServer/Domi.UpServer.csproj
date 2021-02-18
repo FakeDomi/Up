@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{1B5C2F30-7AE7-4041-9C1E-BB0A4B3B8305}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Domi.UpServer</RootNamespace>
+    <AssemblyName>Domi.UpServer</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Console\Commands\BaseCommand.cs" />
+    <Compile Include="Console\Commands\CommandReloadWebContent.cs" />
+    <Compile Include="Console\Commands\CommandStop.cs" />
+    <Compile Include="Console\Commands\CommandUser.cs" />
+    <Compile Include="Console\Commands\CommandUserFind.cs" />
+    <Compile Include="Console\Commands\CommandUserQuery.cs" />
+    <Compile Include="Console\Commands\CommandUserSet.cs" />
+    <Compile Include="Console\Commands\CommandUserSetCapacity.cs" />
+    <Compile Include="Console\Commands\CommandUserSetPassword.cs" />
+    <Compile Include="Console\Commands\Feedback.cs" />
+    <Compile Include="Console\Commands\Result.cs" />
+    <Compile Include="Console\Commands\RootCommand.cs" />
+    <Compile Include="Console\UpConsole.cs" />
+    <Compile Include="FileManager.cs" />
+    <Compile Include="Server\Messages\ListFiles.cs" />
+    <Compile Include="Server\NetServer.cs" />
+    <Compile Include="Server\Connection.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Server\Messages\FileUploadData.cs" />
+    <Compile Include="Server\Messages\FinishUpload.cs" />
+    <Compile Include="Server\Messages\GetStorageInfo.cs" />
+    <Compile Include="Server\Messages\InitiateUpload.cs" />
+    <Compile Include="Server\Messages\Login.cs" />
+    <Compile Include="Server\Messages\SetPassword.cs" />
+    <Compile Include="Server\UploadUnit.cs" />
+    <Compile Include="ServerConfig.cs" />
+    <Compile Include="Server\IMessage.cs" />
+    <Compile Include="Server\MessageContext.cs" />
+    <Compile Include="Server\Messages\LinkFormat.cs" />
+    <Compile Include="UpServer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Web\ApiEndpoints\UploadFile.cs" />
+    <Compile Include="Web\Headers.cs" />
+    <Compile Include="Web\Results.cs" />
+    <Compile Include="Web\UpWebService.cs" />
+    <Compile Include="UserManager.cs" />
+    <Compile Include="Web\ApiEndpoint.cs" />
+    <Compile Include="Web\ApiEndpoints\EndSession.cs" />
+    <Compile Include="Web\ApiEndpoints\GetFiles.cs" />
+    <Compile Include="Web\ApiEndpoints\GetSessions.cs" />
+    <Compile Include="Web\ApiEndpoints\Login.cs" />
+    <Compile Include="Web\Request.cs" />
+    <Compile Include="Web\Sessions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\NanoDB\Domi.NanoDB\Domi.NanoDB.csproj">
+      <Project>{aa32b774-ec0f-4853-929f-f432887639be}</Project>
+      <Name>Domi.NanoDB</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Domi.UpCore\Domi.UpCore.csproj">
+      <Project>{f08ac443-d347-48ec-b853-5ee0e1290adb}</Project>
+      <Name>Domi.UpCore</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
